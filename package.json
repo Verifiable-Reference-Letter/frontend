@@ -1,0 +1,42 @@
+{
+  "name": "tutorialtoken",
+  "version": "1.0.0",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "lite-server",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "precommit": "pretty-quick --staged",
+    "prepare": "tsc",
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "generate": "truffle compile && typechain --target truffle './build/**/*.json'"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^10.17.15",
+    "@types/underscore": "^1.9.4",
+    "@types/web3": "^1.2.2",
+    "husky": "^4.2.3",
+    "lite-server": "^2.3.0",
+    "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.1",
+    "truffle-typings": "^1.0.8",
+    "ts-node": "^8.6.2",
+    "typechain": "^1.0.5",
+    "typechain-target-truffle": "^1.0.2",
+    "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^2.5.0",
+    "bignumber.js": "^9.0.0",
+    "create-typescript-project": "^0.6.5",
+    "openzeppelin-solidity": "^2.5.0",
+    "web3": "^1.2.6"
+  },
+  "keywords": [],
+  "description": ""
+}
