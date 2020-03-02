@@ -11,7 +11,7 @@
     "precommit": "pretty-quick --staged",
     "prepare": "tsc",
     "build": "tsc",
-    "start": "ts-node src/index.ts",
+    "start": "ts-node build/src/index.js",
     "generate": "truffle compile && typechain --target truffle './build/**/*.json'"
   },
   "author": "",
