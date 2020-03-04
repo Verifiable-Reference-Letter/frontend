@@ -5,7 +5,7 @@ const Web3 = require('web3');
 
 let web3: typeof Web3
 let web3Provider;
-web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545')); // was 9545 before
+//web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545')); // was 9545 before
 
 
 function main() {   

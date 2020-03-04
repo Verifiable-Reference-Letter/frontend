@@ -7,17 +7,17 @@
   },
   "scripts": {
     "dev": "lite-server",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "truffle test",
     "precommit": "pretty-quick --staged",
     "prepare": "tsc",
     "build": "tsc",
     "start": "ts-node build/src/index.js",
-    "generate": "truffle compile && typechain --target truffle './build/**/*.json'"
+    "generate": "truffle compile && typechain --outDir './newContract' --target web3-v2 './build/**/*.json'"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^10.17.15",
+    "@types/node": "^12.12.27",
     "@types/underscore": "^1.9.4",
     "@types/web3": "^1.2.2",
     "husky": "^4.2.3",
@@ -34,7 +34,9 @@
     "@openzeppelin/contracts": "^2.5.0",
     "bignumber.js": "^9.0.0",
     "create-typescript-project": "^0.6.5",
+    "ganache-cli": "^6.9.1",
     "openzeppelin-solidity": "^2.5.0",
+    "truffle": "^5.1.15",
     "web3": "^1.2.6"
   },
   "keywords": [],
