@@ -1,6 +1,10 @@
 // happy coding 👻
 import { BigNumber } from "bignumber.js";
 import * as TruffleContracts from ".";
+import { TutorialToken } from "./newContract/TutorialToken";
+import React from "react";
+import ReactDOM from "react-dom";
+
 const Web3 = require('web3');
 
 let web3: typeof Web3
@@ -8,9 +12,10 @@ let web3Provider;
 //web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545')); // was 9545 before
 
 
-function main() {   
-  //function definition 
-  console.log("Hello World!"); 
+function main() {
+	//function definition 
+	//const tutorialToken = new TutorialToken({});
+	console.log("Hello World!");
 	if (typeof web3 !== 'undefined') {
 		web3Provider = web3.currentProvider;
 		web3 = new Web3(web3.currentProvider);
@@ -23,4 +28,7 @@ function main() {
 	console.log(TruffleContracts);
 }
 
+
 main();//function invocation
+ReactDOM.render(<div />, document.getElementById("root"));
+
