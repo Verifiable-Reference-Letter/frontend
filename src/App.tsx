@@ -1,20 +1,14 @@
 import { BigNumber } from "bignumber.js";
 //import * as TruffleContracts from ".";
-import { TutorialToken } from "./newContract/TutorialToken";
+import  { CounterContract } from "./newContract/CounterContract"; // import is correct
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
 
 // const Web3 = require('web3');
 
 // let web3: typeof Web3
 // let web3Provider;
-//web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545')); // was 9545 before
-
-ReactDOM.render(
-    <App />,
-  document.getElementById('root')
- );
+// //web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545')); // was 9545 before
 
 // function main() {
 // 	//function definition 
@@ -36,12 +30,18 @@ ReactDOM.render(
 // main();//function invocation
 // //ReactDOM.render(<div />, document.getElementById("root"));
 
-// class App extends React.Component {
-//   render() {
-//     return (
-        
-//     );
-//   }
-// }
-// export default App;
+class App extends React.Component {
+  render() {
+  	console.log(CounterContract);
+  	//const contract = new CounterContract();
+    return (
+    	<div>
+        <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
+	  		<p>Amount ETC <input /></p>
+	  		<button>Purchase</button>
+	  	</div>
+    );
+  }
+}
+export default App;
 

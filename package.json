@@ -12,7 +12,7 @@
     "prepare": "tsc",
     "build": "react-scripts build",
     "start": "react-scripts start",
-    "generate": "truffle compile && typechain --outDir './newContract' --target web3-v2 './build/**/*.json'"
+    "generate": "truffle compile && typechain --outDir /src/newContract --target web3-v2 ./build/**/*.json"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +20,8 @@
     "@types/node": "^12.12.27",
     "@types/underscore": "^1.9.4",
     "@types/web3": "^1.2.2",
+    "@types/react-dom": "^16.9.5",
+    "react-scripts": "^3.4.0",
     "husky": "^4.2.3",
     "lite-server": "^2.3.0",
     "prettier": "^1.19.1",
@@ -32,6 +34,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^2.5.0",
+    "@types/react": "^16.9.23",
     "bignumber.js": "^9.0.0",
     "create-typescript-project": "^0.6.5",
     "ganache-cli": "^6.9.1",
