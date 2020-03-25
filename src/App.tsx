@@ -32,7 +32,7 @@ import ReactDOM from 'react-dom';
 
 class App extends React.Component {
   render() {
-  	console.log(CounterContract);
+  	console.log(TutorialToken);
   	//const contract = new CounterContract();
     return (
     	<div>
