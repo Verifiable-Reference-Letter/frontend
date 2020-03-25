@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 //import * as TruffleContracts from ".";
-import  { CounterContract } from "./newContract/CounterContract"; // import is correct
+import  { TutorialToken } from "./newContract/TutorialToken"; // import is correct
 import React from 'react';
 import ReactDOM from 'react-dom';
 
