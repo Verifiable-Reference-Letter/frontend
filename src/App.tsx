@@ -3,6 +3,7 @@ import { BigNumber } from "bignumber.js";
 import  { TutorialToken } from "./newContract/TutorialToken"; // import is correct
 import React from 'react';
 import ReactDOM from 'react-dom';
+import TutorialTokenAbi from '../build/contracts/TutorialToken.json';
 
 // const Web3 = require('web3');
 
@@ -32,7 +33,8 @@ import ReactDOM from 'react-dom';
 
 class App extends React.Component {
   render() {
-  	console.log(TutorialToken);
+    const token = new TutorialToken(TutorialTokenAbi.abi);
+    console.log(token);
   	//const contract = new CounterContract();
     return (
     	<div>
