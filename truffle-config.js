@@ -15,6 +15,8 @@ module.exports = {
       provider: new Web3.providers.HttpProvider('https://services.jade.builders/multi-geth/kotti/1.9.9')
     }
   },
+  // Note adjustment here where we specify the contract build directory to output in source
+  contracts_build_directory: "./src/contract-data",
   test_file_extension_regexp: /.*\.ts$/
 };
 

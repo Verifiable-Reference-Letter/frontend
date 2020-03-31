@@ -12,7 +12,7 @@
     "prepare": "tsc",
     "build": "react-scripts build",
     "start": "react-scripts start",
-    "generate": "truffle compile && typechain --outDir /src/newContract --target web3-v2 ./build/**/*.json"
+    "generate": "truffle compile && typechain --outDir /src/contract-types --target web3-v2 ./src/contract-data/**/*.json"
   },
   "author": "",
   "license": "ISC",

@@ -1,9 +1,9 @@
 import { BigNumber } from "bignumber.js";
 //import * as TruffleContracts from ".";
-import  { TutorialToken } from "./newContract/TutorialToken"; // import is correct
+import  { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TutorialTokenAbi from '../build/contracts/TutorialToken.json';
+import TutorialTokenAbi from './contract-data/TutorialToken.json';
 
 // const Web3 = require('web3');
 
