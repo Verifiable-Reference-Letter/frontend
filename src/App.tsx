@@ -1,10 +1,6 @@
 import { BigNumber } from "bignumber.js";
-import { expect } from "chai";
-import { join } from "path";
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
-import { readFileSync } from "fs";
 import React from 'react';
-import ReactDOM from 'react-dom';
 import TutorialTokenContractData from './contract-data/TutorialToken.json';
 
 const Web3 = require('web3');
@@ -17,16 +13,25 @@ let web3Provider;
 export async function deployContract<T>(contractName: string, abi:any, code:any, ...args: any[]): Promise<T> {
   
   const Contract = new web3.eth.Contract(abi);
-  const t = Contract.deploy({ arguments: args, data: code });
+  console.log("Contract1: ");
+  console.log(Contract);
+  const t =  await Contract.deploy({ data: code });
 
-  return (await (t.send({
-    from: accounts[0],
-    gas: GAS_LIMIT_STANDARD,
-  }) as any)) as T;
+  const accounts = await web3.eth.getAccounts();
+
+  console.log("Accounts: ");
+  console.log(accounts);
+
+
+  // return (await (t.send({
+  //   from: accounts[0],
+  //   gas: GAS_LIMIT_STANDARD,
+  // }) as any)) as T;
+  return t;
 }
 
-export async function deployTutorialToken(): Promise<TutorialToken> {
-    return deployContract<TutorialToken>("TutorialToken",TutorialTokenContractData.abi,TutorialContractData.bytecode, 0);
+export function deployTutorialToken(): Promise<TutorialToken> {
+    return deployContract<TutorialToken>("TutorialToken", TutorialTokenContractData.abi, TutorialTokenContractData.bytecode, 0);
 }
 
 
@@ -43,7 +48,7 @@ class App extends React.Component {
     console.log(web3.currentProvider);
 
     const contract = deployTutorialToken();
-    console.log("Contract: ");
+    console.log("Contract2: ");
     console.log(contract);
     return (
     	<div>
