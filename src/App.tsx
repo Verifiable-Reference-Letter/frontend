@@ -5,7 +5,7 @@ import { TutorialToken } from "./contract-types/TutorialToken"; // import is cor
 import { readFileSync } from "fs";
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TutorialTokenAbi from './contract-data/TutorialToken.json';
+import TutorialTokenContractData from './contract-data/TutorialToken.json';
 
 const Web3 = require('web3');
 export let web3: typeof Web3;
@@ -14,19 +14,8 @@ export const GAS_LIMIT_STANDARD = 6000000;
 export let accounts: string[];
 let web3Provider;
 
-export async function deployContract<T>(contractName: string, ...args: any[]): Promise<T> {
+export async function deployContract<T>(contractName: string, abi:any, code:any, ...args: any[]): Promise<T> {
   
-  // Not sure what exactly I put in this line. Would it just be './contract-data' ?
-  const abiDirPath = join(__dirname, '../../abis');
-
-  // Think I can just do const abi = TutorialTokenAbi.abi
-  const abi = JSON.parse(readFileSync(join(abiDirPath, contractName + ".abi"), "utf-8"));
-  
-  // Unsure what is going on in these 2 lines, or why they are needed
-  const bin = readFileSync(join(abiDirPath, contractName + ".bin"), "utf-8");
-  const code = "0x" + bin;
-
-
   const Contract = new web3.eth.Contract(abi);
   const t = Contract.deploy({ arguments: args, data: code });
 
@@ -37,7 +26,7 @@ export async function deployContract<T>(contractName: string, ...args: any[]): P
 }
 
 export async function deployTutorialToken(): Promise<TutorialToken> {
-    return deployContract<TutorialToken>("TutorialToken", 0);
+    return deployContract<TutorialToken>("TutorialToken",TutorialTokenContractData.abi,TutorialContractData.bytecode, 0);
 }
 
 
