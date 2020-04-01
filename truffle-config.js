@@ -7,12 +7,12 @@ module.exports = {
   networks: {
     development: {
       host: "127.0.0.1",
-      port: 9545, // was 7545 before
+      port: 8545, // was 7545 before
       network_id: "*", // Match any network id
     },
     kotti: {
       network_id: "*",
-      provider: new Web3.providers.HttpProvider('https://services.jade.builders/multi-geth/kotti/1.9.9')
+      provider: new Web3.providers.HttpProvider('https://services.jade.builders/core-geth/kotti/1.11.2')
     }
   },
   // Note adjustment here where we specify the contract build directory to output in source
