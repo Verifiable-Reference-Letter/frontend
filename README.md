@@ -2,7 +2,7 @@
 
 ## Backend Server
 The api for the application uses Node.js typescript and Express. It is located under the /api folder. 
-To run the server navigate to this root directory and run npm run start. When running locally the
+To run the server navigate to this directory and run npm run start. When running locally the
 server is located at localhost:8080.
 
 ## Run React App with Backend
