@@ -1,9 +1,12 @@
 import express from "express";
+import cors from 'cors';
 const app = express();
 const port = 8080; // default port to listen
 
 import { router as testAPIRouter } from './routes/testApi';
 
+
+app.use(cors());
 // define a route handler for the default home page
 app.get( "/", ( req, res ) => {
     res.send( "Hello world!" );
@@ -19,7 +22,7 @@ app.use("/testAPI", testAPIRouter);
 
 // start the Express server
 app.listen( port, () => {
-    console.log( 'server started at http://localhost:${ port }' );
+    console.log( `server started at http://localhost:${ port }` );
 } );
 
 module.exports = app;
