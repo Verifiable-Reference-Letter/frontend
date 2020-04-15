@@ -8,7 +8,7 @@ import ReactDOM from 'react-dom';
 import TutorialTokenAbi from './contract-data/TutorialToken.json';
 import Writer from './components/writer/Writer';
 import Sender from './components/sender/Sender';
-import Reciever from './components/reciever/Reciever';
+import Receiver from './components/receiver/Receiver';
 
 // const Web3 = require('web3');
 // export let web3: typeof Web3;
@@ -63,7 +63,7 @@ class App extends React.Component {
     	<div>
         <Sender />
         <Writer />
-        <Reciever />
+        <Receiver />
 	  	</div>
     );
   }
