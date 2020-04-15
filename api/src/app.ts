@@ -2,6 +2,8 @@ import express from "express";
 const app = express();
 const port = 8080; // default port to listen
 
+import { router as testAPIRouter } from './routes/testApi';
+
 // define a route handler for the default home page
 app.get( "/", ( req, res ) => {
     res.send( "Hello world!" );
@@ -11,6 +13,8 @@ app.get( "/bye", (req, res) => {
 	const x: number = 10;
 	res.send( "Bye world!" + x);
 });
+
+app.use("/testAPI", testAPIRouter);
 
 
 // start the Express server
