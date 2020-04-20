@@ -83,7 +83,7 @@ class App extends React.Component<MyProps, MyState> {
     return (
     	<>
         <Container fluid>
-          <Row>
+          <Row noGutters>
             <Col><Sender /></Col>
             <Col><Writer /></Col>
             <Col><Receiver /></Col>
