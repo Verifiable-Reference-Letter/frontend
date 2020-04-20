@@ -3473,7 +3473,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-04-14T22:38:33.119Z",
+  "updatedAt": "2020-04-20T02:01:53.755Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

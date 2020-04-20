@@ -1,66 +1,98 @@
 import { BigNumber } from "bignumber.js";
-import { expect } from "chai";
-import { join } from "path";
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
-import { readFileSync } from "fs";
 import React from 'react';
-import ReactDOM from 'react-dom';
-import TutorialTokenAbi from './contract-data/TutorialToken.json';
+import TutorialTokenContractData from './contract-data/TutorialToken.json';
+import BN from "bn.js";
+
 import Writer from './components/writer/Writer';
 import Sender from './components/sender/Sender';
 import Receiver from './components/receiver/Receiver';
 
-// const Web3 = require('web3');
-// export let web3: typeof Web3;
+import Web3 from "web3";
+export let web3: Web3;
 
-// export const GAS_LIMIT_STANDARD = 6000000;
-// export let accounts: string[];
-// let web3Provider;
+export const GAS_LIMIT_STANDARD = 6000000;
+export let accounts: string[];
+let web3Provider;
 
-// export async function deployContract<T>(contractName: string, ...args: any[]): Promise<T> {
-  
-//   // Not sure what exactly I put in this line. Would it just be './contract-data' ?
-//   const abiDirPath = join(__dirname, '../../abis');
+let contract: any;
+const ERC20_NETWORK = "https://services.jade.builders/core-geth/kotti/1.11.2"
+export async function deployContract<T>(contractName: string, abi: any, code: any, ...args: any[]): Promise<T> {
+  const Contract = new web3.eth.Contract(abi);
+  console.log("Contract1: ");
+  console.log(Contract);
+  const accounts = await web3.eth.getAccounts();
+  console.log(accounts)
+  console.log("deploying contract now")
 
-//   // Think I can just do const abi = TutorialTokenAbi.abi
-//   const abi = JSON.parse(readFileSync(join(abiDirPath, contractName + ".abi"), "utf-8"));
-  
-//   // Unsure what is going on in these 2 lines, or why they are needed
-//   const bin = readFileSync(join(abiDirPath, contractName + ".bin"), "utf-8");
-//   const code = "0x" + bin;
-
-
-//   const Contract = new web3.eth.Contract(abi);
-//   const t = Contract.deploy({ arguments: args, data: code });
-
-//   return (await (t.send({
-//     from: accounts[0],
-//     gas: GAS_LIMIT_STANDARD,
-//   }) as any)) as T;
-// }
-
-// export async function deployTutorialToken(): Promise<TutorialToken> {
-//     return deployContract<TutorialToken>("TutorialToken", 0);
-// }
+  const contractResult = await Contract.deploy({ data: code }).send({
+    from: accounts[0]
+  })
+  return contractResult as any;
+}
 
 
-class App extends React.Component {
-  render() {
-    // if (typeof web3 !== 'undefined') {
-    //   web3Provider = web3.currentProvider;
-    //   web3 = new Web3(web3.currentProvider);
-    // } else {
-    //   // set the provider you want from Web3.providers
-    //   web3Provider = new Web3.providers.HttpProvider('https://services.jade.builders/core-geth/kotti/1.11.2');
-    //   web3 = new Web3(web3Provider);
-    // }
-    // console.log(web3.currentProvider);
+export async function deployTutorialToken(): Promise<TutorialToken> {
+  console.log("Deploying Contract from innner deploy tutorial token method: ");
+  var contract = await deployContract<TutorialToken>("TutorialToken", TutorialTokenContractData.abi, TutorialTokenContractData.bytecode, 0);
+  console.log("Contract from innner deploy tutorial token method: " + contract);
+  return contract;
+}
 
-    // const contract = deployTutorialToken();
-    // console.log("Contract: ");
-    // console.log(contract);
+
+type MyProps = {};
+type MyState = {
+  numErcBeingTraded: number
+  contract: TutorialToken 
+};
+class App extends React.Component<MyProps, MyState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      numErcBeingTraded: 0,
+      contract: {} as TutorialToken
+    };
+
+    //this.handleErcInputChange = this.handleErcInputChange.bind(this);
+  }
+
+  handleErcInputChange(event: any) {
+    this.setState({ 
+      numErcBeingTraded: event.target.value,
+    });
+    console.log("Num of ERC wanted to trade: " + this.state.numErcBeingTraded);
+    var rate = this.state.contract.methods.rate().call();
+    var numErc = new BN(this.state.numErcBeingTraded);
+    //var numTokens = rate.mul(numErc);
+    //console.log("Num of Tutorial Tokens you can receive: " + numTokens.toString());
+  }
+
+  async componentDidMount() {
+    // TODO: Do all this stuff once onComponentDidMount
+    // Same with all my async shit
+      const ethereum = (window as any).ethereum
+      //TODO Ethereum enable may still be necessary
+      // await ethereum.enable()
+      web3Provider =  (window as any).web3.currentProvider;
+      // NOTE you might need this
+      //await ethereum.send('eth_requestAccounts')
+
+      web3 = new Web3(web3Provider);
+
+      const accounts = await web3.eth.getAccounts()
+      console.log(accounts)
+
+    contract = await deployTutorialToken();
+
+    this.setState({contract})
+  }
+
+  render() { 
     return (
     	<div>
+        <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
+        <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
+	  		<button>Purchase</button>
         <Sender />
         <Writer />
         <Receiver />
