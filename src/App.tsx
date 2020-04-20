@@ -84,7 +84,7 @@ class App extends React.Component<MyProps, MyState> {
     return (
     	<>
         <Container fluid>
-          <Navbar>
+          <Navbar bg="dark" variant="dark">
             <Navbar.Brand href="#home">ETC Referance Letter dApp</Navbar.Brand>
             <Navbar.Toggle />
             <Navbar.Collapse className="justify-content-end">
