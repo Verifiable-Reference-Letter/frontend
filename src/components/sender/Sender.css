@@ -1,6 +1,4 @@
 .sender-wrap {
-  display: inline-block;
-  width: 33%;
-  height: 100vh;
+  height: calc(100vh - 56px);
   background-color: burlywood;
 }
