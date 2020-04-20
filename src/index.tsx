@@ -1,8 +1,10 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { BigNumber } from "bignumber.js";
 //import * as TruffleContracts from ".";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
+
 
 // const Web3 = require('web3');
 
