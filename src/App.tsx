@@ -6,6 +6,7 @@ import BN from "bn.js";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
+import Navbar from 'react-bootstrap/Navbar';
 
 import Writer from './components/writer/Writer';
 import Sender from './components/sender/Sender';
@@ -83,6 +84,15 @@ class App extends React.Component<MyProps, MyState> {
     return (
     	<>
         <Container fluid>
+          <Navbar>
+            <Navbar.Brand href="#home">ETC Referance Letter dApp</Navbar.Brand>
+            <Navbar.Toggle />
+            <Navbar.Collapse className="justify-content-end">
+              <Navbar.Text>
+                Signed in as: <a href="#login">Jimmy Johnson</a>
+              </Navbar.Text>
+            </Navbar.Collapse>
+          </Navbar>
           <Row noGutters>
             <Col><Sender /></Col>
             <Col><Writer /></Col>
