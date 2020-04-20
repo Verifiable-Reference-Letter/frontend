@@ -1,8 +1,10 @@
 import express from "express";
 import cors from 'cors';
+import path from 'path';
 const app = express();
 const port = 8080; // default port to listen
-
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../../build')));
 import { router as testAPIRouter } from './routes/testApi';
 
 

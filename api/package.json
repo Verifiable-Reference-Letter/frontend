@@ -8,6 +8,7 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node .",
+    "heroku-postbuild": "cd .. && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -29,5 +30,8 @@
     "@types/node": "^13.11.1",
     "tslint": "^6.1.1",
     "typescript": "^3.8.3"
+  },
+  "engines":{
+   "node":"13.3.0"
   }
 }
