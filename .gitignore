@@ -1,4 +1,4 @@
 build
 node_modules
-types/truffle-contracts
-
+src/contract-data
+src/contract-types
