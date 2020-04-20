@@ -2,10 +2,16 @@
 /* tslint:disable */
 
 import BN from "bn.js";
-import { Contract, ContractOptions, EventOptions } from "web3-eth-contract";
+import { Contract, ContractOptions } from "web3-eth-contract";
 import { EventLog } from "web3-core";
 import { EventEmitter } from "events";
-import { Callback, ContractEvent, TransactionObject } from "./types";
+import { ContractEvent, Callback, TransactionObject, BlockType } from "./types";
+
+interface EventOptions {
+  filter?: object;
+  fromBlock?: BlockType;
+  topics?: string[];
+}
 
 export class CounterContract extends Contract {
   constructor(
@@ -15,11 +21,11 @@ export class CounterContract extends Contract {
   );
   clone(): CounterContract;
   methods: {
-    counter(): TransactionObject<BN>;
+    counter(): TransactionObject<string>;
 
     DumbContract(): TransactionObject<void>;
 
-    counterWithOffset(offset: number | string): TransactionObject<BN>;
+    counterWithOffset(offset: number | string): TransactionObject<string>;
 
     countup(by: number | string): TransactionObject<void>;
   };

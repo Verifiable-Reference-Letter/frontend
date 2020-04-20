@@ -2,10 +2,16 @@
 /* tslint:disable */
 
 import BN from "bn.js";
-import { Contract, ContractOptions, EventOptions } from "web3-eth-contract";
+import { Contract, ContractOptions } from "web3-eth-contract";
 import { EventLog } from "web3-core";
 import { EventEmitter } from "events";
-import { Callback, ContractEvent, TransactionObject } from "./types";
+import { ContractEvent, Callback, TransactionObject, BlockType } from "./types";
+
+interface EventOptions {
+  filter?: object;
+  fromBlock?: BlockType;
+  topics?: string[];
+}
 
 export class TutorialToken extends Contract {
   constructor(
@@ -15,18 +21,18 @@ export class TutorialToken extends Contract {
   );
   clone(): TutorialToken;
   methods: {
-    INITAL_SUPPLY(): TransactionObject<BN>;
+    INITAL_SUPPLY(): TransactionObject<string>;
 
-    allowance(owner: string, spender: string): TransactionObject<BN>;
+    allowance(owner: string, spender: string): TransactionObject<string>;
 
     approve(
       spender: string,
       amount: number | string
     ): TransactionObject<boolean>;
 
-    balanceOf(account: string): TransactionObject<BN>;
+    balanceOf(account: string): TransactionObject<string>;
 
-    decimals(): TransactionObject<BN>;
+    decimals(): TransactionObject<string>;
 
     decreaseAllowance(
       spender: string,
@@ -42,11 +48,11 @@ export class TutorialToken extends Contract {
 
     owner(): TransactionObject<string>;
 
-    rate(): TransactionObject<BN>;
+    rate(): TransactionObject<string>;
 
     symbol(): TransactionObject<string>;
 
-    totalSupply(): TransactionObject<BN>;
+    totalSupply(): TransactionObject<string>;
 
     transfer(
       recipient: string,
@@ -59,7 +65,7 @@ export class TutorialToken extends Contract {
       amount: number | string
     ): TransactionObject<boolean>;
 
-    weiRaised(): TransactionObject<BN>;
+    weiRaised(): TransactionObject<string>;
 
     stabilizeRate(): TransactionObject<void>;
 
@@ -69,18 +75,18 @@ export class TutorialToken extends Contract {
     Approval: ContractEvent<{
       owner: string;
       spender: string;
-      value: BN;
+      value: string;
       0: string;
       1: string;
-      2: BN;
+      2: string;
     }>;
     Transfer: ContractEvent<{
       from: string;
       to: string;
-      value: BN;
+      value: string;
       0: string;
       1: string;
-      2: BN;
+      2: string;
     }>;
     allEvents: (
       options?: EventOptions,
