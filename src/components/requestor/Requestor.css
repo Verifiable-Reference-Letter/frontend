@@ -2,3 +2,23 @@
   height: calc(100vh - 56px);
   background-color: burlywood;
 }
+
+.requestor {
+  padding: 20px;
+}
+.requestor-header {
+  text-align: center;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-align: center;
+}
+
+.requestor-footer {
+  text-align: center;
+}

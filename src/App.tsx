@@ -119,7 +119,11 @@ class App extends React.Component<MyProps, MyState> {
           </Row> */}
           <Row noGutters>
             <Col>
-              <Requestor />
+              <Requestor
+                user_id={102}
+                name="Simba"
+                public_key="0xabcdefghijklmnop"
+              />
             </Col>
             <Col>
               <Writer
