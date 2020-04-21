@@ -1,4 +1,25 @@
-.recipient-wrap {
+.recipient {
+  background-color: whitesmoke;
   height: calc(100vh - 56px);
-  background-color: grey;
+  padding: 20px;
+}
+.recipient-header {
+  text-align: center;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-align: center;
+}
+
+.recipient-footer {
+  text-align: center;
+}
+
+.from {
+  float: right;
 }

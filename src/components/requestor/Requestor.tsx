@@ -1,11 +1,10 @@
 //import { BigNumber } from "bignumber.js";
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
-import React from 'react';
-import './Requestor.css';
+import React from "react";
+import "./Requestor.css";
 import User from "../../interfaces/User.interface";
 import Letter from "../../interfaces/Letter.interface";
 import SentLetter from "../../interfaces/SentLetter.interface";
-
 
 const Web3 = require("web3");
 export let web3: typeof Web3;
@@ -22,14 +21,13 @@ interface RequestorState {
   letterKey: number;
 }
 
-
 class Requestor extends React.Component<User, RequestorState> {
   constructor(props: User) {
     super(props);
     this.state = {
       letters: [],
       sentLetters: [],
-      letterKey: -1,
+      letterKey: -1
     };
   }
 
@@ -42,15 +40,15 @@ class Requestor extends React.Component<User, RequestorState> {
           writer: {
             user_id: 101,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323",
+            public_key: "0x314159265358979323"
           },
           requester: {
             user_id: 102,
             name: "Simba",
-            public_key: "0xabcdefghijklmnop",
+            public_key: "0xabcdefghijklmnop"
           },
-          letter_uploaded: false,
-        },
+          letter_uploaded: false
+        }
       ],
       sentLetters: [
         {
@@ -58,38 +56,38 @@ class Requestor extends React.Component<User, RequestorState> {
           writer: {
             user_id: 1,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323",
+            public_key: "0x314159265358979323"
           },
           requester: {
             user_id: 103,
             name: "Curious George",
-            public_key: "0x142857142857142857",
+            public_key: "0x142857142857142857"
           },
           recipient: {
             user_id: 104,
             name: "Elton John",
-            public_key: "0x101100101001101110100",
-          },
+            public_key: "0x101100101001101110100"
+          }
         },
         {
           letter_id: 2,
           writer: {
             user_id: 1,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323",
+            public_key: "0x314159265358979323"
           },
           requester: {
             user_id: 102,
             name: "Simba",
-            public_key: "0xabcdefghijklmnop",
+            public_key: "0xabcdefghijklmnop"
           },
           recipient: {
             user_id: 103,
             name: "Curious George",
-            public_key: "0x142857142857142857",
-          },
-        },
-      ],
+            public_key: "0x142857142857142857"
+          }
+        }
+      ]
     });
   }
 
@@ -110,13 +108,12 @@ class Requestor extends React.Component<User, RequestorState> {
 
           <button
             style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
+            onClick={e => {
               //this.onUploadClick(e, l.letter_id);
             }}
           >
             send
           </button>
-
         </p>
       </div>
     ));
@@ -129,7 +126,7 @@ class Requestor extends React.Component<User, RequestorState> {
 
           <button
             style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
+            onClick={e => {
               this.onViewClick(e, l.letter_id);
             }}
           >
@@ -141,53 +138,53 @@ class Requestor extends React.Component<User, RequestorState> {
     ));
 
     return (
-    	<div className="requestor-wrap">
+      <div className="requestor-wrap">
         <div className="requestor">
-        <div className="requestor-header">
-          <h1> Requestor Page </h1>
-          <p>
-            <em>{name}</em>
-          </p>
-          <hr></hr>
-        </div>
+          <div className="requestor-header">
+            <h1> Requestor Page </h1>
+            <p>
+              <em>{name}</em>
+            </p>
+            <hr></hr>
+          </div>
 
-        <div>
-          <h3> Request </h3>
-          <input placeholder="Writer Id" />
-          <button
+          <div>
+            <h3> Request </h3>
+            <input placeholder="Writer Id" />
+            <button
               style={{ marginLeft: "10px", float: "right" }}
-              onClick={(e) => {
+              onClick={e => {
                 //this.onViewClick(e, l.letter_id);
               }}
             >
               request
-          </button>
-          <hr></hr>
-        </div>
+            </button>
+            <hr></hr>
+          </div>
 
-        <div className="letters">
-          <h3> Received Letters </h3>
-          <div>{lettersList}</div>
-          <hr></hr>
-        </div>
+          <div className="letters">
+            <h3> Received Letters </h3>
+            <div>{lettersList}</div>
+            <hr></hr>
+          </div>
 
-        <div className="letters">
-          <h3> Pending Letters </h3>
-          <div></div>
-          <hr></hr>
-        </div>
+          <div className="letters">
+            <h3> Pending Letters </h3>
+            <div></div>
+            <hr></hr>
+          </div>
 
-        <div className="sentLetters">
-          <h3> History </h3>
-          <div>{sentLettersList}</div>
-          <hr></hr>
-        </div>
+          <div className="sentLetters">
+            <h3> History </h3>
+            <div>{sentLettersList}</div>
+            <hr></hr>
+          </div>
 
-        <div className="requestor-footer">
-          <p> Product of Team Gas</p>
+          <div className="requestor-footer">
+            <p> Product of Team Gas</p>
+          </div>
         </div>
       </div>
-	  	</div>
     );
   }
 }
