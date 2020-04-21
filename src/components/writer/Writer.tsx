@@ -47,7 +47,7 @@ class Writer extends React.Component<User, WriterState> {
         {
           letter_id: 2,
           writer: {
-            user_id: 1,
+            user_id: 101,
             name: "Mary Poppins",
             public_key: "0x314159265358979323",
           },
@@ -63,7 +63,7 @@ class Writer extends React.Component<User, WriterState> {
         {
           letter_id: 2,
           writer: {
-            user_id: 1,
+            user_id: 101,
             name: "Mary Poppins",
             public_key: "0x314159265358979323",
           },
@@ -81,7 +81,7 @@ class Writer extends React.Component<User, WriterState> {
         {
           letter_id: 2,
           writer: {
-            user_id: 1,
+            user_id: 101,
             name: "Mary Poppins",
             public_key: "0x314159265358979323",
           },

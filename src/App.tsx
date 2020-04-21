@@ -111,7 +111,7 @@ class App extends React.Component<MyProps, MyState> {
           </Row> */}
           <Row noGutters>
             <Col><Requestor /></Col>
-            <Col><Writer user_id={1} name="Mary Poppins" public_key="0x314159265358979323"/></Col>
+            <Col><Writer user_id={101} name="Mary Poppins" public_key="0x314159265358979323"/></Col>
             <Col><Recipient /></Col>
           </Row>
         </Container>
