@@ -10,7 +10,7 @@ import Navbar from 'react-bootstrap/Navbar';
 
 import Writer from './components/writer/Writer';
 import Requestor from './components/requestor/Requestor';
-import Receiver from './components/receiver/Receiver';
+import Recipient from './components/recipient/Recipient';
 
 import Web3 from "web3";
 export let web3: Web3;
@@ -112,7 +112,7 @@ class App extends React.Component<MyProps, MyState> {
           <Row noGutters>
             <Col><Requestor /></Col>
             <Col><Writer user_id={1} name="Mary Poppins" public_key="0x314159265358979323"/></Col>
-            <Col><Receiver /></Col>
+            <Col><Recipient /></Col>
           </Row>
         </Container>
        
