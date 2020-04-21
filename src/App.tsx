@@ -93,9 +93,11 @@ class App extends React.Component<MyProps, MyState> {
         <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
         <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
 	  		<button>Purchase</button>
-        <Sender />
-        <Writer />
-        <Receiver />
+        <div>
+          <Sender />
+          <Writer user_id={1} name="Mary Poppins" public_key="0x314159265358979323"/>
+          <Receiver />
+        </div>
 	  	</div>
     );
   }

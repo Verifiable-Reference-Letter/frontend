@@ -2,5 +2,19 @@
   display: inline-block;
   width: 34%;
   height: 100vh;
-  background-color: aqua;
+  background-color: white;
+}
+.writer {
+  padding: 20px;
+}
+.writer-header {
+  text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-align: center;
+}
+
+.writer-footer {
+  text-align: center;
 }

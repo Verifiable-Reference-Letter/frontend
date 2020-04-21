@@ -12,7 +12,8 @@
     "prepare": "tsc",
     "build": "react-scripts build",
     "start": "react-scripts start",
-    "generate": "truffle compile && typechain --outDir ./src/contract-types --target web3-v1 ./src/contract-data/**/*.json"  },
+    "generate": "truffle compile && typechain --outDir ./src/contract-types --target web3-v1 ./src/contract-data/**/*.json"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -34,6 +35,7 @@
     "@openzeppelin/contracts": "^2.5.0",
     "@types/bn.js": "^4.11.6",
     "@types/react": "^16.9.23",
+    "@types/react-modal": "^3.10.5",
     "@types/web3": "^1.2.2",
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.1.1",
@@ -42,7 +44,9 @@
     "openzeppelin-solidity": "^2.5.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
+    "react-modal": "^3.11.2",
     "react-scripts": "^3.4.0",
+    "reactjs-popup": "^1.5.0",
     "scrypt": "^6.0.3",
     "truffle": "^5.1.15",
     "typechain-target-web3-v1": "^1.0.0",
