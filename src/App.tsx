@@ -96,19 +96,19 @@ class App extends React.Component<MyProps, MyState> {
     	<>
         <Container fluid>
           <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">ETC Referance Letter dApp</Navbar.Brand>
+            <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
             <Navbar.Toggle />
             <Navbar.Collapse className="justify-content-end">
               <Navbar.Text>
-                Signed in as: <a href="#login">Jimmy Johnson</a>
+                Signed in as: <a href="#login">--</a>
               </Navbar.Text>
             </Navbar.Collapse>
           </Navbar>
-          <Row noGutters>
+          {/* <Row noGutters>
             <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
             <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
 	  		    <button>Purchase</button>
-          </Row>
+          </Row> */}
           <Row noGutters>
             <Col><Sender /></Col>
             <Col><Writer user_id={1} name="Mary Poppins" public_key="0x314159265358979323"/></Col>

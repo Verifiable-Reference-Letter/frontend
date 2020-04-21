@@ -120,9 +120,7 @@ class Writer extends React.Component<User, WriterState> {
   onViewClick(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     key: number
-  ) {
-    
-  }
+  ) {}
 
   openUploadModal(key: number) {
     this.setState({ modalIsOpen: true, letterKey: key });
@@ -155,14 +153,7 @@ class Writer extends React.Component<User, WriterState> {
         <p>
           <span>({l.letter_id})&nbsp;</span>
           <span>For: {l.requester.name} </span>
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
-              this.onUploadClick(e, l.letter_id);
-            }}
-          >
-            upload
-          </button>
+
           <button
             style={{ marginLeft: "10px", float: "right" }}
             onClick={(e) => {
@@ -171,6 +162,16 @@ class Writer extends React.Component<User, WriterState> {
           >
             view
           </button>
+
+          <button
+            style={{ marginLeft: "10px", float: "right" }}
+            onClick={(e) => {
+              this.onUploadClick(e, l.letter_id);
+            }}
+          >
+            upload
+          </button>
+
         </p>
       </div>
     ));
@@ -195,39 +196,37 @@ class Writer extends React.Component<User, WriterState> {
     ));
 
     return (
-      <div className="writer-wrap">
-        <div id="writer" className="writer">
-          <div className="writer-header">
-            <h1> Writer Page </h1>
-            <p>
-              Logged in as <b> {name} </b>
-            </p>
-            <hr></hr>
-          </div>
+      <div id="writer" className="writer">
+        <div className="writer-header">
+          <h1> Writer Page </h1>
+          <p>
+            <em>{name}</em>
+          </p>
+          <hr></hr>
+        </div>
 
-          <Modal
-            isOpen={modalIsOpen}
-            onRequestClose={this.closeUploadModal.bind(this)}
-            contentLabel="Upload Modal"
-          >
-            <FileUpload callback={this.onUploadSubmit.bind(this)}></FileUpload>
-          </Modal>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={this.closeUploadModal.bind(this)}
+          contentLabel="Upload Modal"
+        >
+          <FileUpload callback={this.onUploadSubmit.bind(this)}></FileUpload>
+        </Modal>
 
-          <div className="letters">
-            <h3> Letters </h3>
-            <div>{lettersList}</div>
-            <hr></hr>
-          </div>
+        <div className="letters">
+          <h3> Letters </h3>
+          <div>{lettersList}</div>
+          <hr></hr>
+        </div>
 
-          <div className="sentLetters">
-            <h3> History </h3>
-            <div>{sentLettersList}</div>
-            <hr></hr>
-          </div>
+        <div className="sentLetters">
+          <h3> History </h3>
+          <div>{sentLettersList}</div>
+          <hr></hr>
+        </div>
 
-          <div className="writer-footer">
-            <p> Product of Team Gas</p>
-          </div>
+        <div className="writer-footer">
+          <p> Product of Team Gas</p>
         </div>
       </div>
     );
