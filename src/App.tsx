@@ -9,7 +9,7 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 
 import Writer from './components/writer/Writer';
-import Sender from './components/sender/Sender';
+import Requestor from './components/requestor/Requestor';
 import Receiver from './components/receiver/Receiver';
 
 import Web3 from "web3";
@@ -110,7 +110,7 @@ class App extends React.Component<MyProps, MyState> {
 	  		    <button>Purchase</button>
           </Row> */}
           <Row noGutters>
-            <Col><Sender /></Col>
+            <Col><Requestor /></Col>
             <Col><Writer user_id={1} name="Mary Poppins" public_key="0x314159265358979323"/></Col>
             <Col><Receiver /></Col>
           </Row>
