@@ -68,9 +68,9 @@ class Writer extends React.Component<User, WriterState> {
             public_key: "0x314159265358979323",
           },
           requester: {
-            user_id: 103,
-            name: "Curious George",
-            public_key: "0x142857142857142857",
+            user_id: 102,
+            name: "Simba",
+            public_key: "0xabcdefghijklmnop",
           },
           recipient: {
             user_id: 104,
