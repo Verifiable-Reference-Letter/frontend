@@ -3,6 +3,10 @@ import { TutorialToken } from "./contract-types/TutorialToken"; // import is cor
 import React from 'react';
 import TutorialTokenContractData from './contract-data/TutorialToken.json';
 import BN from "bn.js";
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
+import Navbar from 'react-bootstrap/Navbar';
 
 import Writer from './components/writer/Writer';
 import Sender from './components/sender/Sender';
@@ -70,17 +74,17 @@ class App extends React.Component<MyProps, MyState> {
   async componentDidMount() {
     // TODO: Do all this stuff once onComponentDidMount
     // Same with all my async shit
-      const ethereum = (window as any).ethereum
-      //TODO Ethereum enable may still be necessary
-      // await ethereum.enable()
-      web3Provider =  (window as any).web3.currentProvider;
-      // NOTE you might need this
-      //await ethereum.send('eth_requestAccounts')
+    const ethereum = (window as any).ethereum
+    //TODO Ethereum enable may still be necessary
+    // await ethereum.enable()
+    web3Provider =  (window as any).web3.currentProvider;
+    // NOTE you might need this
+    //await ethereum.send('eth_requestAccounts')
 
-      web3 = new Web3(web3Provider);
+    web3 = new Web3(web3Provider);
 
-      const accounts = await web3.eth.getAccounts()
-      console.log(accounts)
+    const accounts = await web3.eth.getAccounts()
+    console.log(accounts)
 
     contract = await deployTutorialToken();
 
@@ -89,16 +93,30 @@ class App extends React.Component<MyProps, MyState> {
 
   render() { 
     return (
-    	<div>
-        <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
-        <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
-	  		<button>Purchase</button>
-        <div>
-          <Sender />
-          <Writer user_id={1} name="Mary Poppins" public_key="0x314159265358979323"/>
-          <Receiver />
-        </div>
-	  	</div>
+    	<>
+        <Container fluid>
+          <Navbar bg="dark" variant="dark">
+            <Navbar.Brand href="#home">ETC Referance Letter dApp</Navbar.Brand>
+            <Navbar.Toggle />
+            <Navbar.Collapse className="justify-content-end">
+              <Navbar.Text>
+                Signed in as: <a href="#login">Jimmy Johnson</a>
+              </Navbar.Text>
+            </Navbar.Collapse>
+          </Navbar>
+          <Row noGutters>
+            <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
+            <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
+	  		    <button>Purchase</button>
+          </Row>
+          <Row noGutters>
+            <Col><Sender /></Col>
+            <Col><Writer user_id={1} name="Mary Poppins" public_key="0x314159265358979323"/></Col>
+            <Col><Receiver /></Col>
+          </Row>
+        </Container>
+       
+	  	</>
     );
   }
 }
