@@ -110,7 +110,7 @@ class App extends React.Component<MyProps, MyState> {
 	  		    <button>Purchase</button>
           </Row> */}
           <Row noGutters>
-            <Col><Requestor /></Col>
+            <Col><Requestor user_id={102} name="Simba" public_key="0xabcdefghijklmnop"/></Col>
             <Col><Writer user_id={101} name="Mary Poppins" public_key="0x314159265358979323"/></Col>
             <Col><Recipient /></Col>
           </Row>
