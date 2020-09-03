@@ -28,12 +28,6 @@ export async function deployContract<T>(
   ...args: any[]
 ): Promise<T> {
   const Contract = new web3.eth.Contract(abi);
-  console.log("Contract1: ");
-  console.log(Contract);
-  const accounts = await web3.eth.getAccounts();
-  console.log(accounts);
-  console.log("deploying contract now");
-
   const contractResult = await Contract.deploy({ data: code }).send({
     from: accounts[0]
   });
@@ -80,20 +74,14 @@ class App extends React.Component<MyProps, MyState> {
   }
 
   async componentDidMount() {
-    // TODO: Do all this stuff once onComponentDidMount
-    // Same with all my async shit
     const ethereum = (window as any).ethereum;
-    //TODO Ethereum enable may still be necessary
-    // await ethereum.enable()
+    await ethereum.enable()
     web3Provider = (window as any).web3.currentProvider;
     // NOTE you might need this
     //await ethereum.send('eth_requestAccounts')
 
     web3 = new Web3(web3Provider);
-
-    const accounts = await web3.eth.getAccounts();
-    console.log(accounts);
-
+    accounts = await ethereum.request({ method: 'eth_accounts' })
     contract = await deployTutorialToken();
 
     this.setState({ contract });
