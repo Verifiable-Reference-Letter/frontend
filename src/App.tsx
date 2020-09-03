@@ -50,15 +50,17 @@ type MyProps = {};
 type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
+  is_login: boolean;
 };
 class App extends React.Component<MyProps, MyState> {
   constructor(props: any) {
     super(props);
     this.state = {
       numErcBeingTraded: 0,
-      contract: {} as TutorialToken
+      contract: {} as TutorialToken,
+      is_login: false
     };
-
+    this.login = this.login.bind(this);
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
   }
 
@@ -73,7 +75,7 @@ class App extends React.Component<MyProps, MyState> {
     //console.log("Num of Tutorial Tokens you can receive: " + numTokens.toString());
   }
 
-  async componentDidMount() {
+  async login() {
     const ethereum = (window as any).ethereum;
     await ethereum.enable()
     web3Provider = (window as any).web3.currentProvider;
@@ -84,7 +86,10 @@ class App extends React.Component<MyProps, MyState> {
     accounts = await ethereum.request({ method: 'eth_accounts' })
     contract = await deployTutorialToken();
 
-    this.setState({ contract });
+    this.setState(prevState => ({ 
+    	contract, 
+    	is_login: true 
+    }));
   }
 
   render() {
@@ -95,6 +100,7 @@ class App extends React.Component<MyProps, MyState> {
             <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
             <Navbar.Toggle />
             <Navbar.Collapse className="justify-content-end">
+              {!this.state.is_login && <button className="Login" onClick={this.login}>Login</button> }
               <Navbar.Text>
                 Signed in as: <a href="#login">--</a>
               </Navbar.Text>
