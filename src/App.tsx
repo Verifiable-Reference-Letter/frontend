@@ -11,6 +11,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Writer from "./components/writer/Writer";
 import Requestor from "./components/requestor/Requestor";
 import Recipient from "./components/recipient/Recipient";
+import Login from "./components/login/Login";
 
 import Web3 from "web3";
 export let web3: Web3;
@@ -86,7 +87,7 @@ class App extends React.Component<MyProps, MyState> {
 
     web3 = new Web3(web3Provider);
     accounts = await ethereum.request({ method: 'eth_accounts' })
-    contract = await deployTutorialToken();
+    // contract = await deployTutorialToken(); // temporary disable
 
     this.setState(prevState => ({ 
     	contract, 
@@ -116,25 +117,16 @@ class App extends React.Component<MyProps, MyState> {
           </Row> */}
           <Row noGutters>
             <Col>
-              <Requestor
-                user_id={102}
-                name="Simba"
-                public_key="0xabcdefghijklmnop"
-              />
-            </Col>
-            <Col>
-              <Writer
-                user_id={101}
-                name="Mary Poppins"
-                public_key="0x314159265358979323"
-              />
-            </Col>
-            <Col>
-              <Recipient
+            <Login
+              user_id={103}
+                name="Curious George"
+                public_key={this.state.user}>
+              </Login>
+              {/* <Recipient
                 user_id={103}
                 name="Curious George"
                 public_key="0x142857142857142857"
-              />
+              /> */}
             </Col>
           </Row>
         </Container>
