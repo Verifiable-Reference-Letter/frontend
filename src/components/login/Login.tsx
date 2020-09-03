@@ -1,9 +1,12 @@
 import React from "react";
-import Web3 from "web3";
 import User from "../../interfaces/User.interface";
-// import detectEthereumProvider from "@metamask/detect-provider";
 
-let web3: Web3;
+import { web3 } from "../../App";
+const headers = new Headers();
+headers.set("Access-Control-Allow-Origin", "*");
+headers.set("Content-Type", "application/json");
+
+// let web3: Web3;
 interface LoginProps {}
 interface LoginState {
   publicAddress: string;
@@ -21,40 +24,42 @@ class Login extends React.Component<User, LoginState> {
 
   onLoginClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     console.log("Login clicked.");
-    
+
     const publicAddress = this.props.public_key;
-    const backendUrl = "https://verifiable-reference-letter.herokuapp.com/";
+    const backendUrl = "https://verifiable-reference-letter.herokuapp.com";
     console.log(publicAddress);
 
-    fetch(
-      // `${process.env.REACT_APP_BACKEND_URL}/users?publicAddress=${publicAddress}`
-      `${backendUrl}user?publicAddress=${publicAddress}`
-    )
+    const init: RequestInit = {
+      method: "GET",
+      headers,
+    };
+
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}`, init)
       .then((response) => {
-        console.log(response.json());
+        console.log("logging response");
+        console.log(response);
         return response.json();
       })
-        // If yes, retrieve it. If no, create it.
-      .then((users) =>
-        users.length ? users[0] : this.signup({ publicAddress })
-      )
-      // Popup MetaMask confirmation modal to sign message
+      .then((users) => {
+        console.log(users);
+        return users[0] != null ? users[0] : this.signup({ publicAddress });
+      })
+      // metamask popup to sign
       .then(this.signMessage)
-      // Send signature to back end on the /auth route
+      // send signature to backend
       .then(this.authenticate)
-      //.then(this.doStuffWithToken)
-      .catch((err: Error) => { console.log(err)});
+      //.then(this.doStuffWithToken) // after receiving the token
+      .catch((err: Error) => {
+        console.log(err);
+      });
 
     return;
   }
 
   async signup({ publicAddress }: { publicAddress: string }) {
-
     return fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
       body: JSON.stringify(this.state.publicAddress),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       method: "POST",
     }).then((response) => response.json());
   }
@@ -66,7 +71,8 @@ class Login extends React.Component<User, LoginState> {
     publicAddress: string;
     nonce: string;
   }): Promise<{ publicAddress: string; signature: any }> {
-    console.log("signing the nonce")
+    console.log("signing the nonce");
+    console.log(nonce);
     return new Promise((resolve, reject) => {
       web3.eth.sign(
         web3.utils.fromUtf8(`I am signing my one-time nonce: ${nonce}`),
@@ -75,7 +81,7 @@ class Login extends React.Component<User, LoginState> {
           if (err) return reject(err);
           return resolve({ publicAddress, signature });
         }
-      )
+      );
     });
   }
 
