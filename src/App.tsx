@@ -51,6 +51,7 @@ type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
   is_login: boolean;
+  user: string
 };
 class App extends React.Component<MyProps, MyState> {
   constructor(props: any) {
@@ -58,7 +59,8 @@ class App extends React.Component<MyProps, MyState> {
     this.state = {
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
-      is_login: false
+      is_login: false,
+      user: ""
     };
     this.login = this.login.bind(this);
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
@@ -88,7 +90,8 @@ class App extends React.Component<MyProps, MyState> {
 
     this.setState(prevState => ({ 
     	contract, 
-    	is_login: true 
+    	is_login: true,
+    	user: accounts[0]
     }));
   }
 
@@ -102,7 +105,7 @@ class App extends React.Component<MyProps, MyState> {
             <Navbar.Collapse className="justify-content-end">
               {!this.state.is_login && <button className="Login" onClick={this.login}>Login</button> }
               <Navbar.Text>
-                Signed in as: <a href="#login">--</a>
+                Signed in as: <a href="#login">{this.state.is_login ? this.state.user : '--'}</a>
               </Navbar.Text>
             </Navbar.Collapse>
           </Navbar>
