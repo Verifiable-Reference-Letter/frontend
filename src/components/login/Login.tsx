@@ -23,16 +23,20 @@ class Login extends React.Component<User, LoginState> {
   }
 
   onLoginClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    console.log("Login clicked.");
+    console.log("login clicked.");
 
     const publicAddress = this.props.public_key;
-    const backendUrl = "https://verifiable-reference-letter.herokuapp.com";
     console.log(publicAddress);
 
     const init: RequestInit = {
       method: "GET",
       headers,
     };
+
+    if (publicAddress == "") {
+      console.log("Invalid public address. Connect to Metamask.")
+      return;
+    }
 
     fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}`, init)
       .then((response) => {
@@ -57,31 +61,50 @@ class Login extends React.Component<User, LoginState> {
   }
 
   async signup({ publicAddress }: { publicAddress: string }) {
-    return fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
+    return await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
       body: JSON.stringify(this.state.publicAddress),
       headers,
       method: "POST",
     }).then((response) => response.json());
   }
 
-  signMessage({
+  async signMessage({
     publicAddress,
     nonce,
   }: {
     publicAddress: string;
     nonce: string;
-  }): Promise<{ publicAddress: string; signature: any }> {
+  }): Promise<{ publicAddress: string; signature: string }> {
+
+    const msgParams = [
+      {
+        type: 'string',      // Any valid solidity type
+        name: 'Message',     // Any string label you want
+        value: 'Hi, Alice!'  // The value to sign
+     },
+     {   
+       type: 'uint32',
+          name: 'A number',
+          value: '1337'
+      }
+    ]   
+    
     console.log("signing the nonce");
     console.log(nonce);
     return new Promise((resolve, reject) => {
-      web3.eth.sign(
-        web3.utils.fromUtf8(`I am signing my one-time nonce: ${nonce}`),
-        publicAddress,
+      // web3.eth.sign doesn't seem to work (never finishes)
+      web3.eth.personal.sign(
+        web3.utils.utf8ToHex(`I am signing my one-time nonce: ${nonce}`),
+        publicAddress, "",
         (err, signature) => {
-          if (err) return reject(err);
+          if (err) {
+            console.log("error when signing");
+            return reject(err);
+          }
+          console.log("message signed");
           return resolve({ publicAddress, signature });
         }
-      );
+      ).then(console.log);
     });
   }
 
@@ -90,7 +113,7 @@ class Login extends React.Component<User, LoginState> {
     signature,
   }: {
     publicAddress: string;
-    signature: any;
+    signature: string;
   }) {
     console.log("authenticating");
     return fetch(`${process.env.REACT_APP_BACKEND_URL}/auth`, {
