@@ -11,6 +11,7 @@ interface LoginProps {}
 interface LoginState {
   publicAddress: string;
   nonce: string;
+  inputName: string;
 }
 
 class Login extends React.Component<User, LoginState> {
@@ -19,24 +20,38 @@ class Login extends React.Component<User, LoginState> {
     this.state = {
       publicAddress: "",
       nonce: "",
+      inputName: ""
     };
+
+    
+    this.handleChange = this.handleChange.bind(this);
+    this.onLoginClick = this.onLoginClick.bind(this);
   }
 
-  onLoginClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  onLoginClick(event: React.MouseEvent<HTMLFormElement, MouseEvent>) {
     console.log("login clicked.");
+    event.preventDefault();
 
-    const publicAddress = this.props.public_key;
-    console.log(publicAddress);
+    // const publicAddress = this.props.publicAddress;
+    const publicAddress = "newAddress"; // uncomment for testing signup
+
+    // if (publicAddress == "") { // comment out conditional for testing signup
+    //   console.log("Invalid public address. Connect to Metamask.");
+    //   return;
+    // }
+
+    console.log("public address:", publicAddress);
+    
+    if (this.state.inputName.length <= 1) {
+      console.log(this.state.inputName);
+      console.log("Please enter a name.")
+      return;
+    }
 
     const init: RequestInit = {
       method: "GET",
       headers,
     };
-
-    if (publicAddress == "") {
-      console.log("Invalid public address. Connect to Metamask.")
-      return;
-    }
 
     fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}`, init)
       .then((response) => {
@@ -46,7 +61,10 @@ class Login extends React.Component<User, LoginState> {
       })
       .then((users) => {
         console.log(users);
-        return users[0] != null ? users[0] : this.signup({ publicAddress });
+        const x: string = this.state.inputName;
+        return users[0] != null
+          ? users[0]
+          : this.signup({ publicAddress: publicAddress, inputName: this.state.inputName });
       })
       // metamask popup to sign
       .then(this.signMessage)
@@ -60,9 +78,16 @@ class Login extends React.Component<User, LoginState> {
     return;
   }
 
-  async signup({ publicAddress }: { publicAddress: string }) {
+  async signup({
+    publicAddress,
+    inputName
+  }: {
+    publicAddress: string;
+    inputName: string;
+  }) {
+    console.log(publicAddress, inputName);
     return await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
-      body: JSON.stringify(this.state.publicAddress),
+      body: JSON.stringify({ publicAddress: publicAddress, inputName: inputName }),
       headers,
       method: "POST",
     }).then((response) => response.json());
@@ -75,36 +100,38 @@ class Login extends React.Component<User, LoginState> {
     publicAddress: string;
     nonce: string;
   }): Promise<{ publicAddress: string; signature: string }> {
-
     const msgParams = [
       {
-        type: 'string',      // Any valid solidity type
-        name: 'Message',     // Any string label you want
-        value: 'Hi, Alice!'  // The value to sign
-     },
-     {   
-       type: 'uint32',
-          name: 'A number',
-          value: '1337'
-      }
-    ]   
-    
+        type: "string", // Any valid solidity type
+        name: "Message", // Any string label you want
+        value: "Hi, Alice!", // The value to sign
+      },
+      {
+        type: "uint32",
+        name: "A number",
+        value: "1337",
+      },
+    ];
+
     console.log("signing the nonce");
     console.log(nonce);
     return new Promise((resolve, reject) => {
       // web3.eth.sign doesn't seem to work (never finishes)
-      web3.eth.personal.sign(
-        web3.utils.utf8ToHex(`I am signing my one-time nonce: ${nonce}`),
-        publicAddress, "",
-        (err, signature) => {
-          if (err) {
-            console.log("error when signing");
-            return reject(err);
+      web3.eth.personal
+        .sign(
+          web3.utils.utf8ToHex(`I am signing my one-time nonce: ${nonce}`),
+          publicAddress,
+          "",
+          (err, signature) => {
+            if (err) {
+              console.log("error when signing");
+              return reject(err);
+            }
+            console.log("message signed");
+            return resolve({ publicAddress, signature });
           }
-          console.log("message signed");
-          return resolve({ publicAddress, signature });
-        }
-      ).then(console.log);
+        )
+        .then(console.log);
     });
   }
 
@@ -125,17 +152,40 @@ class Login extends React.Component<User, LoginState> {
     }).then((response) => response.json());
   }
 
+  handleChange(event: any) {
+    this.setState({inputName: event.target.value});
+  }
+
+  // login(event: any) {
+  //   alert('A name was submitted: ' + this.state.inputName);
+  //   event.preventDefault();
+  // }
+
   render() {
+    const loginDisplay = (
+        <form onSubmit={this.onLoginClick}>
+          <label>
+            Name:
+            <input type="text" value={this.state.inputName} onChange={this.handleChange} />
+          </label>
+          <input type="submit" value="Login" />
+        </form>
+    );
+
     return (
       <div>
-        <button
-          onClick={(e) => {
-            this.onLoginClick(e);
-          }}
-        >
-          Login
-        </button>
+        {loginDisplay}
       </div>
+
+      // <div>
+      //   <button
+      //     onClick={(e) => {
+      //       this.onLoginClick(e);
+      //     }}
+      //   >
+      //     Login
+      //   </button>
+      // </div>
     );
   }
 }

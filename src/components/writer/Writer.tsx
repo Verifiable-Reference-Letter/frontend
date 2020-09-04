@@ -33,28 +33,24 @@ class Writer extends React.Component<User, WriterState> {
         {
           letter_id: 1,
           writer: {
-            user_id: 101,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323",
+            publicAddress: "0x314159265358979323",
           },
           requester: {
-            user_id: 102,
             name: "Simba",
-            public_key: "0xabcdefghijklmnop",
+            publicAddress: "0xabcdefghijklmnop",
           },
           letter_uploaded: false,
         },
         {
           letter_id: 2,
           writer: {
-            user_id: 101,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323",
+            publicAddress: "0x314159265358979323",
           },
           requester: {
-            user_id: 103,
             name: "Curious George",
-            public_key: "0x142857142857142857",
+            publicAddress: "0x142857142857142857",
           },
           letter_uploaded: false,
         },
@@ -63,37 +59,31 @@ class Writer extends React.Component<User, WriterState> {
         {
           letter_id: 2,
           writer: {
-            user_id: 101,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323",
+            publicAddress: "0x314159265358979323",
           },
           requester: {
-            user_id: 102,
             name: "Simba",
-            public_key: "0xabcdefghijklmnop",
+            publicAddress: "0xabcdefghijklmnop",
           },
           recipient: {
-            user_id: 104,
             name: "Elton John",
-            public_key: "0x101100101001101110100",
+            publicAddress: "0x101100101001101110100",
           },
         },
         {
           letter_id: 2,
           writer: {
-            user_id: 101,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323",
+            publicAddress: "0x314159265358979323",
           },
           requester: {
-            user_id: 102,
             name: "Simba",
-            public_key: "0xabcdefghijklmnop",
+            publicAddress: "0xabcdefghijklmnop",
           },
           recipient: {
-            user_id: 103,
             name: "Curious George",
-            public_key: "0x142857142857142857",
+            publicAddress: "0x142857142857142857",
           },
         },
       ],
@@ -145,7 +135,7 @@ class Writer extends React.Component<User, WriterState> {
   // }
 
   render() {
-    const { name, public_key, user_id } = this.props;
+    const { name, publicAddress } = this.props;
     const { letters, sentLetters, modalIsOpen, letterKey } = this.state;
 
     const lettersList = letters.map((l, key) => (
@@ -177,7 +167,7 @@ class Writer extends React.Component<User, WriterState> {
     ));
 
     const sentLettersList = sentLetters.map((l, key) => (
-      <div key={l.letter_id + "x" + l.recipient.user_id}>
+      <div key={l.letter_id + "x" + l.recipient.publicAddress}>
         <p>
           <span>({l.letter_id})&nbsp;</span>
           <span>For: {l.requester.name}</span>

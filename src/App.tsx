@@ -30,7 +30,7 @@ export async function deployContract<T>(
 ): Promise<T> {
   const Contract = new web3.eth.Contract(abi);
   const contractResult = await Contract.deploy({ data: code }).send({
-    from: accounts[0]
+    from: accounts[0],
   });
   return contractResult as any;
 }
@@ -52,7 +52,7 @@ type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
   is_login: boolean;
-  user: string
+  user: string;
 };
 class App extends React.Component<MyProps, MyState> {
   constructor(props: any) {
@@ -61,7 +61,7 @@ class App extends React.Component<MyProps, MyState> {
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
       is_login: false,
-      user: ""
+      user: "",
     };
     this.login = this.login.bind(this);
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
@@ -69,7 +69,7 @@ class App extends React.Component<MyProps, MyState> {
 
   handleErcInputChange(event: any) {
     this.setState({
-      numErcBeingTraded: event.target.value
+      numErcBeingTraded: event.target.value,
     });
     console.log("Num of ERC wanted to trade: " + this.state.numErcBeingTraded);
     var rate = this.state.contract.methods.rate().call();
@@ -80,19 +80,19 @@ class App extends React.Component<MyProps, MyState> {
 
   async login() {
     const ethereum = (window as any).ethereum;
-    await ethereum.enable()
+    await ethereum.enable();
     web3Provider = (window as any).web3.currentProvider;
     // NOTE you might need this
     //await ethereum.send('eth_requestAccounts')
 
     web3 = new Web3(web3Provider);
-    accounts = await ethereum.request({ method: 'eth_accounts' })
+    accounts = await ethereum.request({ method: "eth_accounts" });
     // contract = await deployTutorialToken(); // temporary disable
 
-    this.setState(prevState => ({ 
-    	contract, 
-    	is_login: true,
-    	user: accounts[0]
+    this.setState((prevState) => ({
+      contract,
+      is_login: true,
+      user: accounts[0],
     }));
   }
 
@@ -104,9 +104,16 @@ class App extends React.Component<MyProps, MyState> {
             <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
             <Navbar.Toggle />
             <Navbar.Collapse className="justify-content-end">
-              {!this.state.is_login && <button className="Login" onClick={this.login}>Login</button> }
+              {!this.state.is_login && (
+                <button className="Login" onClick={this.login}>
+                  Login
+                </button>
+              )}
               <Navbar.Text>
-                Signed in as: <a href="#login">{this.state.is_login ? this.state.user : '--'}</a>
+                Signed in as:{" "}
+                <a href="#login">
+                  {this.state.is_login ? this.state.user : "--"}
+                </a>
               </Navbar.Text>
             </Navbar.Collapse>
           </Navbar>
@@ -117,11 +124,7 @@ class App extends React.Component<MyProps, MyState> {
           </Row> */}
           <Row noGutters>
             <Col>
-            <Login
-              user_id={103}
-                name="Curious George"
-                public_key={this.state.user}>
-              </Login>
+              <Login publicAddress={this.state.user}></Login>
               {/* <Recipient
                 user_id={103}
                 name="Curious George"
