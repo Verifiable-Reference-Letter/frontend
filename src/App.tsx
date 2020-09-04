@@ -51,7 +51,7 @@ type MyProps = {};
 type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
-  is_login: boolean;
+  connected: boolean;
   user: string;
 };
 class App extends React.Component<MyProps, MyState> {
@@ -60,10 +60,10 @@ class App extends React.Component<MyProps, MyState> {
     this.state = {
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
-      is_login: false,
+      connected: false,
       user: "",
     };
-    this.login = this.login.bind(this);
+    this.connect = this.connect.bind(this);
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
   }
 
@@ -78,7 +78,7 @@ class App extends React.Component<MyProps, MyState> {
     //console.log("Num of Tutorial Tokens you can receive: " + numTokens.toString());
   }
 
-  async login() {
+  async connect() {
     const ethereum = (window as any).ethereum;
     await ethereum.enable();
     web3Provider = (window as any).web3.currentProvider;
@@ -91,7 +91,7 @@ class App extends React.Component<MyProps, MyState> {
 
     this.setState((prevState) => ({
       contract,
-      is_login: true,
+      connected: true,
       user: accounts[0],
     }));
   }
@@ -104,15 +104,17 @@ class App extends React.Component<MyProps, MyState> {
             <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
             <Navbar.Toggle />
             <Navbar.Collapse className="justify-content-end">
-              {!this.state.is_login && (
-                <button className="Login" onClick={this.login}>
-                  Login
-                </button>
+              {!this.state.connected && (
+                <input
+                  type="button"
+                  onClick={this.connect}
+                  value="Connect"
+                />
               )}
               <Navbar.Text>
                 Signed in as:{" "}
                 <a href="#login">
-                  {this.state.is_login ? this.state.user : "--"}
+                  {this.state.connected ? this.state.user : "--"}
                 </a>
               </Navbar.Text>
             </Navbar.Collapse>

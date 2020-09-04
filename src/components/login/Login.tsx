@@ -1,5 +1,6 @@
 import React from "react";
 import User from "../../interfaces/User.interface";
+import "./Login.css";
 
 import { web3 } from "../../App";
 const headers = new Headers();
@@ -9,44 +10,66 @@ headers.set("Content-Type", "application/json");
 // let web3: Web3;
 interface LoginProps {}
 interface LoginState {
-  publicAddress: string;
-  nonce: string;
   inputName: string;
+  displayMessage: string;
+  loginMode: boolean;
 }
 
 class Login extends React.Component<User, LoginState> {
   constructor(props: User) {
     super(props);
     this.state = {
-      publicAddress: "",
-      nonce: "",
-      inputName: ""
+      inputName: "",
+      displayMessage: "",
+      loginMode: true,
     };
 
-    
     this.handleChange = this.handleChange.bind(this);
     this.onLoginClick = this.onLoginClick.bind(this);
+    this.signMessage = this.signMessage.bind(this);
+    this.authenticate = this.authenticate.bind(this);
   }
 
-  onLoginClick(event: React.MouseEvent<HTMLFormElement, MouseEvent>) {
-    console.log("login clicked.");
-    event.preventDefault();
+  onSignupClick(event: React.MouseEvent<HTMLInputElement, MouseEvent>) {
+    const publicAddress = this.props.publicAddress;
 
-    // const publicAddress = this.props.publicAddress;
-    const publicAddress = "newAddress"; // uncomment for testing signup
-
-    // if (publicAddress == "") { // comment out conditional for testing signup
-    //   console.log("Invalid public address. Connect to Metamask.");
-    //   return;
-    // }
-
-    console.log("public address:", publicAddress);
-    
-    if (this.state.inputName.length <= 1) {
-      console.log(this.state.inputName);
-      console.log("Please enter a name.")
+    // delete after implement router in which login will not be displayed unless connected to metamask
+    if (publicAddress == "") {
+      // comment out conditional for testing signup
+      console.log("Invalid public address. Connect to Metamask.");
+      this.setState({ displayMessage: "Please Connect to Metamask." });
       return;
     }
+
+    if (this.state.inputName.length <= 1) {
+      console.log(this.state.inputName);
+      console.log("Please enter a name.");
+      this.setState({ displayMessage: "Please Enter Your Name." });
+      return;
+    }
+
+    this.signup({
+      publicAddress: publicAddress,
+      inputName: this.state.inputName,
+    });
+  }
+
+  onLoginClick(event: React.MouseEvent<HTMLInputElement, MouseEvent>) {
+    console.log("login clicked.");
+    // event.preventDefault();
+
+    const publicAddress = this.props.publicAddress; // comment out for testing signup
+    // const publicAddress = "newAddress"; // uncomment for testing signup
+
+    // delete after implement router in which login will not be displayed unless connected to metamask
+    if (publicAddress == "") {
+      // comment out conditional for testing signup
+      console.log("Invalid public address. Connect to Metamask.");
+      this.setState({ displayMessage: "Please Connect to Metamask." });
+      return;
+    }
+
+    console.log("public address:", publicAddress);
 
     const init: RequestInit = {
       method: "GET",
@@ -61,10 +84,17 @@ class Login extends React.Component<User, LoginState> {
       })
       .then((users) => {
         console.log(users);
-        const x: string = this.state.inputName;
-        return users[0] != null
-          ? users[0]
-          : this.signup({ publicAddress: publicAddress, inputName: this.state.inputName });
+
+        if (users[0] == null) {
+          console.log("need to signup.");
+          this.setState({
+            displayMessage: "No Existing Account. Sign Up Instead.",
+            // loginMode: false // automatically redirect to signup form
+          });
+          // this.setState({loginMode: false}); // automatically redirect to signup form
+          return Promise.reject("no existing account");
+        }
+        return users[0];
       })
       // metamask popup to sign
       .then(this.signMessage)
@@ -80,17 +110,23 @@ class Login extends React.Component<User, LoginState> {
 
   async signup({
     publicAddress,
-    inputName
+    inputName,
   }: {
     publicAddress: string;
     inputName: string;
   }) {
     console.log(publicAddress, inputName);
+    this.setState({displayMessage: "Signing You Up . . ."})
     return await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
-      body: JSON.stringify({ publicAddress: publicAddress, inputName: inputName }),
+      body: JSON.stringify({
+        publicAddress: publicAddress,
+        inputName: inputName,
+      }),
       headers,
       method: "POST",
-    }).then((response) => response.json());
+    })
+      .then((response) => response.json()) // needs to handle response in which user has existing account
+      .catch((err: Error) => console.log(err));
   }
 
   async signMessage({
@@ -100,19 +136,7 @@ class Login extends React.Component<User, LoginState> {
     publicAddress: string;
     nonce: string;
   }): Promise<{ publicAddress: string; signature: string }> {
-    const msgParams = [
-      {
-        type: "string", // Any valid solidity type
-        name: "Message", // Any string label you want
-        value: "Hi, Alice!", // The value to sign
-      },
-      {
-        type: "uint32",
-        name: "A number",
-        value: "1337",
-      },
-    ];
-
+    // this.setState({displayMessage: "Sign the Message to Confirm Public Address."})
     console.log("signing the nonce");
     console.log(nonce);
     return new Promise((resolve, reject) => {
@@ -143,6 +167,11 @@ class Login extends React.Component<User, LoginState> {
     signature: string;
   }) {
     console.log("authenticating");
+    this.setState({
+      displayMessage: this.state.loginMode
+        ? "Logging You In . . ."
+        : "Signing You Up . . .",
+    });
     return fetch(`${process.env.REACT_APP_BACKEND_URL}/auth`, {
       body: JSON.stringify({ publicAddress, signature }),
       headers: {
@@ -153,39 +182,73 @@ class Login extends React.Component<User, LoginState> {
   }
 
   handleChange(event: any) {
-    this.setState({inputName: event.target.value});
+    this.setState({ inputName: event.target.value });
   }
 
-  // login(event: any) {
-  //   alert('A name was submitted: ' + this.state.inputName);
-  //   event.preventDefault();
-  // }
+  toggleMode() {
+    this.setState({ loginMode: !this.state.loginMode, displayMessage: "" });
+  }
 
   render() {
     const loginDisplay = (
-        <form onSubmit={this.onLoginClick}>
-          <label>
-            Name:
-            <input type="text" value={this.state.inputName} onChange={this.handleChange} />
-          </label>
-          <input type="submit" value="Login" />
-        </form>
+      <div>
+        <input
+          type="button"
+          onClick={(e) => {
+            this.toggleMode();
+          }}
+          value="Sign Up"
+        />
+        <input
+          type="button"
+          onClick={(e) => {
+            this.onLoginClick(e);
+          }}
+          value="Login"
+        />
+      </div>
+    );
+
+    const signupDisplay = (
+      <form>
+        <label>
+          Name &nbsp;
+          <input
+            type="text"
+            placeholder="Not Yet Verified"
+            value={this.state.inputName}
+            onChange={this.handleChange}
+          />
+        </label>
+        <input
+          type="button"
+          onClick={(e) => {
+            this.onSignupClick(e);
+          }}
+          value="Sign Up"
+        />
+        {/* <input
+          type="button"
+          onClick={(e) => {
+            this.onLoginClick(e);
+          }}
+          value="Login"
+        /> */}
+        <input
+          type="button"
+          onClick={(e) => {
+            this.toggleMode();
+          }}
+          value="Back"
+        />
+      </form>
     );
 
     return (
-      <div>
-        {loginDisplay}
+      <div className="login-wrapper">
+        <div>{this.state.loginMode ? loginDisplay : signupDisplay}</div>
+        <div className="alert"> {this.state.displayMessage}</div>
       </div>
-
-      // <div>
-      //   <button
-      //     onClick={(e) => {
-      //       this.onLoginClick(e);
-      //     }}
-      //   >
-      //     Login
-      //   </button>
-      // </div>
     );
   }
 }
