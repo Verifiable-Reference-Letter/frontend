@@ -9,6 +9,7 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Dropdown from "react-bootstrap/Dropdown";
+import "./Nav.css";
 
 import * as ROUTES from '../../common/routes';
 
@@ -97,56 +98,58 @@ class Nav extends React.Component<MyProps, MyState> {
 
   render() {
     return (
-          <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
-            <Navbar.Toggle />
-            <Navbar.Collapse className="justify-content-end">
-              {!this.state.connected && (
-                <input
-                  type="button"
-                  onClick={this.connect}
-                  value="Connect"
-                />
-              )}
-              <Navbar.Text>
-                Signed in as:{" "}
-                <a href="#login">
-                  {this.state.connected ? this.state.user : "--"}
-                </a>
-              </Navbar.Text>
-            </Navbar.Collapse>
-            <Dropdown>
-						  <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-						    Menu
-						  </Dropdown.Toggle>
+      <Navbar bg="dark" variant="dark">
+        <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
+        <Navbar.Toggle />
+        <Navbar.Collapse className="justify-content-end">
+          {!this.state.connected && (
+            <input
+              type="button"
+              onClick={this.connect}
+              value="Connect"
+            />
+          )}
+          {this.state.connected && (
+            <Navbar.Text className="navText">
+              Signed in as:{" "}
+              <a href="#login">
+                {this.state.connected ? this.state.user : "--"}
+              </a>
+            </Navbar.Text>
+          )}
+        </Navbar.Collapse>
+        <Dropdown>
+  			  <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+  			    Menu
+  			  </Dropdown.Toggle>
 
-						  <Dropdown.Menu>
-						  	<Link to={ROUTES.HOME} style={{ textDecoration: 'none' }}>
-			            <li>
-			            	<Dropdown.Item href="#/action-1">Home</Dropdown.Item>
-			            </li>
-			          </Link>
+  			  <Dropdown.Menu alignRight={true}>
+  			  	<Link to={ROUTES.HOME} style={{ textDecoration: 'none' }}>
+              <li>
+              	<Dropdown.Item href="#/action-1">Home</Dropdown.Item>
+              </li>
+            </Link>
 
-					    	<Link to={ROUTES.REQUESTOR} style={{ textDecoration: 'none' }}>
-			            <li>
-			            	<Dropdown.Item href="#/action-2">Requestor</Dropdown.Item>
-			            </li>
-			          </Link>
+  		    	<Link to={ROUTES.REQUESTOR} style={{ textDecoration: 'none' }}>
+              <li>
+              	<Dropdown.Item href="#/action-2">Requestor</Dropdown.Item>
+              </li>
+            </Link>
 
-			          <Link to={ROUTES.RECIPIENT} style={{ textDecoration: 'none' }}>
-			            <li>
-			            	<Dropdown.Item href="#/action-3">Recipient</Dropdown.Item>
-			            </li>
-			          </Link>
+            <Link to={ROUTES.RECIPIENT} style={{ textDecoration: 'none' }}>
+              <li>
+              	<Dropdown.Item href="#/action-3">Recipient</Dropdown.Item>
+              </li>
+            </Link>
 
-			          <Link to={ROUTES.WRITER} style={{ textDecoration: 'none' }}>
-			            <li>
-			            	<Dropdown.Item href="#/action-4">Writer</Dropdown.Item>
-			            </li>
-			          </Link>
-						  </Dropdown.Menu>
-						</Dropdown>
-          </Navbar>
+            <Link to={ROUTES.WRITER} style={{ textDecoration: 'none' }}>
+              <li>
+              	<Dropdown.Item href="#/action-4">Writer</Dropdown.Item>
+              </li>
+            </Link>
+  			  </Dropdown.Menu>
+  			</Dropdown>
+      </Navbar>
     );
   }
 }
