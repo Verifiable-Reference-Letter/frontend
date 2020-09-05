@@ -17,7 +17,6 @@ class App extends React.Component {
       <Router>
           <div>
             <Route exact path={ROUTES.LANDING} component={LandingPage} />
-            
             <Route path={ROUTES.REQUESTOR} component={RequestorPage} />
             <Route path={ROUTES.RECIPIENT} component={RecipientPage} />
             <Route path={ROUTES.WRITER} component={WriterPage} />
