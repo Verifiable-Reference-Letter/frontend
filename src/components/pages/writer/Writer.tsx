@@ -3,10 +3,10 @@
 import React from "react";
 import Modal from "react-modal";
 import "./Writer.css";
-import User from "../../interfaces/User.interface";
-import Letter from "../../interfaces/Letter.interface";
-import SentLetter from "../../interfaces/SentLetter.interface";
-import FileUpload from "../file-upload/FileUpload";
+import User from "../../../interfaces/User.interface";
+import Letter from "../../../interfaces/Letter.interface";
+import SentLetter from "../../../interfaces/SentLetter.interface";
+import FileUpload from "../../file-upload/FileUpload";
 
 const Web3 = require("web3");
 export let web3: typeof Web3;
@@ -218,6 +218,7 @@ class Writer extends React.Component<User, WriterState> {
         <div className="writer-footer">
           <p> Product of Team Gas</p>
         </div>
+        Writer
       </div>
     );
   }

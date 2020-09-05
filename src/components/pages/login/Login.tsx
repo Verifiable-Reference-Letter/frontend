@@ -1,8 +1,8 @@
 import React from "react";
-import User from "../../interfaces/User.interface";
+import User from "../../../interfaces/User.interface";
 import "./Login.css";
 
-import { web3 } from "../../App";
+import { web3 } from "../../../App";
 const headers = new Headers();
 headers.set("Access-Control-Allow-Origin", "*");
 headers.set("Content-Type", "application/json");
@@ -245,9 +245,12 @@ class Login extends React.Component<User, LoginState> {
     );
 
     return (
-      <div className="login-wrapper">
-        <div>{this.state.loginMode ? loginDisplay : signupDisplay}</div>
-        <div className="alert"> {this.state.displayMessage}</div>
+      <div>
+        <div className="login-wrapper">
+          <div>{this.state.loginMode ? loginDisplay : signupDisplay}</div>
+          <div className="alert"> {this.state.displayMessage}</div>
+        </div>
+        Login
       </div>
     );
   }

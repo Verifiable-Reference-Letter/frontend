@@ -2,9 +2,9 @@
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
 import "./Requestor.css";
-import User from "../../interfaces/User.interface";
-import Letter from "../../interfaces/Letter.interface";
-import SentLetter from "../../interfaces/SentLetter.interface";
+import User from "../../../interfaces/User.interface";
+import Letter from "../../../interfaces/Letter.interface";
+import SentLetter from "../../../interfaces/SentLetter.interface";
 
 const Web3 = require("web3");
 export let web3: typeof Web3;
@@ -176,6 +176,7 @@ class Requestor extends React.Component<User, RequestorState> {
             <p> Product of Team Gas</p>
           </div>
         </div>
+        Requestor
       </div>
     );
   }

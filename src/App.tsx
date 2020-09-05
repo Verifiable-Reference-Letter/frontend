@@ -1,6 +1,10 @@
 import { BigNumber } from "bignumber.js";
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+} from 'react-router-dom';
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
 import Row from "react-bootstrap/Row";
@@ -8,10 +12,12 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 
-import Writer from "./components/writer/Writer";
-import Requestor from "./components/requestor/Requestor";
-import Recipient from "./components/recipient/Recipient";
-import Login from "./components/login/Login";
+import WriterPage from "./components/pages/writer/Writer";
+import RequestorPage from "./components/pages/requestor/Requestor";
+import RecipientPage from "./components/pages/recipient/Recipient";
+import LoginPage from "./components/pages/login/Login";
+
+import * as ROUTES from './common/routes';
 
 import Web3 from "web3";
 export let web3: Web3;
@@ -119,24 +125,34 @@ class App extends React.Component<MyProps, MyState> {
               </Navbar.Text>
             </Navbar.Collapse>
           </Navbar>
-          {/* <Row noGutters>
-            <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
-            <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
-	  		    <button>Purchase</button>
-          </Row> */}
-          <Row noGutters>
-            <Col>
-              <Login publicAddress={this.state.user}></Login>
-              {/* <Recipient
-                user_id={103}
-                name="Curious George"
-                public_key="0x142857142857142857"
-              /> */}
-            </Col>
-          </Row>
+          <Router>
+            <div>
+              <Route exact path={ROUTES.LOGIN} component={LoginPage} />
+              <Route path={ROUTES.REQUESTOR} component={RequestorPage} />
+              <Route path={ROUTES.RECIPIENT} component={RecipientPage} />
+              <Route path={ROUTES.WRITER} component={WriterPage} />
+            </div>  
+	      </Router>
+	      App
         </Container>
       </>
     );
   }
 }
 export default App;
+
+ // {/* <Row noGutters>
+ //            <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
+ //            <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
+	//   		    <button>Purchase</button>
+ //          </Row> */}
+ //          <Row noGutters>
+ //            <Col>
+ //              <Login publicAddress={this.state.user}></Login>
+ //              {/* <Recipient
+ //                user_id={103}
+ //                name="Curious George"
+ //                public_key="0x142857142857142857"
+ //              /> */}
+ //            </Col>
+ //          </Row>

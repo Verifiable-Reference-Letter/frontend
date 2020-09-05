@@ -1,8 +1,8 @@
 //import { BigNumber } from "bignumber.js";
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import User from "../../interfaces/User.interface";
-import Letter from "../../interfaces/Letter.interface";
+import User from "../../../interfaces/User.interface";
+import Letter from "../../../interfaces/Letter.interface";
 import "./Recipient.css";
 
 const Web3 = require("web3");
@@ -92,6 +92,7 @@ class Recipient extends React.Component<User, RecipientState> {
         <div className="recipient-footer">
           <p> Product of Team Gas</p>
         </div>
+        Recipient
       </div>
     );
   }
