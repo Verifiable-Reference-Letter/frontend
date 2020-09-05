@@ -1,12 +1,16 @@
 import { BigNumber } from "bignumber.js";
 import { TutorialToken } from "../../contract-types/TutorialToken"; // import is correct
 import React from "react";
+import { Link } from 'react-router-dom';
 import TutorialTokenContractData from "../../contract-data/TutorialToken.json";
 import BN from "bn.js";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
+import Dropdown from "react-bootstrap/Dropdown";
+
+import * as ROUTES from '../../common/routes';
 
 import Web3 from "web3";
 export let web3: Web3;
@@ -93,7 +97,6 @@ class Nav extends React.Component<MyProps, MyState> {
 
   render() {
     return (
-        <Container fluid>
           <Navbar bg="dark" variant="dark">
             <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
             <Navbar.Toggle />
@@ -112,8 +115,38 @@ class Nav extends React.Component<MyProps, MyState> {
                 </a>
               </Navbar.Text>
             </Navbar.Collapse>
+            <Dropdown>
+						  <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+						    Menu
+						  </Dropdown.Toggle>
+
+						  <Dropdown.Menu>
+						  	<Link to={ROUTES.HOME} style={{ textDecoration: 'none' }}>
+			            <li>
+			            	<Dropdown.Item href="#/action-1">Home</Dropdown.Item>
+			            </li>
+			          </Link>
+
+					    	<Link to={ROUTES.REQUESTOR} style={{ textDecoration: 'none' }}>
+			            <li>
+			            	<Dropdown.Item href="#/action-2">Requestor</Dropdown.Item>
+			            </li>
+			          </Link>
+
+			          <Link to={ROUTES.RECIPIENT} style={{ textDecoration: 'none' }}>
+			            <li>
+			            	<Dropdown.Item href="#/action-3">Recipient</Dropdown.Item>
+			            </li>
+			          </Link>
+
+			          <Link to={ROUTES.WRITER} style={{ textDecoration: 'none' }}>
+			            <li>
+			            	<Dropdown.Item href="#/action-4">Writer</Dropdown.Item>
+			            </li>
+			          </Link>
+						  </Dropdown.Menu>
+						</Dropdown>
           </Navbar>
-        </Container>
     );
   }
 }

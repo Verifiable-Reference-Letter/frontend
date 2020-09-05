@@ -176,7 +176,6 @@ class Requestor extends React.Component<User, RequestorState> {
             <p> Product of Team Gas</p>
           </div>
         </div>
-        Requestor
       </div>
     );
   }

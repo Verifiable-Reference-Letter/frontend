@@ -10,12 +10,13 @@ import BN from "bn.js";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
+import Nav from "./components/navbar/Nav";
 
 import WriterPage from "./components/pages/writer/Writer";
 import RequestorPage from "./components/pages/requestor/Requestor";
 import RecipientPage from "./components/pages/recipient/Recipient";
 import LoginPage from "./components/pages/login/Login";
+import HomePage from "./components/pages/home/Home";
 
 import * as ROUTES from './common/routes';
 
@@ -104,55 +105,17 @@ class App extends React.Component<MyProps, MyState> {
 
   render() {
     return (
-      <>
-        <Container fluid>
-          <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
-            <Navbar.Toggle />
-            <Navbar.Collapse className="justify-content-end">
-              {!this.state.connected && (
-                <input
-                  type="button"
-                  onClick={this.connect}
-                  value="Connect"
-                />
-              )}
-              <Navbar.Text>
-                Signed in as:{" "}
-                <a href="#login">
-                  {this.state.connected ? this.state.user : "--"}
-                </a>
-              </Navbar.Text>
-            </Navbar.Collapse>
-          </Navbar>
-          <Router>
-            <div>
-              <Route exact path={ROUTES.LOGIN} component={LoginPage} />
-              <Route path={ROUTES.REQUESTOR} component={RequestorPage} />
-              <Route path={ROUTES.RECIPIENT} component={RecipientPage} />
-              <Route path={ROUTES.WRITER} component={WriterPage} />
-            </div>  
-	      </Router>
-	      App
-        </Container>
-      </>
+      <Router>
+      	<Nav />
+        <div>
+          <Route exact path={ROUTES.LOGIN} component={LoginPage} />
+          <Route path={ROUTES.HOME} component={HomePage} />
+          <Route path={ROUTES.REQUESTOR} component={RequestorPage} />
+          <Route path={ROUTES.RECIPIENT} component={RecipientPage} />
+          <Route path={ROUTES.WRITER} component={WriterPage} />
+        </div>  
+      </Router>
     );
   }
 }
 export default App;
-
- // {/* <Row noGutters>
- //            <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
- //            <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
-	//   		    <button>Purchase</button>
- //          </Row> */}
- //          <Row noGutters>
- //            <Col>
- //              <Login publicAddress={this.state.user}></Login>
- //              {/* <Recipient
- //                user_id={103}
- //                name="Curious George"
- //                public_key="0x142857142857142857"
- //              /> */}
- //            </Col>
- //          </Row>

@@ -92,7 +92,6 @@ class Recipient extends React.Component<User, RecipientState> {
         <div className="recipient-footer">
           <p> Product of Team Gas</p>
         </div>
-        Recipient
       </div>
     );
   }

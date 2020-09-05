@@ -218,7 +218,6 @@ class Writer extends React.Component<User, WriterState> {
         <div className="writer-footer">
           <p> Product of Team Gas</p>
         </div>
-        Writer
       </div>
     );
   }

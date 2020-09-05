@@ -250,7 +250,6 @@ class Login extends React.Component<User, LoginState> {
           <div>{this.state.loginMode ? loginDisplay : signupDisplay}</div>
           <div className="alert"> {this.state.displayMessage}</div>
         </div>
-        Login
       </div>
     );
   }
