@@ -1,8 +1,8 @@
 //import { BigNumber } from "bignumber.js";
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import User from "../../interfaces/User.interface";
-import Letter from "../../interfaces/Letter.interface";
+import User from "../../../interfaces/User.interface";
+import Letter from "../../../interfaces/Letter.interface";
 import "./Recipient.css";
 
 const Web3 = require("web3");
@@ -20,28 +20,24 @@ class Recipient extends React.Component<User, RecipientState> {
         {
           letter_id: 1,
           writer: {
-            user_id: 101,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323"
+            publicAddress: "0x314159265358979323"
           },
           requester: {
-            user_id: 102,
             name: "Simba",
-            public_key: "0xabcdefghijklmnop"
+            publicAddress: "0xabcdefghijklmnop"
           },
           letter_uploaded: false
         },
         {
           letter_id: 2,
           writer: {
-            user_id: 101,
             name: "Mary Poppins",
-            public_key: "0x314159265358979323"
+            publicAddress: "0x314159265358979323"
           },
           requester: {
-            user_id: 102,
             name: "Simba",
-            public_key: "0xabcdefghijklmnop"
+            publicAddress: "0xabcdefghijklmnop"
           },
           letter_uploaded: false
         }
@@ -57,7 +53,7 @@ class Recipient extends React.Component<User, RecipientState> {
   }
 
   render() {
-    const { name, public_key, user_id } = this.props;
+    const { name, publicAddress } = this.props;
     const { letters } = this.state;
 
     const lettersList = letters.map((l, key) => (

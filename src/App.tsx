@@ -1,16 +1,17 @@
-import { BigNumber } from "bignumber.js";
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
+import Nav from "./components/navbar/Nav";
 
-import Writer from "./components/writer/Writer";
-import Requestor from "./components/requestor/Requestor";
-import Recipient from "./components/recipient/Recipient";
+import WriterPage from "./components/pages/writer/Writer";
+import RequestorPage from "./components/pages/requestor/Requestor";
+import RecipientPage from "./components/pages/recipient/Recipient";
+import LoginPage from "./components/pages/login/Login";
+import HomePage from "./components/pages/home/Home";
+
+import * as ROUTES from "./common/routes";
 
 import Web3 from "web3";
 export let web3: Web3;
@@ -29,7 +30,7 @@ export async function deployContract<T>(
 ): Promise<T> {
   const Contract = new web3.eth.Contract(abi);
   const contractResult = await Contract.deploy({ data: code }).send({
-    from: accounts[0]
+    from: accounts[0],
   });
   return contractResult as any;
 }
@@ -50,25 +51,26 @@ type MyProps = {};
 type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
-  is_login: boolean;
-  user: string
+  connected: boolean;
+  publicAddress: string;
 };
+
 class App extends React.Component<MyProps, MyState> {
   constructor(props: any) {
     super(props);
     this.state = {
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
-      is_login: false,
-      user: ""
+      connected: false,
+      publicAddress: "",
     };
-    this.login = this.login.bind(this);
+    this.onConnect = this.onConnect.bind(this);
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
   }
 
   handleErcInputChange(event: any) {
     this.setState({
-      numErcBeingTraded: event.target.value
+      numErcBeingTraded: event.target.value,
     });
     console.log("Num of ERC wanted to trade: " + this.state.numErcBeingTraded);
     var rate = this.state.contract.methods.rate().call();
@@ -77,68 +79,46 @@ class App extends React.Component<MyProps, MyState> {
     //console.log("Num of Tutorial Tokens you can receive: " + numTokens.toString());
   }
 
-  async login() {
+  async onConnect() {
     const ethereum = (window as any).ethereum;
-    await ethereum.enable()
+    await ethereum.enable();
     web3Provider = (window as any).web3.currentProvider;
     // NOTE you might need this
     //await ethereum.send('eth_requestAccounts')
 
     web3 = new Web3(web3Provider);
-    accounts = await ethereum.request({ method: 'eth_accounts' })
-    contract = await deployTutorialToken();
+    accounts = await ethereum.request({ method: "eth_accounts" });
+    // contract = await deployTutorialToken(); // temporary disable
 
-    this.setState(prevState => ({ 
-    	contract, 
-    	is_login: true,
-    	user: accounts[0]
+    this.setState((prevState) => ({
+      contract,
+      connected: true,
+      publicAddress: accounts[0],
     }));
   }
 
   render() {
     return (
-      <>
-        <Container fluid>
-          <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">ETC Reference Letter dApp</Navbar.Brand>
-            <Navbar.Toggle />
-            <Navbar.Collapse className="justify-content-end">
-              {!this.state.is_login && <button className="Login" onClick={this.login}>Login</button> }
-              <Navbar.Text>
-                Signed in as: <a href="#login">{this.state.is_login ? this.state.user : '--'}</a>
-              </Navbar.Text>
-            </Navbar.Collapse>
-          </Navbar>
-          {/* <Row noGutters>
-            <h1><b><i>Send ETC for Tutorial Token</i></b></h1>
-            <p>Amount ETC <input value={this.state.numErcBeingTraded} onChange={e => this.handleErcInputChange(e) }/></p>
-	  		    <button>Purchase</button>
-          </Row> */}
-          <Row noGutters>
-            <Col>
-              <Requestor
-                user_id={102}
-                name="Simba"
-                public_key="0xabcdefghijklmnop"
-              />
-            </Col>
-            <Col>
-              <Writer
-                user_id={101}
-                name="Mary Poppins"
-                public_key="0x314159265358979323"
-              />
-            </Col>
-            <Col>
-              <Recipient
-                user_id={103}
-                name="Curious George"
-                public_key="0x142857142857142857"
-              />
-            </Col>
-          </Row>
-        </Container>
-      </>
+      <Router>
+        <Nav
+          publicAddress={this.state.publicAddress}
+          connected={this.state.connected}
+          onConnect={this.onConnect}
+        />
+        <div>
+          <Route
+            exact
+            path={ROUTES.LOGIN}
+            render={() => (
+              <LoginPage publicAddress={this.state.publicAddress} />
+            )}
+          />
+          <Route path={ROUTES.HOME} component={HomePage} />
+          <Route path={ROUTES.REQUESTOR} component={RequestorPage} />
+          <Route path={ROUTES.RECIPIENT} component={RecipientPage} />
+          <Route path={ROUTES.WRITER} component={WriterPage} />
+        </div>
+      </Router>
     );
   }
 }
