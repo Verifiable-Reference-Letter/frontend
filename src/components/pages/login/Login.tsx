@@ -24,7 +24,7 @@ class Login extends React.Component<User, LoginState> {
       loginMode: true,
     };
 
-    this.handleChange = this.handleChange.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
     this.onLoginClick = this.onLoginClick.bind(this);
     this.signMessage = this.signMessage.bind(this);
     this.authenticate = this.authenticate.bind(this);
@@ -51,7 +51,17 @@ class Login extends React.Component<User, LoginState> {
     this.signup({
       publicAddress: publicAddress,
       inputName: this.state.inputName,
-    });
+    })
+      // metamask popup to sign
+      .then(this.signMessage)
+      // send signature to backend
+      .then(this.authenticate)
+      //.then(this.doStuffWithToken) // after receiving the token
+      .catch((err: Error) => {
+        console.log(err);
+      });
+
+    return;
   }
 
   onLoginClick(event: React.MouseEvent<HTMLInputElement, MouseEvent>) {
@@ -115,8 +125,8 @@ class Login extends React.Component<User, LoginState> {
     publicAddress: string;
     inputName: string;
   }) {
-    console.log(publicAddress, inputName);
-    this.setState({displayMessage: "Signing You Up . . ."})
+    console.log("publicAddress:", publicAddress, "inputName:", inputName);
+    this.setState({ displayMessage: "Signing You Up . . ." });
     return await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
       body: JSON.stringify({
         publicAddress: publicAddress,
@@ -125,8 +135,17 @@ class Login extends React.Component<User, LoginState> {
       headers,
       method: "POST",
     })
-      .then((response) => response.json()) // needs to handle response in which user has existing account
-      .catch((err: Error) => console.log(err));
+      .then((response) => {
+        console.log("logging response");
+        console.log(response);
+        return response.json();
+      })
+      .then((users) => {
+        console.log(users);
+        return users[0];
+      });
+    // .then((response) => response.json()) // needs to handle response in which user has existing account
+    // .catch((err: Error) => console.log(err));
   }
 
   async signMessage({
@@ -179,9 +198,10 @@ class Login extends React.Component<User, LoginState> {
       },
       method: "POST",
     }).then((response) => response.json());
+    // do stuff
   }
 
-  handleChange(event: any) {
+  handleInputChange(event: any) {
     this.setState({ inputName: event.target.value });
   }
 
@@ -217,7 +237,7 @@ class Login extends React.Component<User, LoginState> {
             type="text"
             placeholder="Not Yet Verified"
             value={this.state.inputName}
-            onChange={this.handleChange}
+            onChange={this.handleInputChange}
           />
         </label>
         <input

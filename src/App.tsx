@@ -1,15 +1,8 @@
-import { BigNumber } from "bignumber.js";
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
 import Nav from "./components/navbar/Nav";
 
 import WriterPage from "./components/pages/writer/Writer";
@@ -18,7 +11,7 @@ import RecipientPage from "./components/pages/recipient/Recipient";
 import LoginPage from "./components/pages/login/Login";
 import HomePage from "./components/pages/home/Home";
 
-import * as ROUTES from './common/routes';
+import * as ROUTES from "./common/routes";
 
 import Web3 from "web3";
 export let web3: Web3;
@@ -59,8 +52,9 @@ type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
   connected: boolean;
-  user: string;
+  publicAddress: string;
 };
+
 class App extends React.Component<MyProps, MyState> {
   constructor(props: any) {
     super(props);
@@ -68,9 +62,9 @@ class App extends React.Component<MyProps, MyState> {
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
       connected: false,
-      user: "",
+      publicAddress: "",
     };
-    this.connect = this.connect.bind(this);
+    this.onConnect = this.onConnect.bind(this);
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
   }
 
@@ -85,7 +79,7 @@ class App extends React.Component<MyProps, MyState> {
     //console.log("Num of Tutorial Tokens you can receive: " + numTokens.toString());
   }
 
-  async connect() {
+  async onConnect() {
     const ethereum = (window as any).ethereum;
     await ethereum.enable();
     web3Provider = (window as any).web3.currentProvider;
@@ -99,21 +93,31 @@ class App extends React.Component<MyProps, MyState> {
     this.setState((prevState) => ({
       contract,
       connected: true,
-      user: accounts[0],
+      publicAddress: accounts[0],
     }));
   }
 
   render() {
     return (
       <Router>
-      	<Nav />
+        <Nav
+          publicAddress={this.state.publicAddress}
+          connected={this.state.connected}
+          onConnect={this.onConnect}
+        />
         <div>
-          <Route exact path={ROUTES.LOGIN} component={LoginPage} />
+          <Route
+            exact
+            path={ROUTES.LOGIN}
+            render={() => (
+              <LoginPage publicAddress={this.state.publicAddress} />
+            )}
+          />
           <Route path={ROUTES.HOME} component={HomePage} />
           <Route path={ROUTES.REQUESTOR} component={RequestorPage} />
           <Route path={ROUTES.RECIPIENT} component={RecipientPage} />
           <Route path={ROUTES.WRITER} component={WriterPage} />
-        </div>  
+        </div>
       </Router>
     );
   }
