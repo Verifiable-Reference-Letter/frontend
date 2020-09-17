@@ -6,15 +6,17 @@ const headers = new Headers();
 headers.set("Access-Control-Allow-Origin", "*");
 headers.set("Content-Type", "application/json");
 
+interface HomeProps {
+  user: User;
+}
 interface HomeState {
 }
 
-class Home extends React.Component<User, HomeState> {
-  constructor(props: User) {
+class Home extends React.Component<HomeProps, HomeState> {
+  constructor(props: HomeProps) {
     super(props);
     this.state = {
     };
-
   }
 
   render() {
@@ -22,6 +24,7 @@ class Home extends React.Component<User, HomeState> {
     return (
       <div>
         <div className="home-wrapper">
+          home
         </div>
       </div>
     );

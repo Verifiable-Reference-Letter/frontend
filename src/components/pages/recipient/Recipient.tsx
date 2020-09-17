@@ -8,11 +8,14 @@ import "./Recipient.css";
 const Web3 = require("web3");
 export let web3: typeof Web3;
 
+interface RecipientProps {
+  user: User;
+}
 interface RecipientState {
   letters: Letter[];
 }
 
-class Recipient extends React.Component<User, RecipientState> {
+class Recipient extends React.Component<RecipientProps, RecipientState> {
   componentWillMount() {
     // api call to get letters
     this.setState({
@@ -45,7 +48,7 @@ class Recipient extends React.Component<User, RecipientState> {
     });
   }
 
-  constructor(props: User) {
+  constructor(props: RecipientProps) {
     super(props);
     this.state = {
       letters: []
@@ -53,7 +56,7 @@ class Recipient extends React.Component<User, RecipientState> {
   }
 
   render() {
-    const { name, publicAddress } = this.props;
+    const { name, publicAddress } = this.props.user;
     const { letters } = this.state;
 
     const lettersList = letters.map((l, key) => (

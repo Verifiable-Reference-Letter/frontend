@@ -16,6 +16,10 @@ interface Dictionary<Letter> {
   [key: number]: Letter;
 }
 
+interface WriterProps {
+  user: User;
+}
+
 interface WriterState {
   // need to change into dictionary
   letters: Letter[]; // letter table
@@ -24,7 +28,7 @@ interface WriterState {
   letterKey: number;
 }
 
-class Writer extends React.Component<User, WriterState> {
+class Writer extends React.Component<WriterProps, WriterState> {
   componentWillMount() {
     // api call to get letters
     Modal.setAppElement("body");
@@ -90,7 +94,7 @@ class Writer extends React.Component<User, WriterState> {
     });
   }
 
-  constructor(props: User) {
+  constructor(props: WriterProps) {
     super(props);
     this.state = {
       letters: [],
@@ -135,7 +139,7 @@ class Writer extends React.Component<User, WriterState> {
   // }
 
   render() {
-    const { name, publicAddress } = this.props;
+    const { name, publicAddress } = this.props.user;
     const { letters, sentLetters, modalIsOpen, letterKey } = this.state;
 
     const lettersList = letters.map((l, key) => (
@@ -161,7 +165,6 @@ class Writer extends React.Component<User, WriterState> {
           >
             upload
           </button>
-
         </p>
       </div>
     ));

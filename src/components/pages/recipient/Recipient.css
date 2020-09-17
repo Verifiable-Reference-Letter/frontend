@@ -1,7 +1,7 @@
 .recipient {
   background-color: whitesmoke;
   height: calc(100vh - 56px);
-  padding: 20px;
+  padding: 20px 20% 20px
 }
 .recipient-header {
   text-align: center;

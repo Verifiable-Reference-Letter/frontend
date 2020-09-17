@@ -145,6 +145,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       })
       .then((users) => {
         console.log(users);
+        console.log("signup finish");
         return users[0];
       });
     // .then((response) => response.json()) // needs to handle response in which user has existing account

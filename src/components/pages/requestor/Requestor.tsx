@@ -14,6 +14,10 @@ export let web3: typeof Web3;
 //   [key: number]: Letter;
 // }
 
+interface RequestorProps {
+  user: User;
+}
+
 interface RequestorState {
   // need to change into dictionary
   letters: Letter[]; // letter table
@@ -21,8 +25,8 @@ interface RequestorState {
   letterKey: number;
 }
 
-class Requestor extends React.Component<User, RequestorState> {
-  constructor(props: User) {
+class Requestor extends React.Component<RequestorProps, RequestorState> {
+  constructor(props: RequestorProps) {
     super(props);
     this.state = {
       letters: [],
@@ -89,7 +93,7 @@ class Requestor extends React.Component<User, RequestorState> {
   ) {}
 
   render() {
-    const { name, publicAddress } = this.props;
+    const { name, publicAddress } = this.props.user;
     const { letters, sentLetters, letterKey } = this.state;
 
     const lettersList = letters.map((l, key) => (

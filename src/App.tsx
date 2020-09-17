@@ -99,8 +99,9 @@ class App extends React.Component<MyProps, MyState> {
     }));
   }
 
-  onLogin(user: User) {
-
+  onLogin(u: User) {
+    console.log("login complete");
+    this.setState({user: u});
   }
 
   render() {
