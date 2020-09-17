@@ -10,7 +10,7 @@ headers.set("Content-Type", "application/json");
 // let web3: Web3;
 interface LoginProps {
   user: User;
-  callback: (u: User) => void
+  callback: (u: User) => void;
 }
 interface LoginState {
   inputName: string;
@@ -177,7 +177,10 @@ class Login extends React.Component<LoginProps, LoginState> {
             return resolve({ publicAddress, signature });
           }
         )
-        .then(console.log);
+        .then(console.log)
+        .catch((err: Error) => {
+          console.log();
+        });
     });
   }
 
@@ -201,13 +204,31 @@ class Login extends React.Component<LoginProps, LoginState> {
       },
       method: "POST",
     }).then((response) => {
-
+      let u: User;
       let h: Headers = response.headers;
-      let sessionKey = h.get("sessionKey")
-      console.log(sessionKey);
-
+      const j = h.get("jwtToken");
+      response.json().then((body) => {
+        u = body[0];
+        let jwtToken = j ? j : undefined;
+        if (this.props.user.publicAddress != u.publicAddress) {
+          console.log("error: publicAddresses do not match");
+        } else if (jwtToken) {
+          console.log(jwtToken);
+          this.props.callback({
+            publicAddress: this.props.user.publicAddress,
+            name: u.name,
+            email: u.email,
+            jwtToken: jwtToken,
+          });
+        } else {
+          console.log("error with jwtToken");
+        }
+      }).catch((err: Error) => {
+        console.log(err);
+      });
+    }).catch((err: Error) => {
+      console.log(err);
     });
-
   }
 
   handleInputChange(event: any) {
@@ -267,6 +288,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           type="button"
           onClick={(e) => {
             this.toggleMode();
+            this.setState({ inputName: "" });
           }}
           value="Back"
         />
