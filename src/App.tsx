@@ -11,6 +11,8 @@ import RecipientPage from "./components/pages/recipient/Recipient";
 import LoginPage from "./components/pages/login/Login";
 import HomePage from "./components/pages/home/Home";
 
+import User from "./interfaces/User.interface";
+
 import * as ROUTES from "./common/routes";
 
 import Web3 from "web3";
@@ -52,7 +54,7 @@ type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
   connected: boolean;
-  publicAddress: string;
+  user: User;
 };
 
 class App extends React.Component<MyProps, MyState> {
@@ -62,7 +64,7 @@ class App extends React.Component<MyProps, MyState> {
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
       connected: false,
-      publicAddress: "",
+      user: {publicAddress: ""},
     };
     this.onConnect = this.onConnect.bind(this);
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
@@ -93,15 +95,19 @@ class App extends React.Component<MyProps, MyState> {
     this.setState((prevState) => ({
       contract,
       connected: true,
-      publicAddress: accounts[0],
+      user: {publicAddress: accounts[0]},
     }));
+  }
+
+  onLogin(user: User) {
+
   }
 
   render() {
     return (
       <Router>
         <Nav
-          publicAddress={this.state.publicAddress}
+          publicAddress={this.state.user.publicAddress}
           connected={this.state.connected}
           onConnect={this.onConnect}
         />
@@ -110,7 +116,7 @@ class App extends React.Component<MyProps, MyState> {
             exact
             path={ROUTES.LOGIN}
             render={() => (
-              <LoginPage publicAddress={this.state.publicAddress} />
+              <LoginPage callback={this.onLogin.bind(this)} user={this.state.user} />
             )}
           />
           <Route path={ROUTES.HOME} component={HomePage} />

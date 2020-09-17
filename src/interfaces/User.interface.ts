@@ -1,4 +1,6 @@
 export default interface User {
-    name?: string,
     publicAddress: string,
+    name?: string,
+    email?: string,
+    sessionKey?: string,
 }

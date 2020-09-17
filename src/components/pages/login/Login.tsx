@@ -8,15 +8,18 @@ headers.set("Access-Control-Allow-Origin", "*");
 headers.set("Content-Type", "application/json");
 
 // let web3: Web3;
-interface LoginProps {}
+interface LoginProps {
+  user: User;
+  callback: (u: User) => void
+}
 interface LoginState {
   inputName: string;
   displayMessage: string;
   loginMode: boolean;
 }
 
-class Login extends React.Component<User, LoginState> {
-  constructor(props: User) {
+class Login extends React.Component<LoginProps, LoginState> {
+  constructor(props: LoginProps) {
     super(props);
     this.state = {
       inputName: "",
@@ -31,7 +34,7 @@ class Login extends React.Component<User, LoginState> {
   }
 
   onSignupClick(event: React.MouseEvent<HTMLInputElement, MouseEvent>) {
-    const publicAddress = this.props.publicAddress;
+    const publicAddress = this.props.user.publicAddress;
 
     // delete after implement router in which login will not be displayed unless connected to metamask
     if (publicAddress == "") {
@@ -68,7 +71,7 @@ class Login extends React.Component<User, LoginState> {
     console.log("login clicked.");
     // event.preventDefault();
 
-    const publicAddress = this.props.publicAddress; // comment out for testing signup
+    const publicAddress = this.props.user.publicAddress; // comment out for testing signup
     // const publicAddress = "newAddress"; // uncomment for testing signup
 
     // delete after implement router in which login will not be displayed unless connected to metamask
@@ -197,8 +200,14 @@ class Login extends React.Component<User, LoginState> {
         "Content-Type": "application/json",
       },
       method: "POST",
-    }).then((response) => response.json());
-    // do stuff
+    }).then((response) => {
+
+      let h: Headers = response.headers;
+      let sessionKey = h.get("sessionKey")
+      console.log(sessionKey);
+
+    });
+
   }
 
   handleInputChange(event: any) {
