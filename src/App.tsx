@@ -1,15 +1,16 @@
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
-import Nav from "./components/navbar/Nav";
 
+import Nav from "./components/navbar/Nav";
+import HomePage from "./components/pages/home/Home";
 import WriterPage from "./components/pages/writer/Writer";
 import RequestorPage from "./components/pages/requestor/Requestor";
 import RecipientPage from "./components/pages/recipient/Recipient";
 import LoginPage from "./components/pages/login/Login";
-import HomePage from "./components/pages/home/Home";
+import DashboardPage from "./components/pages/dashboard/Dashboard";
 
 import User from "./interfaces/User.interface";
 
@@ -53,7 +54,8 @@ type MyProps = {};
 type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
-  connected: boolean;
+  connectedTo: boolean; // metamask
+  loggedIn: boolean; // our app
   user: User;
 };
 
@@ -63,10 +65,12 @@ class App extends React.Component<MyProps, MyState> {
     this.state = {
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
-      connected: false,
-      user: {publicAddress: ""},
+      connectedTo: false,
+      loggedIn: false,
+      user: { publicAddress: "" },
     };
     this.onConnect = this.onConnect.bind(this);
+    this.onLogin = this.onLogin.bind(this);
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
   }
 
@@ -94,38 +98,51 @@ class App extends React.Component<MyProps, MyState> {
 
     this.setState((prevState) => ({
       contract,
-      connected: true,
-      user: {publicAddress: accounts[0]},
+      connectedTo: true,
+      user: { publicAddress: accounts[0] },
+      loggedIn: true, // testing purposes only
     }));
   }
 
   onLogin(u: User) {
     console.log("login complete");
-    this.setState({user: u});
+    this.setState({ user: u, loggedIn: true });
   }
 
   render() {
+    const home = <HomePage user={this.state.user} />;
+    const login = (
+      <LoginPage callback={this.onLogin.bind(this)} user={this.state.user} />
+    );
+    const dashboard = <DashboardPage user={this.state.user} />;
+    const requestor = <RequestorPage user={this.state.user} />;
+    const writer = <WriterPage user={this.state.user} />;
+    const recipient = <RecipientPage user={this.state.user} />;
+
+    // const x = this.state.loggedIn ? <HomePage user={this.state.user} /> : login;
+    // if (this.state.loggedIn == true) {
+    //   return <Redirect to="/dashboard" />;
+    // }
+
     return (
-      <Router>
+      <div>
         <Nav
-          publicAddress={this.state.user.publicAddress}
-          connected={this.state.connected}
+          user={this.state.user}
+          connectedTo={this.state.connectedTo}
           onConnect={this.onConnect}
+          loggedIn={this.state.loggedIn}
         />
+        {this.state.loggedIn ? <Redirect to="/dashboard" /> : null}
         <div>
-          <Route
-            exact
-            path={ROUTES.LOGIN}
-            render={() => (
-              <LoginPage callback={this.onLogin.bind(this)} user={this.state.user} />
-            )}
-          />
-          <Route path={ROUTES.HOME} component={HomePage} />
-          <Route path={ROUTES.REQUESTOR} component={RequestorPage} />
-          <Route path={ROUTES.RECIPIENT} component={RecipientPage} />
-          <Route path={ROUTES.WRITER} component={WriterPage} />
+          <Route exact path={ROUTES.HOME} render={() => home} />
+          <Route exact path={ROUTES.LOGIN} render={() => login} />
+          <Route exact path={ROUTES.DASHBOARD} render={() => dashboard} />
+          <Route exact path={ROUTES.REQUESTOR} render={() => requestor} />
+          <Route exact path={ROUTES.WRITER} render={() => writer} />
+          <Route exact path={ROUTES.RECIPIENT} render={() => recipient} />
         </div>
-      </Router>
+      </div>
+      
     );
   }
 }

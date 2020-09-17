@@ -37,7 +37,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     const publicAddress = this.props.user.publicAddress;
 
     // delete after implement router in which login will not be displayed unless connected to metamask
-    if (publicAddress == "") {
+    if (publicAddress === "") {
       // comment out conditional for testing signup
       console.log("Invalid public address. Connect to Metamask.");
       this.setState({ displayMessage: "Please Connect to Metamask." });
@@ -298,7 +298,7 @@ class Login extends React.Component<LoginProps, LoginState> {
 
     return (
       <div>
-        <div className="login-wrapper">
+        <div className="login">
           <div>{this.state.loginMode ? loginDisplay : signupDisplay}</div>
           <div className="alert"> {this.state.displayMessage}</div>
         </div>

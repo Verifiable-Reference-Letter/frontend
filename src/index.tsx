@@ -1,10 +1,10 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 import { BigNumber } from "bignumber.js";
 //import * as TruffleContracts from ".";
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import { BrowserRouter as Router } from "react-router-dom";
 
 // const Web3 = require('web3');
 
@@ -13,8 +13,8 @@ import App from './App';
 //web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545')); // was 9545 before
 
 ReactDOM.render(
-    <App />,
-  document.getElementById('root')
- );
-
-
+  <Router>
+    <App />
+  </Router>,
+  document.getElementById("root")
+);

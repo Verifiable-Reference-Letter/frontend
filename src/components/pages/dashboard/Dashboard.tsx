@@ -1,19 +1,19 @@
 import React from "react";
 import User from "../../../interfaces/User.interface";
-import "./Home.css";
+import "./Dashboard.css";
 
 const headers = new Headers();
 headers.set("Access-Control-Allow-Origin", "*");
 headers.set("Content-Type", "application/json");
 
-interface HomeProps {
+interface DashboardProps {
   user: User;
 }
-interface HomeState {
+interface DashboardState {
 }
 
-class Home extends React.Component<HomeProps, HomeState> {
-  constructor(props: HomeProps) {
+class Dashboard extends React.Component<DashboardProps, DashboardState> {
+  constructor(props: DashboardProps) {
     super(props);
     this.state = {
     };
@@ -23,11 +23,11 @@ class Home extends React.Component<HomeProps, HomeState> {
 
     return (
       <div>
-        <div className="home">
-          Home
+        <div className="dashboard">
+          Dashboard
         </div>
       </div>
     );
   }
 }
-export default Home;
+export default Dashboard;
