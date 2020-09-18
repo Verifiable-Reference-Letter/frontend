@@ -67,7 +67,7 @@ class App extends React.Component<MyProps, MyState> {
       contract: {} as TutorialToken,
       connectedTo: false,
       loggedIn: false,
-      user: { publicAddress: "" },
+      user: { publicAddress: "", name: "", email: "", jwtToken: "" },
     };
     this.onConnect = this.onConnect.bind(this);
     this.onLogin = this.onLogin.bind(this);
@@ -96,12 +96,12 @@ class App extends React.Component<MyProps, MyState> {
     accounts = await ethereum.request({ method: "eth_accounts" });
     // contract = await deployTutorialToken(); // temporary disable
 
-    this.setState((prevState) => ({
+    this.setState({
       contract,
       connectedTo: true,
-      user: { publicAddress: accounts[0] },
+      user: { publicAddress: accounts[0], name: "", email: "", jwtToken: ""},
       loggedIn: true, // testing purposes only
-    }));
+    });
   }
 
   onLogin(u: User) {

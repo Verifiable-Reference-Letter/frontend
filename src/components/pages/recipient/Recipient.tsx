@@ -27,11 +27,15 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           letter_id: 1,
           writer: {
             name: "Mary Poppins",
-            publicAddress: "0x314159265358979323"
+            publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: ""
           },
           requester: {
             name: "Simba",
-            publicAddress: "0xabcdefghijklmnop"
+            publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: ""
           },
           letter_uploaded: false
         },
@@ -39,11 +43,15 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           letter_id: 2,
           writer: {
             name: "Mary Poppins",
-            publicAddress: "0x314159265358979323"
+            publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: ""
           },
           requester: {
             name: "Simba",
-            publicAddress: "0xabcdefghijklmnop"
+            publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: ""
           },
           letter_uploaded: false
         }

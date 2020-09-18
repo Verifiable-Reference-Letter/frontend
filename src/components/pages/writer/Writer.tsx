@@ -1,9 +1,10 @@
 //import { BigNumber } from "bignumber.js";
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import Modal from "react-modal";
+// import Modal from "react-modal";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
+import Modal from "react-bootstrap/Modal";
 import Container from "react-bootstrap/Container";
 import "./Writer.css";
 import User from "../../../interfaces/User.interface";
@@ -28,13 +29,15 @@ interface WriterState {
   letters: Letter[]; // letter table
   sentLetters: SentLetter[]; // letter-recipient table
   modalIsOpen: boolean;
-  letterKey: number;
+  selectedLetterKey: number;
+  selectedLetterId: number;
+  fetchUrl: string;
 }
 
 class Writer extends React.Component<WriterProps, WriterState> {
   componentWillMount() {
+    // Modal.setAppElement("body");
     // api call to get letters
-    Modal.setAppElement("body");
     this.setState({
       letters: [
         {
@@ -42,10 +45,14 @@ class Writer extends React.Component<WriterProps, WriterState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
           requester: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: "",
           },
           letter_uploaded: false,
         },
@@ -54,10 +61,14 @@ class Writer extends React.Component<WriterProps, WriterState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
           requester: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
+            email: "",
+            jwtToken: "",
           },
           letter_uploaded: false,
         },
@@ -68,14 +79,20 @@ class Writer extends React.Component<WriterProps, WriterState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
           requester: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: "",
           },
           recipient: {
             name: "Elton John",
             publicAddress: "0x101100101001101110100",
+            email: "",
+            jwtToken: "",
           },
         },
         {
@@ -83,14 +100,20 @@ class Writer extends React.Component<WriterProps, WriterState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
           requester: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: "",
           },
           recipient: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
+            email: "",
+            jwtToken: "",
           },
         },
       ],
@@ -103,7 +126,9 @@ class Writer extends React.Component<WriterProps, WriterState> {
       letters: [],
       sentLetters: [],
       modalIsOpen: false,
-      letterKey: -1,
+      selectedLetterKey: -1,
+      selectedLetterId: -1,
+      fetchUrl: "",
     };
   }
 
@@ -120,18 +145,25 @@ class Writer extends React.Component<WriterProps, WriterState> {
   ) {}
 
   openUploadModal(key: number) {
-    this.setState({ modalIsOpen: true, letterKey: key });
+    console.log("opening modal");
+    console.log(key);
+    this.setState({
+      modalIsOpen: true,
+      selectedLetterKey: key,
+      selectedLetterId: this.state.letters[key].letter_id,
+    });
   }
 
   closeUploadModal() {
+    console.log("closing modal");
     this.setState({ modalIsOpen: false });
   }
 
-  onUploadSubmit(file: FormData) {
-    this.closeUploadModal();
-    console.log(this.state.letterKey);
+  onUploadSubmit(file: File) {
     console.log(file);
-    // send letter to backend
+    // TODO: do stuff with file
+    // TODO: send File to backend
+    this.closeUploadModal();
   }
 
   // letterView() {
@@ -142,19 +174,24 @@ class Writer extends React.Component<WriterProps, WriterState> {
   // }
 
   render() {
-    const { name, publicAddress } = this.props.user;
-    const { letters, sentLetters, modalIsOpen, letterKey } = this.state;
+    const { publicAddress, name, email, jwtToken } = this.props.user;
+    const {
+      letters,
+      sentLetters,
+      modalIsOpen,
+      selectedLetterKey,
+      selectedLetterId,
+    } = this.state;
 
-    const lettersList = letters.map((l, key) => (
-      <Row key={l.letter_id}>
+    const lettersList = letters.map((l, k) => (
+      <Row key={k}>
         <div className="full-width">
           <span className="text-float-left">({l.letter_id})&nbsp;</span>
           <span className="text-float-left">For: {l.requester.name}</span>
           <Button
             className="left-float-right-button"
-            // style={{ marginLeft: "10px", float: "right" }}
             onClick={() => {
-              this.onViewClick(l.letter_id);
+              this.onViewClick(k);
             }}
           >
             view
@@ -162,9 +199,8 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
           <Button
             className="left-float-right-button"
-            // style={{ marginLeft: "10px", float: "right" }}
             onClick={() => {
-              this.onUploadClick(l.letter_id);
+              this.onUploadClick(k);
             }}
           >
             upload
@@ -173,17 +209,16 @@ class Writer extends React.Component<WriterProps, WriterState> {
       </Row>
     ));
 
-    const sentLettersList = sentLetters.map((l, key) => (
-      <Row key={l.letter_id + "x" + l.recipient.publicAddress}>
+    const sentLettersList = sentLetters.map((l, k) => (
+      <Row key={k}>
         <div className="full-width">
           <span className="text-float-left">({l.letter_id})&nbsp;</span>
           <span className="text-float-left">For: {l.requester.name}</span>
 
           <Button
             className="left-float-right-button"
-            // style={{ marginLeft: "10px", float: "right" }}
             onClick={() => {
-              this.onViewClick(l.letter_id);
+              this.onViewClick(k);
             }}
           >
             view
@@ -195,6 +230,32 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
     return (
       <div id="writer" className="writer">
+        <Modal
+          show={modalIsOpen}
+          onHide={this.closeUploadModal.bind(this)}
+          backdrop="static"
+          animation={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Upload File</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FileUpload
+              user={this.props.user}
+              fetchUrl={
+                "/api/users/" +
+                publicAddress +
+                "/letters/" +
+                +selectedLetterId +
+                "/content"
+              }
+              onUpload={this.onUploadSubmit.bind(this)}
+              onClose={this.closeUploadModal.bind(this)}
+            ></FileUpload>
+          </Modal.Body>
+        </Modal>
+
         <div className="writer-header">
           <h1> Writer Page </h1>
           <p>
@@ -203,13 +264,15 @@ class Writer extends React.Component<WriterProps, WriterState> {
           <hr></hr>
         </div>
 
-        <Modal
+        {/* <Modal
           isOpen={modalIsOpen}
           onRequestClose={this.closeUploadModal.bind(this)}
           contentLabel="Upload Modal"
         >
-          <FileUpload callback={this.onUploadSubmit.bind(this)}></FileUpload>
-        </Modal>
+          <FileUpload
+            user={this.props.user} callback={this.onUploadSubmit.bind(this)}
+          ></FileUpload>
+        </Modal> */}
 
         <div className="letters">
           <h3> Letters </h3>

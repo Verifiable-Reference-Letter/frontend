@@ -47,10 +47,14 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: ""
           },
           requester: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: ""
           },
           letter_uploaded: false,
         },
@@ -61,14 +65,20 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: ""
           },
           requester: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
+            email: "",
+            jwtToken: ""
           },
           recipient: {
             name: "Elton John",
             publicAddress: "0x101100101001101110100",
+            email: "",
+            jwtToken: ""
           },
         },
         {
@@ -76,14 +86,20 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: ""
           },
           requester: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: ""
           },
           recipient: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
+            email: "",
+            jwtToken: ""
           },
         },
       ],
