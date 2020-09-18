@@ -1,6 +1,9 @@
 //import { BigNumber } from "bignumber.js";
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Container from "react-bootstrap/Container";
 import User from "../../../interfaces/User.interface";
 import Letter from "../../../interfaces/Letter.interface";
 import "./Recipient.css";
@@ -60,22 +63,22 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     const { letters } = this.state;
 
     const lettersList = letters.map((l, key) => (
-      <div key={l.letter_id}>
-        <p>
-          <span>({l.letter_id})&nbsp;</span>
-          <span>For: {l.requester.name} </span>
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            // onClick={(e) => {
-            //   this.onViewClick(e, l.letter_id);
-            // }}
+      <Row key={l.letter_id}>
+        <div className="full-width">
+          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">For: {l.requester.name}</span>
+          <Button
+            className="left-float-right-button"
+            // style={{ marginLeft: "10px", float: "right" }}
+            onClick={() => {
+            }}
           >
             view
-          </button>
-          <span className="from">From: {l.writer.name}</span>
-        </p>
-      </div>
+          </Button>
+        </div>
+      </Row>
     ));
+
     return (
       <div className="recipient">
         <div className="recipient-header">
@@ -88,7 +91,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
 
         <div className="letters">
           <h3> Letters </h3>
-          <div>{lettersList}</div>
+          <Container fluid>{lettersList}</Container>
           <hr></hr>
         </div>
 

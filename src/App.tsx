@@ -119,11 +119,6 @@ class App extends React.Component<MyProps, MyState> {
     const writer = <WriterPage user={this.state.user} />;
     const recipient = <RecipientPage user={this.state.user} />;
 
-    // const x = this.state.loggedIn ? <HomePage user={this.state.user} /> : login;
-    // if (this.state.loggedIn == true) {
-    //   return <Redirect to="/dashboard" />;
-    // }
-
     return (
       <div>
         <Nav

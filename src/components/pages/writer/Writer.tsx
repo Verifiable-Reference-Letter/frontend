@@ -2,6 +2,9 @@
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
 import Modal from "react-modal";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Container from "react-bootstrap/Container";
 import "./Writer.css";
 import User from "../../../interfaces/User.interface";
 import Letter from "../../../interfaces/Letter.interface";
@@ -105,14 +108,14 @@ class Writer extends React.Component<WriterProps, WriterState> {
   }
 
   onUploadClick(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    // event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     key: number
   ) {
     this.openUploadModal(key);
   }
 
   onViewClick(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    // event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     key: number
   ) {}
 
@@ -143,49 +146,51 @@ class Writer extends React.Component<WriterProps, WriterState> {
     const { letters, sentLetters, modalIsOpen, letterKey } = this.state;
 
     const lettersList = letters.map((l, key) => (
-      <div key={l.letter_id}>
-        <p>
-          <span>({l.letter_id})&nbsp;</span>
-          <span>For: {l.requester.name} </span>
-
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
-              this.onViewClick(e, l.letter_id);
+      <Row key={l.letter_id}>
+        <div className="full-width">
+          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">For: {l.requester.name}</span>
+          <Button
+            className="left-float-right-button"
+            // style={{ marginLeft: "10px", float: "right" }}
+            onClick={() => {
+              this.onViewClick(l.letter_id);
             }}
           >
             view
-          </button>
+          </Button>
 
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
-              this.onUploadClick(e, l.letter_id);
+          <Button
+            className="left-float-right-button"
+            // style={{ marginLeft: "10px", float: "right" }}
+            onClick={() => {
+              this.onUploadClick(l.letter_id);
             }}
           >
             upload
-          </button>
-        </p>
-      </div>
+          </Button>
+        </div>
+      </Row>
     ));
 
     const sentLettersList = sentLetters.map((l, key) => (
-      <div key={l.letter_id + "x" + l.recipient.publicAddress}>
-        <p>
-          <span>({l.letter_id})&nbsp;</span>
-          <span>For: {l.requester.name}</span>
+      <Row key={l.letter_id + "x" + l.recipient.publicAddress}>
+        <div className="full-width">
+          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">For: {l.requester.name}</span>
 
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
-              this.onViewClick(e, l.letter_id);
+          <Button
+            className="left-float-right-button"
+            // style={{ marginLeft: "10px", float: "right" }}
+            onClick={() => {
+              this.onViewClick(l.letter_id);
             }}
           >
             view
-          </button>
-          <span style={{ float: "right" }}>To: {l.recipient.name}</span>
-        </p>
-      </div>
+          </Button>
+          <span className="text-float-right">To: {l.recipient.name}</span>
+        </div>
+      </Row>
     ));
 
     return (
@@ -208,13 +213,13 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
         <div className="letters">
           <h3> Letters </h3>
-          <div>{lettersList}</div>
+          <Container fluid>{lettersList}</Container>
           <hr></hr>
         </div>
 
         <div className="sentLetters">
           <h3> History </h3>
-          <div>{sentLettersList}</div>
+          <Container fluid>{sentLettersList}</Container>
           <hr></hr>
         </div>
 

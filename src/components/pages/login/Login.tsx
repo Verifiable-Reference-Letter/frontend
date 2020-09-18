@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "react-bootstrap/Button";
 import User from "../../../interfaces/User.interface";
 import "./Login.css";
 
@@ -33,7 +34,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     this.authenticate = this.authenticate.bind(this);
   }
 
-  onSignupClick(event: React.MouseEvent<HTMLInputElement, MouseEvent>) {
+  onSignupClick(/*event: React.MouseEvent<HTMLInputElement, MouseEvent>*/) {
     const publicAddress = this.props.user.publicAddress;
 
     // delete after implement router in which login will not be displayed unless connected to metamask
@@ -67,7 +68,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     return;
   }
 
-  onLoginClick(event: React.MouseEvent<HTMLInputElement, MouseEvent>) {
+  onLoginClick(/*event: React.MouseEvent<HTMLInputElement, MouseEvent>*/) {
     console.log("login clicked.");
     // event.preventDefault();
 
@@ -75,7 +76,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     // const publicAddress = "newAddress"; // uncomment for testing signup
 
     // delete after implement router in which login will not be displayed unless connected to metamask
-    if (publicAddress == "") {
+    if (publicAddress === "") {
       // comment out conditional for testing signup
       console.log("Invalid public address. Connect to Metamask.");
       this.setState({ displayMessage: "Please Connect to Metamask." });
@@ -204,32 +205,37 @@ class Login extends React.Component<LoginProps, LoginState> {
         "Content-Type": "application/json",
       },
       method: "POST",
-    }).then((response) => {
-      let u: User;
-      let h: Headers = response.headers;
-      const j = h.get("jwtToken");
-      response.json().then((body) => {
-        u = body[0];
-        let jwtToken = j ? j : undefined;
-        if (this.props.user.publicAddress != u.publicAddress) {
-          console.log("error: publicAddresses do not match");
-        } else if (jwtToken) {
-          console.log(jwtToken);
-          this.props.callback({
-            publicAddress: this.props.user.publicAddress,
-            name: u.name,
-            email: u.email,
-            jwtToken: jwtToken,
+    })
+      .then((response) => {
+        let u: User;
+        let h: Headers = response.headers;
+        const j = h.get("jwtToken");
+        response
+          .json()
+          .then((body) => {
+            u = body[0];
+            let jwtToken = j ? j : undefined;
+            if (this.props.user.publicAddress !== u.publicAddress) {
+              console.log("error: publicAddresses do not match");
+            } else if (jwtToken) {
+              console.log(jwtToken);
+              this.props.callback({
+                publicAddress: this.props.user.publicAddress,
+                name: u.name,
+                email: u.email,
+                jwtToken: jwtToken,
+              });
+            } else {
+              console.log("error with jwtToken");
+            }
+          })
+          .catch((err: Error) => {
+            console.log(err);
           });
-        } else {
-          console.log("error with jwtToken");
-        }
-      }).catch((err: Error) => {
+      })
+      .catch((err: Error) => {
         console.log(err);
       });
-    }).catch((err: Error) => {
-      console.log(err);
-    });
   }
 
   handleInputChange(event: any) {
@@ -243,26 +249,28 @@ class Login extends React.Component<LoginProps, LoginState> {
   render() {
     const loginDisplay = (
       <div>
-        <input
-          type="button"
-          onClick={(e) => {
+        <Button
+          className="left-button"
+          onClick={() => {
             this.toggleMode();
           }}
-          value="Sign Up"
-        />
-        <input
-          type="button"
-          onClick={(e) => {
-            this.onLoginClick(e);
+        >
+          Sign Up
+        </Button>
+        <Button
+          className="left-button"
+          onClick={() => {
+            this.onLoginClick();
           }}
-          value="Login"
-        />
+        >
+          Login
+        </Button>
       </div>
     );
 
     const signupDisplay = (
       <form>
-        <label>
+        <label className="label-top">
           Name &nbsp;
           <input
             type="text"
@@ -271,28 +279,23 @@ class Login extends React.Component<LoginProps, LoginState> {
             onChange={this.handleInputChange}
           />
         </label>
-        <input
-          type="button"
-          onClick={(e) => {
-            this.onSignupClick(e);
-          }}
-          value="Sign Up"
-        />
-        {/* <input
-          type="button"
-          onClick={(e) => {
-            this.onLoginClick(e);
-          }}
-          value="Login"
-        /> */}
-        <input
-          type="button"
-          onClick={(e) => {
+        <Button
+          className="left-float-right-button"
+          onClick={() => {
             this.toggleMode();
             this.setState({ inputName: "" });
           }}
-          value="Back"
-        />
+        >
+          Back
+        </Button>
+        <Button
+          className="left-float-right-button"
+          onClick={() => {
+            this.onSignupClick();
+          }}
+        >
+          Sign Up
+        </Button>
       </form>
     );
 

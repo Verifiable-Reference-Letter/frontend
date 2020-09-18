@@ -1,4 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./assets/styles/app.scss";
 import { BigNumber } from "bignumber.js";
 //import * as TruffleContracts from ".";
 import React from "react";

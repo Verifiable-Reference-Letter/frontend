@@ -1,6 +1,4 @@
 .recipient {
-  background-color: whitesmoke;
-  height: calc(100vh - 56px);
   padding: 20px 20% 20px
 }
 .recipient-header {
@@ -20,6 +18,26 @@ h6 {
   text-align: center;
 }
 
-.from {
+h1, h2, h3, h4, h5, h6 {
+  text-align: center;
+}
+
+.left-float-right-button {
+  margin-left: 10px;
   float: right;
+  margin-bottom: 10px;
+}
+
+.full-width {
+  width: 100%
+}
+
+.text-float-right {
+  float: right;
+  margin-top: 5px;
+}
+
+.text-float-left {
+  float: left;
+  margin-top: 5px;
 }

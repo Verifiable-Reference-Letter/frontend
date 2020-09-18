@@ -1,6 +1,9 @@
 //import { BigNumber } from "bignumber.js";
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Container from "react-bootstrap/Container";
 import "./Requestor.css";
 import User from "../../../interfaces/User.interface";
 import Letter from "../../../interfaces/Letter.interface";
@@ -31,7 +34,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     this.state = {
       letters: [],
       sentLetters: [],
-      letterKey: -1
+      letterKey: -1,
     };
   }
 
@@ -43,52 +46,52 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           letter_id: 1,
           writer: {
             name: "Mary Poppins",
-            publicAddress: "0x314159265358979323"
+            publicAddress: "0x314159265358979323",
           },
           requester: {
             name: "Simba",
-            publicAddress: "0xabcdefghijklmnop"
+            publicAddress: "0xabcdefghijklmnop",
           },
-          letter_uploaded: false
-        }
+          letter_uploaded: false,
+        },
       ],
       sentLetters: [
         {
           letter_id: 2,
           writer: {
             name: "Mary Poppins",
-            publicAddress: "0x314159265358979323"
+            publicAddress: "0x314159265358979323",
           },
           requester: {
             name: "Curious George",
-            publicAddress: "0x142857142857142857"
+            publicAddress: "0x142857142857142857",
           },
           recipient: {
             name: "Elton John",
-            publicAddress: "0x101100101001101110100"
-          }
+            publicAddress: "0x101100101001101110100",
+          },
         },
         {
           letter_id: 2,
           writer: {
             name: "Mary Poppins",
-            publicAddress: "0x314159265358979323"
+            publicAddress: "0x314159265358979323",
           },
           requester: {
             name: "Simba",
-            publicAddress: "0xabcdefghijklmnop"
+            publicAddress: "0xabcdefghijklmnop",
           },
           recipient: {
             name: "Curious George",
-            publicAddress: "0x142857142857142857"
-          }
-        }
-      ]
+            publicAddress: "0x142857142857142857",
+          },
+        },
+      ],
     });
   }
 
   onViewClick(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    // event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     key: number
   ) {}
 
@@ -97,44 +100,41 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     const { letters, sentLetters, letterKey } = this.state;
 
     const lettersList = letters.map((l, key) => (
-      <div key={l.letter_id}>
-        <p>
-          <span>({l.letter_id})&nbsp;</span>
-          <span>From: {l.writer.name} </span>
+      <Row key={l.letter_id}>
+        <div className="full-width">
+          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">From: {l.writer.name} </span>
 
-          <button
+          <Button
             style={{ marginLeft: "10px", float: "right" }}
-            onClick={e => {
-              //this.onUploadClick(e, l.letter_id);
-            }}
+            onClick={() => {}}
           >
             send
-          </button>
-        </p>
-      </div>
+          </Button>
+        </div>
+      </Row>
     ));
 
     const sentLettersList = sentLetters.map((l, key) => (
-      <div key={l.letter_id + "x" + l.recipient.publicAddress}>
-        <p>
-          <span>({l.letter_id})&nbsp;</span>
-          <span>From: {l.writer.name}</span>
+      <Row key={l.letter_id + "x" + l.recipient.publicAddress}>
+        <div className="full-width">
+          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">From: {l.writer.name}</span>
 
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            onClick={e => {
-              this.onViewClick(e, l.letter_id);
+          <Button
+            className="left-float-right-button"
+            onClick={() => {
+              this.onViewClick(l.letter_id);
             }}
           >
             view
-          </button>
-          <span style={{ float: "right" }}>To: {l.recipient.name}</span>
-        </p>
-      </div>
+          </Button>
+          <span className="text-float-right">To: {l.recipient.name}</span>
+        </div>
+      </Row>
     ));
 
     return (
-      <div className="requestor-wrap">
         <div className="requestor">
           <div className="requestor-header">
             <h1> Requestor Page </h1>
@@ -147,32 +147,25 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           <div>
             <h3> Request </h3>
             <input placeholder="Writer Id" />
-            <button
-              style={{ marginLeft: "10px", float: "right" }}
-              onClick={e => {
-                //this.onViewClick(e, l.letter_id);
+            <Button
+            className="left-float-right-button"
+              onClick={() => {
               }}
             >
               request
-            </button>
+            </Button>
             <hr></hr>
           </div>
 
           <div className="letters">
-            <h3> Received Letters </h3>
-            <div>{lettersList}</div>
-            <hr></hr>
-          </div>
-
-          <div className="letters">
-            <h3> Pending Letters </h3>
-            <div></div>
+            <h3> Letters </h3>
+            <Container fluid>{lettersList}</Container>
             <hr></hr>
           </div>
 
           <div className="sentLetters">
             <h3> History </h3>
-            <div>{sentLettersList}</div>
+            <Container fluid>{sentLettersList}</Container>
             <hr></hr>
           </div>
 
@@ -180,7 +173,6 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             <p> Product of Team Gas</p>
           </div>
         </div>
-      </div>
     );
   }
 }
