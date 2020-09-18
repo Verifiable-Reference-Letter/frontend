@@ -34,10 +34,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-float-right {
   float: right;
-  margin-top: 5px;
+  margin-top: 7px;
 }
 
 .text-float-left {
   float: left;
-  margin-top: 5px;
+  margin-top: 7px;
 }

@@ -16,9 +16,10 @@ import FileView from "../../file-view/FileView";
 const Web3 = require("web3");
 export let web3: typeof Web3;
 
-// need to fix
-interface Dictionary<Letter> {
-  [key: number]: Letter;
+enum LetterCategory {
+  letters,
+  sentLetters,
+  invalid
 }
 
 interface WriterProps {
@@ -31,9 +32,9 @@ interface WriterState {
   sentLetters: SentLetter[]; // letter-recipient table
   uploadIsOpen: boolean;
   viewIsOpen: boolean;
-  uploadInitialDisplayMessage?: string;
   selectedLetterKey: number;
   selectedLetterId: number;
+  selectedLetterCategory: LetterCategory;
 }
 
 class Writer extends React.Component<WriterProps, WriterState> {
@@ -135,24 +136,29 @@ class Writer extends React.Component<WriterProps, WriterState> {
       uploadIsOpen: false,
       selectedLetterKey: -1,
       selectedLetterId: -1,
+      selectedLetterCategory: LetterCategory.invalid,
     };
   }
 
-  onUploadClick(
-    // event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    key: number
-  ) {
-    this.openUploadModal(key);
-  }
 
-  openUploadModal(key: number) {
+  openUploadModal(key: number, cat: LetterCategory) {
     console.log("opening upload modal");
-    console.log(key);
-    this.setState({
-      uploadIsOpen: true,
-      selectedLetterKey: key,
-      selectedLetterId: this.state.letters[key].letter_id,
-    });
+    console.log(cat, key);
+    if (cat === LetterCategory.letters) {
+      this.setState({
+        uploadIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.letters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    } else if (cat === LetterCategory.sentLetters) {
+      this.setState({
+        uploadIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.sentLetters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    }
   }
 
   closeUploadModal() {
@@ -219,21 +225,24 @@ class Writer extends React.Component<WriterProps, WriterState> {
       });
   }
 
-  onViewClick(
-    // event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    key: number
-  ) {
-    this.openViewModal(key);
-  }
-
-  openViewModal(key: number) {
+  openViewModal(key: number, cat: LetterCategory) {
     console.log("opening view modal");
-    console.log(key);
-    this.setState({
-      viewIsOpen: true,
-      selectedLetterKey: key,
-      selectedLetterId: this.state.letters[key].letter_id,
-    });
+    console.log(cat, key);
+    if (cat === LetterCategory.letters) {
+      this.setState({
+        viewIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.letters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    } else if (cat === LetterCategory.sentLetters) {
+      this.setState({
+        viewIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.sentLetters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    }
   }
 
   closeViewModal() {
@@ -241,9 +250,19 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.setState({ viewIsOpen: false });
   }
 
+  getUserName() {
+    if (this.state.selectedLetterCategory === LetterCategory.letters) {
+      console.log(this.state.letters[this.state.selectedLetterKey]);
+      return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
+    } else if (this.state.selectedLetterCategory === LetterCategory.sentLetters) {
+      return this.state.sentLetters[this.state.selectedLetterKey]?.requestor.name;
+    }
+    return "";
+  }
+
   render() {
     const { name } = this.props.user;
-    const { letters, sentLetters, uploadIsOpen, viewIsOpen } = this.state;
+    const { letters, sentLetters, uploadIsOpen, viewIsOpen, selectedLetterId } = this.state;
 
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
@@ -254,7 +273,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             <Button
               className="left-float-right-button"
               onClick={() => {
-                this.onViewClick(k);
+                this.openViewModal(k, LetterCategory.letters);
               }}
             >
               view
@@ -263,7 +282,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
           <Button
             className="left-float-right-button"
             onClick={() => {
-              this.onUploadClick(k);
+              this.openUploadModal(k, LetterCategory.letters);
             }}
           >
             upload
@@ -281,7 +300,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
           <Button
             className="left-float-right-button"
             onClick={() => {
-              this.onViewClick(k);
+              this.openViewModal(k, LetterCategory.sentLetters);
             }}
           >
             view
@@ -301,7 +320,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
           animation={false}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Upload File</Modal.Title>
+            <Modal.Title>Upload File for {this.getUserName()} ({selectedLetterId})</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
@@ -329,7 +348,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
           animation={false}
         >
           <Modal.Header closeButton>
-            <Modal.Title>View File</Modal.Title>
+            <Modal.Title>View File for {this.getUserName()} ({selectedLetterId})</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
