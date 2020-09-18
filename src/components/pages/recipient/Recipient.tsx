@@ -31,13 +31,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             email: "",
             jwtToken: ""
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
             email: "",
             jwtToken: ""
           },
-          letter_uploaded: false
+          contents: new File([], "")
         },
         {
           letter_id: 2,
@@ -47,13 +47,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             email: "",
             jwtToken: ""
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
             email: "",
             jwtToken: ""
           },
-          letter_uploaded: false
+          contents: new File([], "")
         }
       ]
     });
@@ -74,7 +74,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       <Row key={l.letter_id}>
         <div className="full-width">
           <span className="text-float-left">({l.letter_id})&nbsp;</span>
-          <span className="text-float-left">For: {l.requester.name}</span>
+          <span className="text-float-left">For: {l.requestor.name}</span>
           <Button
             className="left-float-right-button"
             // style={{ marginLeft: "10px", float: "right" }}

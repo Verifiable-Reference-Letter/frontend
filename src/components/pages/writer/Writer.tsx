@@ -11,6 +11,7 @@ import User from "../../../interfaces/User.interface";
 import Letter from "../../../interfaces/Letter.interface";
 import SentLetter from "../../../interfaces/SentLetter.interface";
 import FileUpload from "../../file-upload/FileUpload";
+import FileView from "../../file-view/FileView";
 
 const Web3 = require("web3");
 export let web3: typeof Web3;
@@ -37,10 +38,12 @@ interface WriterState {
 
 class Writer extends React.Component<WriterProps, WriterState> {
   private uploadModal = React.createRef<FileUpload>();
+  private viewModal = React.createRef<FileView>();
 
   componentWillMount() {
     // Modal.setAppElement("body");
     // api call to get letters
+    console.log("componentWillMount");
     this.setState({
       letters: [
         {
@@ -51,13 +54,13 @@ class Writer extends React.Component<WriterProps, WriterState> {
             email: "",
             jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
             email: "",
             jwtToken: "",
           },
-          letter_uploaded: false,
+          contents: new File([], ""),
         },
         {
           letter_id: 2,
@@ -67,13 +70,13 @@ class Writer extends React.Component<WriterProps, WriterState> {
             email: "",
             jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
             email: "",
             jwtToken: "",
           },
-          letter_uploaded: false,
+          contents: new File([], ""),
         },
       ],
       sentLetters: [
@@ -85,7 +88,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             email: "",
             jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
             email: "",
@@ -106,7 +109,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             email: "",
             jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
             email: "",
@@ -142,13 +145,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.openUploadModal(key);
   }
 
-  onViewClick(
-    // event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    key: number
-  ) {
-    this.openViewModal(key);
-  }
-
   openUploadModal(key: number) {
     console.log("opening upload modal");
     console.log(key);
@@ -160,14 +156,33 @@ class Writer extends React.Component<WriterProps, WriterState> {
   }
 
   closeUploadModal() {
-    console.log("closing modal");
+    console.log("closing upload modal");
     this.setState({ uploadIsOpen: false });
   }
 
   onUploadSubmit(file: File) {
     console.log(file);
+    console.log("onUploadSubmit");
     // TODO: do stuff with file
     // TODO: send File to backend
+    // REMOVE: here testing purposes, should be in uploadToServer following a successful request
+    let newLetters = [...this.state.letters]; // either this or replace oldLetters with that of response body
+    newLetters[this.state.selectedLetterKey] = {
+      ...newLetters[this.state.selectedLetterKey],
+      contents: file
+    };
+    console.log("newLetters");
+    console.log(newLetters);
+
+    this.setState({
+      letters: newLetters,
+    });
+    
+    console.log("setting state");
+    setTimeout(() => {
+      console.log(this.state.letters);
+    }, 2000);
+
     let fetchUrl =
       "/api/users/" +
       this.props.user.publicAddress +
@@ -177,7 +192,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.uploadToServer(file, fetchUrl);
   }
 
-  
   uploadToServer(file: File, fetchUrl: string) {
     let fileForm: FormData = new FormData();
     fileForm.append("file", file);
@@ -195,12 +209,21 @@ class Writer extends React.Component<WriterProps, WriterState> {
         if (response.status === 200) {
           this.closeUploadModal();
         } else {
-          this.uploadModal.current!.changeDisplayMessage("Upload Failed. Try Again Later.")
+          this.uploadModal.current!.changeDisplayMessage(
+            "Upload Failed. Try Again Later."
+          );
         }
       })
       .catch((e: Error) => {
         console.log(e);
       });
+  }
+
+  onViewClick(
+    // event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    key: number
+  ) {
+    this.openViewModal(key);
   }
 
   openViewModal(key: number) {
@@ -213,30 +236,30 @@ class Writer extends React.Component<WriterProps, WriterState> {
     });
   }
 
+  closeViewModal() {
+    console.log("closing view modal");
+    this.setState({ viewIsOpen: false });
+  }
+
   render() {
-    const { publicAddress, name, email, jwtToken } = this.props.user;
-    const {
-      letters,
-      sentLetters,
-      uploadIsOpen,
-      selectedLetterKey,
-      selectedLetterId,
-    } = this.state;
+    const { name } = this.props.user;
+    const { letters, sentLetters, uploadIsOpen, viewIsOpen } = this.state;
 
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
         <div className="full-width">
           <span className="text-float-left">({l.letter_id})&nbsp;</span>
-          <span className="text-float-left">For: {l.requester.name}</span>
-          <Button
-            className="left-float-right-button"
-            onClick={() => {
-              this.onViewClick(k);
-            }}
-          >
-            view
-          </Button>
-
+          <span className="text-float-left">For: {l.requestor.name}</span>
+          {l.contents && (
+            <Button
+              className="left-float-right-button"
+              onClick={() => {
+                this.onViewClick(k);
+              }}
+            >
+              view
+            </Button>
+          )}
           <Button
             className="left-float-right-button"
             onClick={() => {
@@ -253,7 +276,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
       <Row key={k}>
         <div className="full-width">
           <span className="text-float-left">({l.letter_id})&nbsp;</span>
-          <span className="text-float-left">For: {l.requester.name}</span>
+          <span className="text-float-left">For: {l.requestor.name}</span>
 
           <Button
             className="left-float-right-button"
@@ -271,6 +294,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     return (
       <div id="writer" className="writer">
         <Modal
+          id="upload-modal"
           show={uploadIsOpen}
           onHide={this.closeUploadModal.bind(this)}
           backdrop="static"
@@ -297,6 +321,32 @@ class Writer extends React.Component<WriterProps, WriterState> {
           </Modal.Body>
         </Modal>
 
+        <Modal
+          id="view-modal"
+          show={viewIsOpen}
+          onHide={this.closeViewModal.bind(this)}
+          backdrop="static"
+          animation={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>View File</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FileView
+              ref={this.viewModal}
+              user={this.props.user}
+              /*fetchUrl={
+                "/api/users/" +
+                publicAddress +
+                "/letters/" +
+                selectedLetterId +
+                "/content"
+              }*/
+              onClose={this.closeUploadModal.bind(this)}
+            ></FileView>
+          </Modal.Body>
+        </Modal>
         <div className="writer-header">
           <h1> Writer Page </h1>
           <p>

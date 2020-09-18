@@ -50,13 +50,13 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             email: "",
             jwtToken: ""
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
             email: "",
             jwtToken: ""
           },
-          letter_uploaded: false,
+          contents: new File([], "")
         },
       ],
       sentLetters: [
@@ -68,7 +68,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             email: "",
             jwtToken: ""
           },
-          requester: {
+          requestor: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
             email: "",
@@ -89,7 +89,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             email: "",
             jwtToken: ""
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
             email: "",
