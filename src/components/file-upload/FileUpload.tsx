@@ -1,14 +1,13 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Alert from "react-bootstrap/Alert";
-import Card from "react-bootstrap/Card";
 import User from "../../interfaces/User.interface";
 import "./FileUpload.css";
 
 interface FileUploadProps {
   user: User;
-  fetchUrl?: string;
+  fetchUrl?: string; // if defined, fileupload will handle uploading to server
+  initialDisplayMessage?: string;
   onUpload: (file: File) => void;
   onClose: () => void;
 }
@@ -22,7 +21,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     super(props);
     this.state = {
       file: new File([], ""),
-      displayMessage: "",
+      displayMessage: this.props.initialDisplayMessage ? this.props.initialDisplayMessage : "",
     };
     this.onFormSubmit = this.onFormSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -51,24 +50,31 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     console.log("sending file to server");
     let fileForm: FormData = new FormData();
     fileForm.append("file", file);
-    if (this.props?.fetchUrl) {
-      fetch(`${process.env.REACT_APP_BACKEND_URL}` + this.props.fetchUrl, {
-        body: fileForm,
-        headers: {
-          "Content-Type": "mutlipart/form-data",
-          jwtToken: this.props.user.jwtToken,
-        },
-        method: "POST",
-      })
-        .then((response: any) => {
-          console.log(response.json);
-        })
-        .catch((e: Error) => {
-          console.log(e);
-        });
 
-      this.props.onUpload(file);
-    }
+    fetch(`${process.env.REACT_APP_BACKEND_URL}` + this.props.fetchUrl, {
+      body: fileForm,
+      headers: {
+        "Content-Type": "mutlipart/form-data",
+        jwtToken: this.props.user.jwtToken,
+      },
+      method: "POST",
+    })
+      .then((response: any) => {
+        console.log(response.json);
+        console.log(response.status);
+        if (response.status === 200) {
+          this.props.onUpload(file);
+        } else {
+          this.changeDisplayMessage("Upload Failed. Try Again Later.");
+        }
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+  }
+
+  changeDisplayMessage(newDisplayMessage: string) {
+    this.setState({displayMessage: newDisplayMessage})
   }
 
   render() {
@@ -79,7 +85,6 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
           <Form.File id="fileUpload" onChange={this.onChange} />
           <div>
             <div className="display-message"> {displayMessage} </div>
-
             <Button
               className="form-button"
               onClick={(e: any) => {

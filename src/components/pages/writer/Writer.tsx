@@ -28,13 +28,16 @@ interface WriterState {
   // need to change into dictionary
   letters: Letter[]; // letter table
   sentLetters: SentLetter[]; // letter-recipient table
-  modalIsOpen: boolean;
+  uploadIsOpen: boolean;
+  viewIsOpen: boolean;
+  uploadInitialDisplayMessage?: string;
   selectedLetterKey: number;
   selectedLetterId: number;
-  fetchUrl: string;
 }
 
 class Writer extends React.Component<WriterProps, WriterState> {
+  private uploadModal = React.createRef<FileUpload>();
+
   componentWillMount() {
     // Modal.setAppElement("body");
     // api call to get letters
@@ -125,10 +128,10 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.state = {
       letters: [],
       sentLetters: [],
-      modalIsOpen: false,
+      viewIsOpen: false,
+      uploadIsOpen: false,
       selectedLetterKey: -1,
       selectedLetterId: -1,
-      fetchUrl: "",
     };
   }
 
@@ -142,13 +145,15 @@ class Writer extends React.Component<WriterProps, WriterState> {
   onViewClick(
     // event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     key: number
-  ) {}
+  ) {
+    this.openViewModal(key);
+  }
 
   openUploadModal(key: number) {
-    console.log("opening modal");
+    console.log("opening upload modal");
     console.log(key);
     this.setState({
-      modalIsOpen: true,
+      uploadIsOpen: true,
       selectedLetterKey: key,
       selectedLetterId: this.state.letters[key].letter_id,
     });
@@ -156,29 +161,64 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
   closeUploadModal() {
     console.log("closing modal");
-    this.setState({ modalIsOpen: false });
+    this.setState({ uploadIsOpen: false });
   }
 
   onUploadSubmit(file: File) {
     console.log(file);
     // TODO: do stuff with file
     // TODO: send File to backend
-    this.closeUploadModal();
+    let fetchUrl =
+      "/api/users/" +
+      this.props.user.publicAddress +
+      "/letters/" +
+      this.state.selectedLetterId +
+      "/content";
+    this.uploadToServer(file, fetchUrl);
   }
 
-  // letterView() {
-  //   if (this.state.letters.) {
-  //     return <UserGreeting />;
-  //   }
-  //   return <GuestGreeting />;
-  // }
+  
+  uploadToServer(file: File, fetchUrl: string) {
+    let fileForm: FormData = new FormData();
+    fileForm.append("file", file);
+
+    fetch(`${process.env.REACT_APP_BACKEND_URL}` + fetchUrl, {
+      body: fileForm,
+      headers: {
+        "Content-Type": "mutlipart/form-data",
+        jwtToken: this.props.user.jwtToken,
+      },
+      method: "POST",
+    })
+      .then((response: any) => {
+        console.log(response.status);
+        if (response.status === 200) {
+          this.closeUploadModal();
+        } else {
+          this.uploadModal.current!.changeDisplayMessage("Upload Failed. Try Again Later.")
+        }
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+  }
+
+  openViewModal(key: number) {
+    console.log("opening view modal");
+    console.log(key);
+    this.setState({
+      viewIsOpen: true,
+      selectedLetterKey: key,
+      selectedLetterId: this.state.letters[key].letter_id,
+    });
+  }
 
   render() {
     const { publicAddress, name, email, jwtToken } = this.props.user;
     const {
       letters,
       sentLetters,
-      modalIsOpen,
+      uploadIsOpen,
       selectedLetterKey,
       selectedLetterId,
     } = this.state;
@@ -231,7 +271,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     return (
       <div id="writer" className="writer">
         <Modal
-          show={modalIsOpen}
+          show={uploadIsOpen}
           onHide={this.closeUploadModal.bind(this)}
           backdrop="static"
           animation={false}
@@ -242,14 +282,15 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
           <Modal.Body>
             <FileUpload
+              ref={this.uploadModal}
               user={this.props.user}
-              fetchUrl={
+              /*fetchUrl={
                 "/api/users/" +
                 publicAddress +
                 "/letters/" +
-                +selectedLetterId +
+                selectedLetterId +
                 "/content"
-              }
+              }*/
               onUpload={this.onUploadSubmit.bind(this)}
               onClose={this.closeUploadModal.bind(this)}
             ></FileUpload>
@@ -265,7 +306,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
         </div>
 
         {/* <Modal
-          isOpen={modalIsOpen}
+          isOpen={uploadIsOpen}
           onRequestClose={this.closeUploadModal.bind(this)}
           contentLabel="Upload Modal"
         >
