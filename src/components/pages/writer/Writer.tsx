@@ -292,16 +292,16 @@ class Writer extends React.Component<WriterProps, WriterState> {
         <div className="full-width">
           <span className="text-float-left">({l.letter_id})&nbsp;</span>
           <span className="text-float-left">For: {l.requestor.name}</span>
-          {l.contents && (
-            <Button
-              className="left-float-right-button"
-              onClick={() => {
-                this.openViewModal(k, LetterCategory.letters);
-              }}
-            >
-              view
-            </Button>
-          )}
+          <Button
+            disabled={l.contents.size === 0}
+            className="left-float-right-button"
+            onClick={() => {
+              this.openViewModal(k, LetterCategory.letters);
+            }}
+          >
+            view
+          </Button>
+
           <Button
             className="left-float-right-button"
             onClick={() => {
@@ -321,6 +321,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
           <span className="text-float-left">For: {l.requestor.name}</span>
 
           <Button
+            disabled={l.contents.size === 0}
             className="left-float-right-button"
             onClick={() => {
               this.openViewModal(k, LetterCategory.sentLetters);
