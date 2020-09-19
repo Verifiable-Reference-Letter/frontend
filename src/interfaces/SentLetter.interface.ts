@@ -4,4 +4,5 @@ export default interface SentLetter {
     writer: User;
     requestor: User;
     recipient: User;
+    contents: File;
 }

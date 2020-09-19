@@ -80,6 +80,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             email: "",
             jwtToken: ""
           },
+          contents: new File([], ""),
         },
         {
           letter_id: 2,
@@ -101,6 +102,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             email: "",
             jwtToken: ""
           },
+          contents: new File([], ""),
         },
       ],
     });

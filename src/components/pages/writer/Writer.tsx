@@ -19,7 +19,7 @@ export let web3: typeof Web3;
 enum LetterCategory {
   letters,
   sentLetters,
-  invalid
+  invalid,
 }
 
 interface WriterProps {
@@ -101,6 +101,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             email: "",
             jwtToken: "",
           },
+          contents: new File([], ""),
         },
         {
           letter_id: 2,
@@ -122,6 +123,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             email: "",
             jwtToken: "",
           },
+          contents: new File([], ""),
         },
       ],
     });
@@ -139,7 +141,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
       selectedLetterCategory: LetterCategory.invalid,
     };
   }
-
 
   openUploadModal(key: number, cat: LetterCategory) {
     console.log("opening upload modal");
@@ -171,19 +172,25 @@ class Writer extends React.Component<WriterProps, WriterState> {
     console.log("onUploadSubmit");
     // TODO: do stuff with file
     // TODO: send File to backend
-    // REMOVE: here testing purposes, should be in uploadToServer following a successful request
-    let newLetters = [...this.state.letters]; // either this or replace oldLetters with that of response body
-    newLetters[this.state.selectedLetterKey] = {
-      ...newLetters[this.state.selectedLetterKey],
-      contents: file
-    };
+    // REMOVE: here testing purposes, should be a query in uploadToServer following a successful request
+    let newLetters = [...this.state.letters];
+    newLetters[this.state.selectedLetterKey].contents = file;
+    let newSentLetters = [...this.state.sentLetters];
+    for (let i = 0; i < newSentLetters.length; i++) {
+      if (newSentLetters[i].letter_id === this.state.selectedLetterId) {
+        newSentLetters[i].contents = file;
+      }
+    }
+    // END REMOVE
+
     console.log("newLetters");
     console.log(newLetters);
 
     this.setState({
       letters: newLetters,
+      sentLetters: newSentLetters,
     });
-    
+
     console.log("setting state");
     setTimeout(() => {
       console.log(this.state.letters);
@@ -250,19 +257,35 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.setState({ viewIsOpen: false });
   }
 
-  getUserName() {
+  getCorrectUserName() {
     if (this.state.selectedLetterCategory === LetterCategory.letters) {
-      console.log(this.state.letters[this.state.selectedLetterKey]);
       return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
-    } else if (this.state.selectedLetterCategory === LetterCategory.sentLetters) {
-      return this.state.sentLetters[this.state.selectedLetterKey]?.requestor.name;
+    } else if (
+      this.state.selectedLetterCategory === LetterCategory.sentLetters
+    ) {
+      return this.state.sentLetters[this.state.selectedLetterKey]?.requestor
+        .name;
     }
     return "";
   }
 
+  getCorrectLetter() {
+    if (this.state.selectedLetterCategory === LetterCategory.letters) {
+      return this.state.letters[this.state.selectedLetterKey];
+    } else {
+      return this.state.sentLetters[this.state.selectedLetterKey];
+    }
+  }
+
   render() {
     const { name } = this.props.user;
-    const { letters, sentLetters, uploadIsOpen, viewIsOpen, selectedLetterId } = this.state;
+    const {
+      letters,
+      sentLetters,
+      uploadIsOpen,
+      viewIsOpen,
+      selectedLetterId,
+    } = this.state;
 
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
@@ -317,10 +340,13 @@ class Writer extends React.Component<WriterProps, WriterState> {
           show={uploadIsOpen}
           onHide={this.closeUploadModal.bind(this)}
           backdrop="static"
+          size="lg"
           animation={false}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Upload File for {this.getUserName()} ({selectedLetterId})</Modal.Title>
+            <Modal.Title>
+              {this.getCorrectUserName()} ({selectedLetterId})
+            </Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
@@ -346,15 +372,21 @@ class Writer extends React.Component<WriterProps, WriterState> {
           onHide={this.closeViewModal.bind(this)}
           backdrop="static"
           animation={false}
+          className="modal"
+          scrollable={false}
+          // size="lg"
         >
           <Modal.Header closeButton>
-            <Modal.Title>View File for {this.getUserName()} ({selectedLetterId})</Modal.Title>
+            <Modal.Title>
+              {this.getCorrectUserName()} ({selectedLetterId})
+            </Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
             <FileView
               ref={this.viewModal}
               user={this.props.user}
+              letter={this.getCorrectLetter()}
               /*fetchUrl={
                 "/api/users/" +
                 publicAddress +
@@ -362,7 +394,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
                 selectedLetterId +
                 "/content"
               }*/
-              onClose={this.closeUploadModal.bind(this)}
+              onClose={this.closeViewModal.bind(this)}
             ></FileView>
           </Modal.Body>
         </Modal>
