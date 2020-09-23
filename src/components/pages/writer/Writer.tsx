@@ -1,33 +1,45 @@
 //import { BigNumber } from "bignumber.js";
 // import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import Modal from "react-modal";
-import "./Writer.css";
+// import Modal from "react-modal";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Modal from "react-bootstrap/Modal";
+import Container from "react-bootstrap/Container";
+
 import User from "../../../interfaces/User.interface";
 import Letter from "../../../interfaces/Letter.interface";
 import SentLetter from "../../../interfaces/SentLetter.interface";
+import LetterCategory from "../../../interfaces/LetterCategory.enum";
+
 import FileUpload from "../../file-upload/FileUpload";
+import FileView from "../../file-view/FileView";
 
-const Web3 = require("web3");
-export let web3: typeof Web3;
+import "./Writer.css";
 
-// need to fix
-interface Dictionary<Letter> {
-  [key: number]: Letter;
+interface WriterProps {
+  user: User;
 }
 
 interface WriterState {
   // need to change into dictionary
   letters: Letter[]; // letter table
-  sentLetters: SentLetter[]; // letter-recipient table
-  modalIsOpen: boolean;
-  letterKey: number;
+  sentLetters: SentLetter[]; // sent letters table
+  uploadIsOpen: boolean;
+  viewIsOpen: boolean;
+  selectedLetterKey: number;
+  selectedLetterId: number;
+  selectedLetterCategory: LetterCategory;
 }
 
-class Writer extends React.Component<User, WriterState> {
+class Writer extends React.Component<WriterProps, WriterState> {
+  private uploadModal = React.createRef<FileUpload>();
+  private viewModal = React.createRef<FileView>();
+
   componentWillMount() {
+    // Modal.setAppElement("body");
     // api call to get letters
-    Modal.setAppElement("body");
+    console.log("componentWillMount");
     this.setState({
       letters: [
         {
@@ -35,24 +47,32 @@ class Writer extends React.Component<User, WriterState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: "",
           },
-          letter_uploaded: false,
+          contents: new File([], ""),
         },
         {
           letter_id: 2,
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
+            email: "",
+            jwtToken: "",
           },
-          letter_uploaded: false,
+          contents: new File([], ""),
         },
       ],
       sentLetters: [
@@ -61,132 +81,321 @@ class Writer extends React.Component<User, WriterState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: "",
           },
           recipient: {
             name: "Elton John",
             publicAddress: "0x101100101001101110100",
+            email: "",
+            jwtToken: "",
           },
+          contents: new File([], ""),
         },
         {
           letter_id: 2,
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: "",
           },
           recipient: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
+            email: "",
+            jwtToken: "",
           },
+          contents: new File([], ""),
         },
       ],
     });
   }
 
-  constructor(props: User) {
+  constructor(props: WriterProps) {
     super(props);
     this.state = {
       letters: [],
       sentLetters: [],
-      modalIsOpen: false,
-      letterKey: -1,
+      viewIsOpen: false,
+      uploadIsOpen: false,
+      selectedLetterKey: -1,
+      selectedLetterId: -1,
+      selectedLetterCategory: LetterCategory.invalid,
     };
   }
 
-  onUploadClick(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    key: number
-  ) {
-    this.openUploadModal(key);
-  }
-
-  onViewClick(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    key: number
-  ) {}
-
-  openUploadModal(key: number) {
-    this.setState({ modalIsOpen: true, letterKey: key });
+  openUploadModal(key: number, cat: LetterCategory) {
+    console.log("opening upload modal");
+    console.log(cat, key);
+    if (cat === LetterCategory.letters) {
+      this.setState({
+        uploadIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.letters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    } else if (cat === LetterCategory.sentLetters) {
+      this.setState({
+        uploadIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.sentLetters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    }
   }
 
   closeUploadModal() {
-    this.setState({ modalIsOpen: false });
+    console.log("closing upload modal");
+    this.setState({ uploadIsOpen: false });
   }
 
-  onUploadSubmit(file: FormData) {
-    this.closeUploadModal();
-    console.log(this.state.letterKey);
+  onUploadSubmit(file: File) {
     console.log(file);
-    // send letter to backend
+    console.log("onUploadSubmit");
+
+    // TODO: do stuff with file
+    // TODO: send File to backend
+    // REMOVE: here testing purposes, should be a query in uploadToServer following a successful request
+    let newLetters = [...this.state.letters];
+    newLetters[this.state.selectedLetterKey].contents = file;
+    let newSentLetters = [...this.state.sentLetters];
+    for (let i = 0; i < newSentLetters.length; i++) {
+      if (newSentLetters[i].letter_id === this.state.selectedLetterId) {
+        newSentLetters[i].contents = file;
+      }
+    }
+    // END REMOVE
+
+    console.log("newLetters");
+    console.log(newLetters);
+
+    this.setState({
+      letters: newLetters,
+      sentLetters: newSentLetters,
+    });
+
+    console.log("setting state");
+    setTimeout(() => {
+      console.log(this.state.letters);
+    }, 2000);
+
+    let fetchUrl =
+      "/api/users/" +
+      this.props.user.publicAddress +
+      "/letters/" +
+      this.state.selectedLetterId +
+      "/content";
+    this.uploadToServer(file, fetchUrl);
   }
 
-  // letterView() {
-  //   if (this.state.letters.) {
-  //     return <UserGreeting />;
-  //   }
-  //   return <GuestGreeting />;
-  // }
+  uploadToServer(file: File, fetchUrl: string) {
+    let fileForm: FormData = new FormData();
+    fileForm.append("file", file);
+
+    fetch(`${process.env.REACT_APP_BACKEND_URL}` + fetchUrl, {
+      body: fileForm,
+      headers: {
+        "Content-Type": "mutlipart/form-data",
+        jwtToken: this.props.user.jwtToken,
+      },
+      method: "POST",
+    })
+      .then((response: any) => {
+        console.log(response.status);
+        if (response.status === 200) {
+          this.closeUploadModal();
+        } else {
+          this.uploadModal.current!.changeDisplayMessage(
+            "Upload Failed. Try Again Later."
+          );
+        }
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+  }
+
+  openViewModal(key: number, cat: LetterCategory) {
+    console.log("opening view modal");
+    console.log(cat, key);
+    if (cat === LetterCategory.letters) {
+      this.setState({
+        viewIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.letters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    } else if (cat === LetterCategory.sentLetters) {
+      this.setState({
+        viewIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.sentLetters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    }
+  }
+
+  closeViewModal() {
+    console.log("closing view modal");
+    this.setState({ viewIsOpen: false });
+  }
+
+  getCorrectUserName() {
+    if (this.state.selectedLetterCategory === LetterCategory.letters) {
+      return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
+    } else if (
+      this.state.selectedLetterCategory === LetterCategory.sentLetters
+    ) {
+      return this.state.sentLetters[this.state.selectedLetterKey]?.requestor
+        .name;
+    }
+    return "";
+  }
+
+  getCorrectLetter() {
+    if (this.state.selectedLetterCategory === LetterCategory.letters) {
+      return this.state.letters[this.state.selectedLetterKey];
+    } else {
+      return this.state.sentLetters[this.state.selectedLetterKey];
+    }
+  }
 
   render() {
-    const { name, publicAddress } = this.props;
-    const { letters, sentLetters, modalIsOpen, letterKey } = this.state;
+    const { name } = this.props.user;
+    const {
+      letters,
+      sentLetters,
+      uploadIsOpen,
+      viewIsOpen,
+      selectedLetterId,
+    } = this.state;
 
-    const lettersList = letters.map((l, key) => (
-      <div key={l.letter_id}>
-        <p>
-          <span>({l.letter_id})&nbsp;</span>
-          <span>For: {l.requester.name} </span>
-
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
-              this.onViewClick(e, l.letter_id);
+    const lettersList = letters.map((l, k) => (
+      <Row key={k}>
+        <div className="full-width">
+          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">For: {l.requestor.name}</span>
+          <Button
+            disabled={l.contents.size === 0}
+            className="left-float-right-button"
+            onClick={() => {
+              this.openViewModal(k, LetterCategory.letters);
             }}
           >
             view
-          </button>
+          </Button>
 
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
-              this.onUploadClick(e, l.letter_id);
+          <Button
+            className="left-float-right-button"
+            onClick={() => {
+              this.openUploadModal(k, LetterCategory.letters);
             }}
           >
             upload
-          </button>
-
-        </p>
-      </div>
+          </Button>
+        </div>
+      </Row>
     ));
 
-    const sentLettersList = sentLetters.map((l, key) => (
-      <div key={l.letter_id + "x" + l.recipient.publicAddress}>
-        <p>
-          <span>({l.letter_id})&nbsp;</span>
-          <span>For: {l.requester.name}</span>
+    const sentLettersList = sentLetters.map((l, k) => (
+      <Row key={k}>
+        <div className="full-width">
+          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">For: {l.requestor.name}</span>
 
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            onClick={(e) => {
-              this.onViewClick(e, l.letter_id);
+          <Button
+            disabled={l.contents.size === 0}
+            className="left-float-right-button"
+            onClick={() => {
+              this.openViewModal(k, LetterCategory.sentLetters);
             }}
           >
             view
-          </button>
-          <span style={{ float: "right" }}>To: {l.recipient.name}</span>
-        </p>
-      </div>
+          </Button>
+          <span className="text-float-right">To: {l.recipient.name}</span>
+        </div>
+      </Row>
     ));
 
     return (
       <div id="writer" className="writer">
+        <Modal
+          id="upload-modal"
+          show={uploadIsOpen}
+          onHide={this.closeUploadModal.bind(this)}
+          backdrop="static"
+          size="lg"
+          animation={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              {this.getCorrectUserName()} ({selectedLetterId})
+            </Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FileUpload
+              ref={this.uploadModal}
+              user={this.props.user}
+              restrictPdf={true}
+              /*fetchUrl={
+                "/api/users/" +
+                publicAddress +
+                "/letters/" +
+                selectedLetterId +
+                "/content"
+              }*/
+              onUpload={this.onUploadSubmit.bind(this)}
+              onClose={this.closeUploadModal.bind(this)}
+            ></FileUpload>
+          </Modal.Body>
+        </Modal>
+
+        <Modal
+          id="view-modal"
+          show={viewIsOpen}
+          onHide={this.closeViewModal.bind(this)}
+          backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              {this.getCorrectUserName()} ({selectedLetterId})
+            </Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FileView
+              ref={this.viewModal}
+              user={this.props.user}
+              letter={this.getCorrectLetter()}
+              /*fetchUrl={
+                "/api/users/" +
+                publicAddress +
+                "/letters/" +
+                selectedLetterId +
+                "/content"
+              }*/
+              onClose={this.closeViewModal.bind(this)}
+            ></FileView>
+          </Modal.Body>
+        </Modal>
         <div className="writer-header">
           <h1> Writer Page </h1>
           <p>
@@ -195,23 +404,15 @@ class Writer extends React.Component<User, WriterState> {
           <hr></hr>
         </div>
 
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={this.closeUploadModal.bind(this)}
-          contentLabel="Upload Modal"
-        >
-          <FileUpload callback={this.onUploadSubmit.bind(this)}></FileUpload>
-        </Modal>
-
         <div className="letters">
           <h3> Letters </h3>
-          <div>{lettersList}</div>
+          <Container fluid>{lettersList}</Container>
           <hr></hr>
         </div>
 
         <div className="sentLetters">
           <h3> History </h3>
-          <div>{sentLettersList}</div>
+          <Container fluid>{sentLettersList}</Container>
           <hr></hr>
         </div>
 

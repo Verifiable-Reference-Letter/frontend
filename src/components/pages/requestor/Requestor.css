@@ -1,10 +1,5 @@
-.requestor-wrap {
-  height: calc(100vh - 56px);
-  background-color: burlywood;
-}
-
 .requestor {
-  padding: 20px;
+  padding: 20px 20% 20px
 }
 .requestor-header {
   text-align: center;
@@ -21,4 +16,24 @@ h6 {
 
 .requestor-footer {
   text-align: center;
+}
+
+.left-float-right-button {
+  margin-left: 10px;
+  float: right;
+  margin-bottom: 10px;
+}
+
+.full-width {
+  width: 100%
+}
+
+.text-float-right {
+  float: right;
+  margin-top: 7px;
+}
+
+.text-float-left {
+  float: left;
+  margin-top: 7px;
 }

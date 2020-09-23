@@ -45,6 +45,7 @@
     "cors": "^2.8.5",
     "create-typescript-project": "^0.6.5",
     "ganache-cli": "^6.9.1",
+    "node-sass": "^4.14.1",
     "openzeppelin-solidity": "^2.5.0",
     "react": "^16.13.0",
     "react-bootstrap": "^1.0.0",

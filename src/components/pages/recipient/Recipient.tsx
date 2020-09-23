@@ -1,18 +1,31 @@
-//import { BigNumber } from "bignumber.js";
-// import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Container from "react-bootstrap/Container";
+import Modal from "react-bootstrap/Modal";
+
 import User from "../../../interfaces/User.interface";
 import Letter from "../../../interfaces/Letter.interface";
+import LetterCategory from "../../../interfaces/LetterCategory.enum";
+
+import FileView from "../../file-view/FileView";
+
 import "./Recipient.css";
 
-const Web3 = require("web3");
-export let web3: typeof Web3;
-
+interface RecipientProps {
+  user: User;
+}
 interface RecipientState {
   letters: Letter[];
+  viewIsOpen: boolean;
+  selectedLetterKey: number;
+  selectedLetterId: number;
+  selectedLetterCategory: LetterCategory;
 }
 
-class Recipient extends React.Component<User, RecipientState> {
+class Recipient extends React.Component<RecipientProps, RecipientState> {
+  private viewModal = React.createRef<FileView>();
+
   componentWillMount() {
     // api call to get letters
     this.setState({
@@ -21,60 +34,144 @@ class Recipient extends React.Component<User, RecipientState> {
           letter_id: 1,
           writer: {
             name: "Mary Poppins",
-            publicAddress: "0x314159265358979323"
+            publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Simba",
-            publicAddress: "0xabcdefghijklmnop"
+            publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: "",
           },
-          letter_uploaded: false
+          contents: new File([], ""),
         },
         {
           letter_id: 2,
           writer: {
             name: "Mary Poppins",
-            publicAddress: "0x314159265358979323"
+            publicAddress: "0x314159265358979323",
+            email: "",
+            jwtToken: "",
           },
-          requester: {
+          requestor: {
             name: "Simba",
-            publicAddress: "0xabcdefghijklmnop"
+            publicAddress: "0xabcdefghijklmnop",
+            email: "",
+            jwtToken: "",
           },
-          letter_uploaded: false
-        }
-      ]
+          contents: new File([], ""),
+        },
+      ],
     });
   }
 
-  constructor(props: User) {
+  constructor(props: RecipientProps) {
     super(props);
     this.state = {
-      letters: []
+      letters: [],
+      viewIsOpen: false,
+      selectedLetterKey: -1,
+      selectedLetterId: -1,
+      selectedLetterCategory: LetterCategory.invalid,
     };
   }
 
-  render() {
-    const { name, publicAddress } = this.props;
-    const { letters } = this.state;
+  closeViewModal() {
+    console.log("closing view modal");
+    this.setState({ viewIsOpen: false });
+  }
 
-    const lettersList = letters.map((l, key) => (
-      <div key={l.letter_id}>
-        <p>
-          <span>({l.letter_id})&nbsp;</span>
-          <span>For: {l.requester.name} </span>
-          <button
-            style={{ marginLeft: "10px", float: "right" }}
-            // onClick={(e) => {
-            //   this.onViewClick(e, l.letter_id);
-            // }}
+  openViewModal(key: number, cat: LetterCategory) {
+    console.log("opening view modal");
+    console.log(cat, key);
+    if (cat === LetterCategory.letters) {
+      this.setState({
+        viewIsOpen: true,
+        selectedLetterKey: key,
+        selectedLetterId: this.state.letters[key].letter_id,
+        selectedLetterCategory: cat,
+      });
+    } else {
+      console.log("error with letterCategory");
+    }
+  }
+
+  getCorrectUserName() {
+    if (this.state.selectedLetterCategory === LetterCategory.letters) {
+      return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
+    } else {
+      console.log("error with letterCategory");
+      return;
+    }
+  }
+
+  getCorrectLetter() {
+    if (this.state.selectedLetterCategory === LetterCategory.letters) {
+      return this.state.letters[this.state.selectedLetterKey];
+    } else {
+      console.log("error with letterCategory");
+      return;
+    }
+  }
+
+  render() {
+    const { name } = this.props.user;
+    const { letters, viewIsOpen, selectedLetterId } = this.state;
+
+    const lettersList = letters.map((l, k) => (
+      <Row key={k}>
+        <div className="full-width">
+          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">For: {l.requestor.name}</span>
+          <Button
+            disabled={l.contents.size === 0}
+            className="left-float-right-button"
+            onClick={() => {
+              this.openViewModal(k, LetterCategory.letters);
+            }}
           >
             view
-          </button>
-          <span className="from">From: {l.writer.name}</span>
-        </p>
-      </div>
+          </Button>
+        </div>
+      </Row>
     ));
+
     return (
       <div className="recipient">
+        <Modal
+          id="view-modal"
+          show={viewIsOpen}
+          onHide={this.closeViewModal.bind(this)}
+          backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          // size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              {this.getCorrectUserName()} ({selectedLetterId})
+            </Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FileView
+              ref={this.viewModal}
+              user={this.props.user}
+              letter={this.getCorrectLetter()}
+              /*fetchUrl={
+                "/api/users/" +
+                publicAddress +
+                "/letters/" +
+                selectedLetterId +
+                "/content"
+              }*/
+              onClose={this.closeViewModal.bind(this)}
+            ></FileView>
+          </Modal.Body>
+        </Modal>
+
         <div className="recipient-header">
           <h1> Recipient Page </h1>
           <p>
@@ -85,7 +182,7 @@ class Recipient extends React.Component<User, RecipientState> {
 
         <div className="letters">
           <h3> Letters </h3>
-          <div>{lettersList}</div>
+          <Container fluid>{lettersList}</Container>
           <hr></hr>
         </div>
 

@@ -1,7 +1,7 @@
 import User from "./User.interface";
 export default interface Letter {
     letter_id: number;
+    contents: File;
     writer: User;
-    requester: User;
-    letter_uploaded: boolean;
+    requestor: User;
 }

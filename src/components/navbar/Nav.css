@@ -1,3 +1,7 @@
 .navText {
-	margin-right: 10px;
+	/* margin-right: 10px; */
+	float: right;
+}
+.connect {
+	float: right;
 }
