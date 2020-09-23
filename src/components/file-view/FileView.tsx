@@ -25,6 +25,9 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
       // console.log(reader.result);
       this.setState({ letterUrl: reader.result });
     };
+    setTimeout(()=> 
+      console.log(this.props.letter.contents.type)
+    , 2000);
   }
 
   getLetterUrl() {}
@@ -37,7 +40,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
             type={this.props.letter.contents.type}
             src={this.state.letterUrl}
             width="100%"
-            height="100%"
+            height="400px"
           />
         </div>
         <Button

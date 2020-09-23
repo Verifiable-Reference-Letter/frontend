@@ -6,21 +6,16 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Modal from "react-bootstrap/Modal";
 import Container from "react-bootstrap/Container";
-import "./Writer.css";
+
 import User from "../../../interfaces/User.interface";
 import Letter from "../../../interfaces/Letter.interface";
 import SentLetter from "../../../interfaces/SentLetter.interface";
+import LetterCategory from "../../../interfaces/LetterCategory.enum";
+
 import FileUpload from "../../file-upload/FileUpload";
 import FileView from "../../file-view/FileView";
 
-const Web3 = require("web3");
-export let web3: typeof Web3;
-
-enum LetterCategory {
-  letters,
-  sentLetters,
-  invalid,
-}
+import "./Writer.css";
 
 interface WriterProps {
   user: User;
@@ -29,7 +24,7 @@ interface WriterProps {
 interface WriterState {
   // need to change into dictionary
   letters: Letter[]; // letter table
-  sentLetters: SentLetter[]; // letter-recipient table
+  sentLetters: SentLetter[]; // sent letters table
   uploadIsOpen: boolean;
   viewIsOpen: boolean;
   selectedLetterKey: number;
@@ -170,6 +165,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
   onUploadSubmit(file: File) {
     console.log(file);
     console.log("onUploadSubmit");
+
     // TODO: do stuff with file
     // TODO: send File to backend
     // REMOVE: here testing purposes, should be a query in uploadToServer following a successful request
@@ -354,6 +350,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             <FileUpload
               ref={this.uploadModal}
               user={this.props.user}
+              restrictPdf={true}
               /*fetchUrl={
                 "/api/users/" +
                 publicAddress +
@@ -375,7 +372,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
           animation={false}
           className="modal"
           scrollable={false}
-          // size="lg"
+          size="lg"
         >
           <Modal.Header closeButton>
             <Modal.Title>
@@ -406,16 +403,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
           </p>
           <hr></hr>
         </div>
-
-        {/* <Modal
-          isOpen={uploadIsOpen}
-          onRequestClose={this.closeUploadModal.bind(this)}
-          contentLabel="Upload Modal"
-        >
-          <FileUpload
-            user={this.props.user} callback={this.onUploadSubmit.bind(this)}
-          ></FileUpload>
-        </Modal> */}
 
         <div className="letters">
           <h3> Letters </h3>

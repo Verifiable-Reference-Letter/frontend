@@ -99,7 +99,7 @@ class App extends React.Component<MyProps, MyState> {
     this.setState({
       contract,
       connectedTo: true,
-      user: { publicAddress: accounts[0], name: "", email: "", jwtToken: ""},
+      user: { publicAddress: accounts[0], name: "", email: "", jwtToken: "" },
       loggedIn: true, // testing purposes only
     });
   }
@@ -137,7 +137,6 @@ class App extends React.Component<MyProps, MyState> {
           <Route exact path={ROUTES.RECIPIENT} render={() => recipient} />
         </div>
       </div>
-      
     );
   }
 }

@@ -7,6 +7,7 @@ import "./FileUpload.css";
 interface FileUploadProps {
   user: User;
   fetchUrl?: string; // if defined, fileupload will handle uploading to server
+  restrictPdf?: boolean; 
   initialDisplayMessage?: string;
   onUpload: (file: File) => void;
   onClose: () => void;
@@ -31,13 +32,16 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
   onFormSubmit() //e: React.FormEvent
   {
     console.log(this.state.file);
-    if (this.state.file.size === 0) {
+    if (this.state.file && this.state.file.size === 0) {
       console.log("no file uploaded");
       this.setState({ displayMessage: "No File Uploaded." });
+    } else if (this.props.restrictPdf && this.state.file.type != "application/pdf") {
+      console.log("not a pdf");
+      this.setState({ displayMessage: "Convert Your File to a PDF!" });
     } else {
       console.log("checking if upload to server");
       if (this.props?.fetchUrl) this.fileUploadToServer(this.state.file);
-      else this.props.onUpload(this.state.file);
+      else this.props.onUpload(this.state.file); // callback
     }
   }
 
