@@ -1,4 +1,4 @@
-import User from "./UserAuth.interface";
+import User from "./User.interface";
 export default interface Letter {
     letterId: number;
     contents: File;

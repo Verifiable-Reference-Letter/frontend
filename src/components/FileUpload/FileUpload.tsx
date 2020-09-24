@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Spinner from "react-bootstrap/Spinner";
 
 import User from "../../common/UserAuth.interface";
 import "./FileUpload.css";
@@ -14,6 +15,7 @@ interface FileUploadProps {
 interface FileUploadState {
   file: File;
   displayMessage: string;
+  buffering: boolean;
 }
 
 class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
@@ -22,6 +24,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     this.state = {
       file: new File([], ""),
       displayMessage: "",
+      buffering: false,
     };
     this.onFormSubmit = this.onFormSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -38,15 +41,15 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     if (file && file.size === 0) {
       console.log("no file uploaded");
       this.setState({ displayMessage: "No File Uploaded." });
-    } else if (
-      this.props.restrictPdf &&
-      file.type !== "application/pdf"
-    ) {
+    } else if (this.props.restrictPdf && file.type !== "application/pdf") {
       console.log("not a pdf");
       this.setState({ displayMessage: "Please Upload a PDF." });
     } else {
       console.log("checking if upload to server");
-      this.props.onUpload(file);
+      this.setState({ buffering: true });
+      setTimeout(() => {
+        this.props.onUpload(file);
+      }, 1000);
     }
   }
 
@@ -96,7 +99,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
   }
 
   render() {
-    const displayMessage = this.state.displayMessage;
+    const { displayMessage, buffering } = this.state;
     return (
       <Form onSubmit={this.onFormSubmit.bind(this)}>
         <Form.Group>
@@ -114,6 +117,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
             <Button className="form-button" onClick={this.onFormSubmit}>
               Upload
             </Button>
+           {buffering && <Spinner className="float-right mt-4 mr-3" animation="border" variant="secondary" />}
           </div>
         </Form.Group>
       </Form>

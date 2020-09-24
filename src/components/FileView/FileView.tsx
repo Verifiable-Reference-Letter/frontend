@@ -22,8 +22,8 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
       reader.onload = (e: any) => {
         this.setState({ letterUrl: reader.result, letterType: file.type });
       };
+      console.log("letterUrl", this.state.letterUrl);
     }
-    console.log("letterUrl", this.state.letterUrl);
   }
 
   constructor(props: FileViewProps) {

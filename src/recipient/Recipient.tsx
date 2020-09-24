@@ -4,7 +4,7 @@ import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
 
-import User from "../common/UserAuth.interface";
+import UserAuth from "../common/UserAuth.interface";
 import Letter from "../common/LetterDetails.interface";
 
 import CryptService from "../services/CryptService";
@@ -15,7 +15,7 @@ import FileView from "../components/FileView/FileView";
 import "./Recipient.css";
 
 interface RecipientProps {
-  user: User;
+  user: UserAuth;
 }
 interface RecipientState {
   letters: Letter[];
@@ -39,12 +39,10 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
-            jwtToken: "",
           },
           requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
-            jwtToken: "",
           },
         },
         {
@@ -52,12 +50,10 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
-            jwtToken: "",
           },
           requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
-            jwtToken: "",
           },
         },
       ],
@@ -153,7 +149,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
               this.openViewModal(k);
             }}
           >
-            view
+            View
           </Button>
         </div>
       </Row>

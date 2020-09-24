@@ -25,7 +25,7 @@ interface WriterState {
   viewIsOpen: boolean;
   selectedLetterKey: number;
   selectedLetterId: number;
-  file?: File;
+  selectedFile?: File;
 }
 
 class Writer extends React.Component<WriterProps, WriterState> {
@@ -45,12 +45,10 @@ class Writer extends React.Component<WriterProps, WriterState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
-            jwtToken: "",
           },
           requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
-            jwtToken: "",
           },
         },
         {
@@ -58,12 +56,10 @@ class Writer extends React.Component<WriterProps, WriterState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
-            jwtToken: "",
           },
           requestor: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
-            jwtToken: "",
           },
         },
       ],
@@ -152,10 +148,10 @@ class Writer extends React.Component<WriterProps, WriterState> {
       console.log("file", file);
       if (file) {
         this.setState({
-          file: file,
           viewIsOpen: true,
           selectedLetterKey: key,
           selectedLetterId: letterId,
+          selectedFile: file,
         });
       }
     }
@@ -187,10 +183,10 @@ class Writer extends React.Component<WriterProps, WriterState> {
         // decrypt letter
         let file = this.cryptService.decrypt(encryptedLetter);
         this.setState({
-          file: file,
           viewIsOpen: true,
           selectedLetterKey: key,
           selectedLetterId: letterId,
+          selectedFile: file,
         });
       })
       .catch((e: Error) => {
@@ -217,7 +213,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
               this.openViewModal(k);
             }}
           >
-            view
+            View
           </Button>
 
           <Button
@@ -226,7 +222,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
               this.openUploadModal(k);
             }}
           >
-            upload
+            Upload
           </Button>
         </div>
       </Row>
@@ -277,7 +273,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
           <Modal.Body>
             <FileView
-              file={this.state.file}
+              file={this.state.selectedFile}
               ref={this.viewModal}
               user={this.props.user}
               onClose={this.closeViewModal.bind(this)}

@@ -1,25 +1,33 @@
-//import { BigNumber } from "bignumber.js";
-// import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Container from "react-bootstrap/Container";
-import Modal from "react-bootstrap/Modal";
+import {
+  Button,
+  Row,
+  Container,
+  Modal,
+  InputGroup,
+  Form,
+} from "react-bootstrap";
+import { Typeahead } from "react-bootstrap-typeahead";
+import { Fragment } from "react";
 
-import User from "../common/UserAuth.interface";
+import User from "../common/User.interface";
+import UserAuth from "../common/UserAuth.interface";
 import Letter from "../common/LetterDetails.interface";
 import FileView from "../components/FileView/FileView";
 
 import "./Requestor.css";
 
 interface RequestorProps {
-  user: User;
+  user: UserAuth;
 }
 
 interface RequestorState {
+  users: User[];
   letters: Letter[];
   letterKey: number;
+  requestIsOpen: boolean;
   viewIsOpen: boolean;
+  selectedUser: User[];
   selectedLetterKey: number;
   selectedLetterId: number;
 }
@@ -28,20 +36,23 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
   private viewModal = React.createRef<FileView>();
 
   componentWillMount() {
-    // api call to get letters
+    // api call to get users and letters
     this.setState({
+      users: [
+        { name: "Mary Poppins", publicAddress: "0x314159265358979323" },
+        { name: "Elton John", publicAddress: "0x101100101001101110100" },
+        { name: "Curious George", publicAddress: "0x142857142857142857" },
+      ],
       letters: [
         {
           letterId: 1,
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
-            jwtToken: "",
           },
           requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
-            jwtToken: "",
           },
         },
       ],
@@ -51,12 +62,27 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
   constructor(props: RequestorProps) {
     super(props);
     this.state = {
+      users: [],
       letters: [],
       letterKey: -1,
+      requestIsOpen: false,
       viewIsOpen: false,
+      selectedUser: [],
       selectedLetterKey: -1,
       selectedLetterId: -1,
     };
+  }
+
+  closeRequestModal() {
+    console.log("closing request modal");
+    this.setState({ requestIsOpen: false });
+  }
+
+  openRequestModal() {
+    console.log("opening request modal");
+    this.setState({
+      requestIsOpen: true,
+    });
   }
 
   closeViewModal() {
@@ -80,7 +106,13 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
   render() {
     const { name } = this.props.user;
-    const { letters, viewIsOpen, selectedLetterId } = this.state;
+    const {
+      letters,
+      requestIsOpen,
+      viewIsOpen,
+      selectedUser,
+      selectedLetterId,
+    } = this.state;
 
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
@@ -93,14 +125,88 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               this.openViewModal(k);
             }}
           >
-            view
+            View
           </Button>
         </div>
       </Row>
     ));
+    // const options = range(0, 1000).map((o) => `Item ${o}`);
+    // const options = this.state.users.map((l) => {
+    //   return `${l.name} (${l.publicAddress})`;
+    // });
+    const options = this.state.users;
+
+    const request = (
+      <Fragment>
+        <Form.Group>
+          <InputGroup className="d-flex justify-content-between border-radius">
+            <div
+              className="flex-fill mr-4"
+              onClick={() => {
+                this.setState({ selectedUser: [] });
+              }}
+            >
+              <Typeahead
+                id="basic-behaviors-example"
+                // minLength={2}
+                labelKey="name"
+                filterBy={["name", "publicAddress"]}
+                options={options}
+                placeholder="Select a User"
+                paginate={true}
+                selected={this.state.selectedUser}
+                onChange={(selected) => {
+                  console.log("selected", selected);
+                  this.setState({
+                    selectedUser: selected,
+                  });
+                }}
+                renderMenuItemChildren={
+                  (option) => `${option.name} (${option.publicAddress})` // TODO: add padding with service
+                }
+              />
+            </div>
+            <Button
+              className="flex-shrink-1"
+              disabled={selectedUser.length === 0}
+              onClick={() => this.openRequestModal()}
+            >
+              Request
+            </Button>
+          </InputGroup>
+        </Form.Group>
+      </Fragment>
+    );
 
     return (
       <div className="requestor">
+        <Modal
+          id="request-modal"
+          show={requestIsOpen}
+          onHide={this.closeRequestModal.bind(this)}
+          backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <span>
+                {selectedUser[0]?.name} ({selectedUser[0]?.publicAddress})
+              </span>
+            </Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FileView
+              ref={this.viewModal}
+              user={this.props.user}
+              onClose={this.closeRequestModal.bind(this)}
+            ></FileView>
+          </Modal.Body>
+        </Modal>
+
         <Modal
           id="view-modal"
           show={viewIsOpen}
@@ -136,10 +242,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
         <div>
           <h3> Request </h3>
-          <input placeholder="Writer Id" />
-          <Button className="left-float-right-button" onClick={() => {}}>
-            request
-          </Button>
+          {request}
           <hr></hr>
         </div>
 
