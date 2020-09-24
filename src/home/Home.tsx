@@ -1,5 +1,5 @@
 import React from "react";
-import User from "../../../interfaces/User.interface";
+import User from "../common/UserAuth.interface";
 import "./Home.css";
 
 const headers = new Headers();

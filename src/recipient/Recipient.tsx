@@ -4,11 +4,13 @@ import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
 
-import User from "../../../interfaces/User.interface";
-import Letter from "../../../interfaces/Letter.interface";
-import LetterCategory from "../../../interfaces/LetterCategory.enum";
+import User from "../common/UserAuth.interface";
+import Letter from "../common/LetterDetails.interface";
 
-import FileView from "../../file-view/FileView";
+import CryptService from "../services/CryptService";
+import CacheService from "../services/CacheService";
+
+import FileView from "../components/FileView/FileView";
 
 import "./Recipient.css";
 
@@ -20,47 +22,44 @@ interface RecipientState {
   viewIsOpen: boolean;
   selectedLetterKey: number;
   selectedLetterId: number;
-  selectedLetterCategory: LetterCategory;
+  file: File;
 }
 
 class Recipient extends React.Component<RecipientProps, RecipientState> {
   private viewModal = React.createRef<FileView>();
+  private cryptService: CryptService;
+  private cacheService: CacheService<number, string>;
+  private testCacheService: CacheService<number, File>;
 
   componentWillMount() {
     // api call to get letters
     this.setState({
       letters: [
         {
-          letter_id: 1,
+          letterId: 1,
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
-            email: "",
             jwtToken: "",
           },
           requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
-            email: "",
             jwtToken: "",
           },
-          contents: new File([], ""),
         },
         {
-          letter_id: 2,
+          letterId: 2,
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
-            email: "",
             jwtToken: "",
           },
           requestor: {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
-            email: "",
             jwtToken: "",
           },
-          contents: new File([], ""),
         },
       ],
     });
@@ -73,8 +72,29 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       viewIsOpen: false,
       selectedLetterKey: -1,
       selectedLetterId: -1,
-      selectedLetterCategory: LetterCategory.invalid,
+      file: new File([], ""),
     };
+    this.cryptService = new CryptService();
+    this.cacheService = new CacheService(1);
+    this.testCacheService = new CacheService(1);
+  }
+
+  openViewModal(key: number) {
+    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${this.state.selectedLetterId}/content`;
+    this.setState({
+      viewIsOpen: true,
+      selectedLetterKey: key,
+      selectedLetterId: this.state.letters[key].letterId,
+    });
+    console.log("opening view modal");
+    let encryptedLetter = this.cacheService.get(this.state.selectedLetterId);
+    if (encryptedLetter === null) {
+      this.retrieveFromServer(fetchUrl);
+    } else {
+      this.cacheService.get(this.state.selectedLetterId);
+      let file: File = this.cryptService.decrypt(encryptedLetter);
+      this.setState({file: file});
+    }
   }
 
   closeViewModal() {
@@ -82,37 +102,33 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     this.setState({ viewIsOpen: false });
   }
 
-  openViewModal(key: number, cat: LetterCategory) {
-    console.log("opening view modal");
-    console.log(cat, key);
-    if (cat === LetterCategory.letters) {
-      this.setState({
-        viewIsOpen: true,
-        selectedLetterKey: key,
-        selectedLetterId: this.state.letters[key].letter_id,
-        selectedLetterCategory: cat,
+  retrieveFromServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "GET",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    };
+    // get letter from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+      .then((response) => {
+        console.log("logging response");
+        console.log(response);
+        return response.json();
+      })
+      .then((encryptedLetter) => {
+        // decrypt letter
+        let file: File = this.cryptService.decrypt(encryptedLetter);
+        this.setState({file: file});
+      })
+      .catch((e: Error) => {
+        console.log(e);
       });
-    } else {
-      console.log("error with letterCategory");
-    }
   }
 
-  getCorrectUserName() {
-    if (this.state.selectedLetterCategory === LetterCategory.letters) {
-      return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
-    } else {
-      console.log("error with letterCategory");
-      return;
-    }
-  }
-
-  getCorrectLetter() {
-    if (this.state.selectedLetterCategory === LetterCategory.letters) {
-      return this.state.letters[this.state.selectedLetterKey];
-    } else {
-      console.log("error with letterCategory");
-      return;
-    }
+  getUserName() {
+    return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
   }
 
   render() {
@@ -122,13 +138,12 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
         <div className="full-width">
-          <span className="text-float-left">({l.letter_id})&nbsp;</span>
+          <span className="text-float-left">({l.letterId})&nbsp;</span>
           <span className="text-float-left">For: {l.requestor.name}</span>
           <Button
-            disabled={l.contents.size === 0}
             className="left-float-right-button"
             onClick={() => {
-              this.openViewModal(k, LetterCategory.letters);
+              this.openViewModal(k);
             }}
           >
             view
@@ -151,7 +166,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              {this.getCorrectUserName()} ({selectedLetterId})
+              {this.getUserName()} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 
@@ -159,14 +174,6 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             <FileView
               ref={this.viewModal}
               user={this.props.user}
-              letter={this.getCorrectLetter()}
-              /*fetchUrl={
-                "/api/users/" +
-                publicAddress +
-                "/letters/" +
-                selectedLetterId +
-                "/content"
-              }*/
               onClose={this.closeViewModal.bind(this)}
             ></FileView>
           </Modal.Body>

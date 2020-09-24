@@ -1,12 +1,9 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
-import User from "../../../interfaces/User.interface";
+import User from "../common/UserAuth.interface";
 import "./Login.css";
 
-import { web3 } from "../../../App";
-const headers = new Headers();
-headers.set("Access-Control-Allow-Origin", "*");
-headers.set("Content-Type", "application/json");
+import { web3 } from "../App";
 
 // let web3: Web3;
 interface LoginProps {
@@ -87,10 +84,13 @@ class Login extends React.Component<LoginProps, LoginState> {
 
     const init: RequestInit = {
       method: "GET",
-      headers,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      }
     };
 
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}`, init)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}/nonce`, init)
       .then((response) => {
         console.log("logging response");
         console.log(response);
@@ -136,7 +136,10 @@ class Login extends React.Component<LoginProps, LoginState> {
         publicAddress: publicAddress,
         inputName: inputName,
       }),
-      headers,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
       method: "POST",
     })
       .then((response) => {
@@ -202,6 +205,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     return fetch(`${process.env.REACT_APP_BACKEND_URL}/auth`, {
       body: JSON.stringify({ publicAddress, signature }),
       headers: {
+        "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
       method: "POST",
@@ -222,7 +226,6 @@ class Login extends React.Component<LoginProps, LoginState> {
               this.props.callback({
                 publicAddress: this.props.user.publicAddress,
                 name: u.name,
-                email: u.email,
                 jwtToken: jwtToken,
               });
             } else {

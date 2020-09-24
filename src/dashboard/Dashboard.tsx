@@ -1,5 +1,5 @@
 import React from "react";
-import User from "../../../interfaces/User.interface";
+import UserAuth from "../common/UserAuth.interface";
 import "./Dashboard.css";
 
 const headers = new Headers();
@@ -7,7 +7,7 @@ headers.set("Access-Control-Allow-Origin", "*");
 headers.set("Content-Type", "application/json");
 
 interface DashboardProps {
-  user: User;
+  user: UserAuth;
 }
 interface DashboardState {
 }

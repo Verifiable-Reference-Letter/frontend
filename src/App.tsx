@@ -4,17 +4,17 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
 
-import Nav from "./components/navbar/Nav";
-import HomePage from "./components/pages/home/Home";
-import WriterPage from "./components/pages/writer/Writer";
-import RequestorPage from "./components/pages/requestor/Requestor";
-import RecipientPage from "./components/pages/recipient/Recipient";
-import LoginPage from "./components/pages/login/Login";
-import DashboardPage from "./components/pages/dashboard/Dashboard";
+import Nav from "./nav/Nav";
+import HomePage from "./home/Home";
+import WriterPage from "./writer/Writer";
+import RequestorPage from "./requestor/Requestor";
+import RecipientPage from "./recipient/Recipient";
+import LoginPage from "./login/Login";
+import DashboardPage from "./dashboard/Dashboard";
 
-import User from "./interfaces/User.interface";
+import User from "./common/UserAuth.interface";
 
-import * as ROUTES from "./common/routes";
+import * as ROUTES from "./routes";
 
 import Web3 from "web3";
 export let web3: Web3;
@@ -67,7 +67,7 @@ class App extends React.Component<MyProps, MyState> {
       contract: {} as TutorialToken,
       connectedTo: false,
       loggedIn: false,
-      user: { publicAddress: "", name: "", email: "", jwtToken: "" },
+      user: { publicAddress: "", name: "", jwtToken: "" },
     };
     this.onConnect = this.onConnect.bind(this);
     this.onLogin = this.onLogin.bind(this);
@@ -99,7 +99,7 @@ class App extends React.Component<MyProps, MyState> {
     this.setState({
       contract,
       connectedTo: true,
-      user: { publicAddress: accounts[0], name: "", email: "", jwtToken: "" },
+      user: { publicAddress: accounts[0], name: "", jwtToken: "" },
       loggedIn: true, // testing purposes only
     });
   }

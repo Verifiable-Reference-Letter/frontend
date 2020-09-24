@@ -5,8 +5,8 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Button from "react-bootstrap/Button";
 import "./Nav.css";
 
-import * as ROUTES from "../../routes";
-import UserAuth from "../../common/UserAuth.interface";
+import * as ROUTES from "../routes";
+import UserAuth from "../common/UserAuth.interface";
 
 type NavProps = {
   user: UserAuth;

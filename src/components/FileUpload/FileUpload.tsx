@@ -1,14 +1,13 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import User from "../../interfaces/User.interface";
+
+import User from "../../common/UserAuth.interface";
 import "./FileUpload.css";
 
 interface FileUploadProps {
   user: User;
-  fetchUrl?: string; // if defined, fileupload will handle uploading to server
-  restrictPdf?: boolean; 
-  initialDisplayMessage?: string;
+  restrictPdf?: boolean;
   onUpload: (file: File) => void;
   onClose: () => void;
 }
@@ -22,27 +21,10 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     super(props);
     this.state = {
       file: new File([], ""),
-      displayMessage: this.props.initialDisplayMessage ? this.props.initialDisplayMessage : "",
+      displayMessage: "",
     };
     this.onFormSubmit = this.onFormSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
-    // this.fileUpload = this.fileUpload.bind(this);
-  }
-
-  onFormSubmit() //e: React.FormEvent
-  {
-    console.log(this.state.file);
-    if (this.state.file && this.state.file.size === 0) {
-      console.log("no file uploaded");
-      this.setState({ displayMessage: "No File Uploaded." });
-    } else if (this.props.restrictPdf && this.state.file.type != "application/pdf") {
-      console.log("not a pdf");
-      this.setState({ displayMessage: "Convert Your File to a PDF!" });
-    } else {
-      console.log("checking if upload to server");
-      if (this.props?.fetchUrl) this.fileUploadToServer(this.state.file);
-      else this.props.onUpload(this.state.file); // callback
-    }
   }
 
   onChange(e: any) {
@@ -50,35 +32,67 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     this.setState({ file: e.target.files[0] });
   }
 
+  onFormSubmit() {
+    const file = this.state.file;
+    console.log(file);
+    if (file && file.size === 0) {
+      console.log("no file uploaded");
+      this.setState({ displayMessage: "No File Uploaded." });
+    } else if (
+      this.props.restrictPdf &&
+      file.type !== "application/pdf"
+    ) {
+      console.log("not a pdf");
+      this.setState({ displayMessage: "Please Upload a PDF." });
+    } else {
+      console.log("checking if upload to server");
+      this.props.onUpload(file);
+    }
+  }
+
+  /*encryptFile(file: File) {
+    console.log("pretending to encrypt file");
+    this.fileUploadToServer(file);
+  }
+
   fileUploadToServer(file: File) {
     console.log("sending file to server");
+
+    // let fileForm: string = this.encryptFile(file);
+    
+    // REMOVE:
     let fileForm: FormData = new FormData();
     fileForm.append("file", file);
+    // END REMOVE
+
+    this.setState({displayMessage: "Uploading File."});
 
     fetch(`${process.env.REACT_APP_BACKEND_URL}` + this.props.fetchUrl, {
       body: fileForm,
       headers: {
+        "Access-Control-Allow-Origin": "*",
         "Content-Type": "mutlipart/form-data",
         jwtToken: this.props.user.jwtToken,
       },
       method: "POST",
     })
       .then((response: any) => {
-        console.log(response.json);
-        console.log(response.status);
+        console.log("body", response.json);
+        console.log("status", response.status);
         if (response.status === 200) {
-          this.props.onUpload(file);
+          this.props.onUpload(this.state.file);
         } else {
           this.changeDisplayMessage("Upload Failed. Try Again Later.");
+          this.props.onUpload(this.state.file); // DELETE: here for testing purposes
         }
       })
       .catch((e: Error) => {
         console.log(e);
       });
-  }
+  }*/
 
   changeDisplayMessage(newDisplayMessage: string) {
-    this.setState({displayMessage: newDisplayMessage})
+    this.setState({ displayMessage: newDisplayMessage });
   }
 
   render() {
@@ -97,21 +111,12 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
             >
               Close
             </Button>
-            <Button
-              className="form-button"
-              //type="submit"
-              onClick={this.onFormSubmit}
-            >
+            <Button className="form-button" onClick={this.onFormSubmit}>
               Upload
             </Button>
           </div>
         </Form.Group>
       </Form>
-
-      // <form onSubmit={this.onFormSubmit}>
-      //   <input type="file" onChange={this.onChange} />
-      //   <button type="submit">Upload</button>
-      // </form>
     );
   }
 }
