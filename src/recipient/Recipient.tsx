@@ -29,7 +29,6 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
   private viewModal = React.createRef<FileView>();
   private cryptService: CryptService;
   private cacheService: CacheService<number, string>;
-  private testCacheService: CacheService<number, File>;
 
   componentWillMount() {
     // api call to get letters
@@ -76,24 +75,26 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     };
     this.cryptService = new CryptService();
     this.cacheService = new CacheService(1);
-    this.testCacheService = new CacheService(1);
   }
 
   openViewModal(key: number) {
-    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${this.state.selectedLetterId}/content`;
-    this.setState({
-      viewIsOpen: true,
-      selectedLetterKey: key,
-      selectedLetterId: this.state.letters[key].letterId,
-    });
     console.log("opening view modal");
-    let encryptedLetter = this.cacheService.get(this.state.selectedLetterId);
+    const letterId = this.state.letters[key].letterId;
+    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
+    let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
-      this.retrieveFromServer(fetchUrl);
+      this.retrieveFromServer(fetchUrl, key);
     } else {
-      this.cacheService.get(this.state.selectedLetterId);
-      let file: File = this.cryptService.decrypt(encryptedLetter);
-      this.setState({file: file});
+      let file = this.cryptService.decrypt(encryptedLetter);
+      console.log("file", file);
+      if (file) {
+        this.setState({
+          file: file,
+          viewIsOpen: true,
+          selectedLetterKey: key,
+          selectedLetterId: letterId,
+        });
+      }
     }
   }
 
@@ -102,7 +103,8 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     this.setState({ viewIsOpen: false });
   }
 
-  retrieveFromServer(fetchUrl: string) {
+  retrieveFromServer(fetchUrl: string, key: number) {
+    console.log("retrieving from server");
     const init: RequestInit = {
       method: "GET",
       headers: {
@@ -110,6 +112,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         "Content-Type": "application/json",
       },
     };
+    const letterId = this.state.letters[key].letterId;
     // get letter from server
     fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
       .then((response) => {
@@ -119,14 +122,18 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       })
       .then((encryptedLetter) => {
         // decrypt letter
-        let file: File = this.cryptService.decrypt(encryptedLetter);
-        this.setState({file: file});
+        let file = this.cryptService.decrypt(encryptedLetter);
+        this.setState({
+          file: file,
+          viewIsOpen: true,
+          selectedLetterKey: key,
+          selectedLetterId: letterId,
+        });
       })
       .catch((e: Error) => {
         console.log(e);
       });
   }
-
   getUserName() {
     return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
   }

@@ -139,8 +139,9 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
   openViewModal(key: number) {
     console.log("opening view modal");
-    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${this.state.selectedLetterId}/content`;
     const letterId = this.state.letters[key].letterId;
+    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
+
     // let encryptedLetter = this.cacheService.get(letterId);
     let encryptedLetter = this.testCacheService.get(letterId); // DELETE
     if (encryptedLetter === null) {
@@ -157,9 +158,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
           selectedLetterId: letterId,
         });
       }
-      setTimeout(() => {
-        console.log(this.state.file);
-      })
     }
   }
 
