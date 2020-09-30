@@ -275,7 +275,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             <FileView
               file={this.state.selectedFile}
               ref={this.viewModal}
-              user={this.props.user}
+              letter={letters[this.state.selectedLetterKey]}
               onClose={this.closeViewModal.bind(this)}
             ></FileView>
           </Modal.Body>

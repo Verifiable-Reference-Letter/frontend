@@ -12,7 +12,7 @@ import RecipientPage from "./recipient/Recipient";
 import LoginPage from "./login/Login";
 import DashboardPage from "./dashboard/Dashboard";
 
-import User from "./common/UserAuth.interface";
+import UserAuth from "./common/UserAuth.interface";
 
 import * as ROUTES from "./routes";
 
@@ -56,7 +56,7 @@ type MyState = {
   contract: TutorialToken;
   connectedTo: boolean; // metamask
   loggedIn: boolean; // our app
-  user: User;
+  user: UserAuth;
 };
 
 class App extends React.Component<MyProps, MyState> {
@@ -100,11 +100,11 @@ class App extends React.Component<MyProps, MyState> {
       contract,
       connectedTo: true,
       user: { publicAddress: accounts[0], name: "", jwtToken: "" },
-      loggedIn: true, // testing purposes only
+      // loggedIn: true, // testing purposes only
     });
   }
 
-  onLogin(u: User) {
+  onLogin(u: UserAuth) {
     console.log("login complete");
     this.setState({ user: u, loggedIn: true });
   }

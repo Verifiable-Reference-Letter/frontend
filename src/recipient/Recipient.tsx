@@ -52,8 +52,8 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             publicAddress: "0x314159265358979323",
           },
           requestor: {
-            name: "Simba",
-            publicAddress: "0xabcdefghijklmnop",
+            name: "Curious George",
+            publicAddress: "0x142857142857142857",
           },
         },
       ],
@@ -176,7 +176,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           <Modal.Body>
             <FileView
               ref={this.viewModal}
-              user={this.props.user}
+              letter={letters[this.state.selectedLetterKey]}
               onClose={this.closeViewModal.bind(this)}
             ></FileView>
           </Modal.Body>

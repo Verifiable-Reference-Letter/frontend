@@ -1,10 +1,10 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
-import User from "../../common/UserAuth.interface";
+import { Button, ListGroup, Table } from "react-bootstrap";
+import LetterDetails from "../../common/LetterDetails.interface";
 import "./FileView.css";
 
 interface FileViewProps {
-  user: User;
+  letter: LetterDetails;
   file?: File;
   onClose: () => void;
 }
@@ -37,18 +37,44 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
   }*/
 
   render() {
+    const { letter, file } = this.props;
+    const requestor = letter.requestor;
+    const writer = letter.writer;
+    const { letterUrl, letterType } = this.state;
     return (
       <div>
-        <div>
-          {this.props.file && (
+        <div className="mb-3">
+          {file && (
             <embed
-              type={this.state.letterType}
-              src={this.state.letterUrl}
+              type={letterType}
+              src={letterUrl}
               width="100%"
-              height="400px"
+              height="360px"
             />
           )}
         </div>
+
+        <Table hover className="border border-secondary">
+          <thead>
+            <tr>
+              <th className="border border-secondary .bg-secondary">Letter ID</th>
+              <th className="border border-secondary">Requestor</th>
+              <th className="border border-secondary">Writer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border border-secondary">{letter.letterId}</td>
+              <td className="border border-secondary">
+                {requestor.name} ({requestor.publicAddress})
+              </td>
+              <td className="border border-secondary">
+                {writer.name} ({writer.publicAddress})
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+
         <Button
           className="form-button"
           onClick={(e: any) => {

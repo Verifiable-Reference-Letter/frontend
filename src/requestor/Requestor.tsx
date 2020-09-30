@@ -12,9 +12,10 @@ import { Fragment } from "react";
 
 import User from "../common/User.interface";
 import UserAuth from "../common/UserAuth.interface";
-import Letter from "../common/LetterDetails.interface";
-import FileView from "../components/FileView/FileView";
-
+import LetterDetails from "../common/LetterDetails.interface";
+import LetterHistory from "../common/LetterHistory.interface";
+import FileView from "../components/FileView";
+import FileHistory from "../components/FileHistory";
 import "./Requestor.css";
 
 interface RequestorProps {
@@ -23,10 +24,12 @@ interface RequestorProps {
 
 interface RequestorState {
   users: User[];
-  letters: Letter[];
+  letters: LetterDetails[];
+  history: LetterHistory[];
   letterKey: number;
   requestIsOpen: boolean;
   viewIsOpen: boolean;
+  historyIsOpen: boolean;
   selectedUser: User[];
   selectedLetterKey: number;
   selectedLetterId: number;
@@ -56,6 +59,38 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           },
         },
       ],
+      history: [
+        {
+          letterId: 1,
+          writer: {
+            name: "Mary Poppins",
+            publicAddress: "0x314159265358979323",
+          },
+          requestor: {
+            name: "Simba",
+            publicAddress: "0xabcdefghijklmnop",
+          },
+          recipient: {
+            name: "Elton John",
+            publicAddress: "0x101100101001101110100",
+          },
+        },
+        {
+          letterId: 1,
+          writer: {
+            name: "Mary Poppins",
+            publicAddress: "0x314159265358979323",
+          },
+          requestor: {
+            name: "Simba",
+            publicAddress: "0xabcdefghijklmnop",
+          },
+          recipient: {
+            name: "Curious George",
+            publicAddress: "0x142857142857142857",
+          },
+        },
+      ],
     });
   }
 
@@ -64,9 +99,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     this.state = {
       users: [],
       letters: [],
+      history: [],
       letterKey: -1,
       requestIsOpen: false,
       viewIsOpen: false,
+      historyIsOpen: false,
       selectedUser: [],
       selectedLetterKey: -1,
       selectedLetterId: -1,
@@ -100,6 +137,20 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     });
   }
 
+  closeHistoryModal() {
+    console.log("closing view modal");
+    this.setState({ historyIsOpen: false });
+  }
+
+  openHistoryModal(key: number) {
+    console.log("opening history modal");
+    this.setState({
+      historyIsOpen: true,
+      selectedLetterKey: key,
+      selectedLetterId: this.state.letters[key].letterId,
+    });
+  }
+
   getUserName() {
     return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
   }
@@ -108,8 +159,10 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     const { name } = this.props.user;
     const {
       letters,
+      history,
       requestIsOpen,
       viewIsOpen,
+      historyIsOpen,
       selectedUser,
       selectedLetterId,
     } = this.state;
@@ -122,6 +175,14 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           <Button
             className="left-float-right-button"
             onClick={() => {
+              this.openHistoryModal(k);
+            }}
+          >
+            History
+          </Button>
+          <Button
+            className="left-float-right-button"
+            onClick={() => {
               this.openViewModal(k);
             }}
           >
@@ -130,10 +191,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         </div>
       </Row>
     ));
+
     // const options = range(0, 1000).map((o) => `Item ${o}`);
-    // const options = this.state.users.map((l) => {
-    //   return `${l.name} (${l.publicAddress})`;
-    // });
     const options = this.state.users;
 
     const request = (
@@ -188,7 +247,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           animation={false}
           className="modal"
           scrollable={false}
-          size="lg"
+          size="sm"
         >
           <Modal.Header closeButton>
             <Modal.Title>
@@ -198,13 +257,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             </Modal.Title>
           </Modal.Header>
 
-          <Modal.Body>
-            <FileView
-              ref={this.viewModal}
-              user={this.props.user}
-              onClose={this.closeRequestModal.bind(this)}
-            ></FileView>
-          </Modal.Body>
+          <Modal.Body></Modal.Body>
         </Modal>
 
         <Modal
@@ -226,9 +279,33 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           <Modal.Body>
             <FileView
               ref={this.viewModal}
-              user={this.props.user}
+              letter={letters[this.state.selectedLetterKey]}
               onClose={this.closeViewModal.bind(this)}
             ></FileView>
+          </Modal.Body>
+        </Modal>
+
+        <Modal
+          id="history-modal"
+          show={historyIsOpen}
+          onHide={this.closeHistoryModal.bind(this)}
+          backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          size="sm"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              {this.getUserName()} ({selectedLetterId})
+            </Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FileHistory
+              history={history}
+              onClose={this.closeHistoryModal.bind(this)}
+            ></FileHistory>
           </Modal.Body>
         </Modal>
 

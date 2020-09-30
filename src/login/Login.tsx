@@ -1,14 +1,15 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
-import User from "../common/UserAuth.interface";
+import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
+import Body from "../common/Body.interface";
 
 import { web3 } from "../App";
 
 // let web3: Web3;
 interface LoginProps {
-  user: User;
-  callback: (u: User) => void;
+  user: UserAuth;
+  callback: (u: UserAuth) => void;
 }
 interface LoginState {
   inputName: string;
@@ -90,9 +91,9 @@ class Login extends React.Component<LoginProps, LoginState> {
       }
     };
 
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}/nonce`, init)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}`, init)
       .then((response) => {
-        console.log("logging response");
+        console.log("logging nonce fetch response");
         console.log(response);
         return response.json();
       })
@@ -117,6 +118,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       //.then(this.doStuffWithToken) // after receiving the token
       .catch((err: Error) => {
         console.log(err);
+        this.setState({displayMessage: "Login Failed. Try Again Later."})
       });
 
     return;
@@ -143,7 +145,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       method: "POST",
     })
       .then((response) => {
-        console.log("logging response");
+        console.log("logging signup response");
         console.log(response);
         return response.json();
       })
@@ -166,11 +168,13 @@ class Login extends React.Component<LoginProps, LoginState> {
     // this.setState({displayMessage: "Sign the Message to Confirm Public Address."})
     console.log("signing the nonce");
     console.log(nonce);
+    const message = web3.utils.sha3(nonce);
+    console.log(message);
     return new Promise((resolve, reject) => {
       // web3.eth.sign doesn't seem to work (never finishes)
       web3.eth.personal
         .sign(
-          web3.utils.utf8ToHex(`I am signing my one-time nonce: ${nonce}`),
+          web3.utils.utf8ToHex(`${message}`),
           publicAddress,
           "",
           (err, signature) => {
@@ -211,21 +215,24 @@ class Login extends React.Component<LoginProps, LoginState> {
       method: "POST",
     })
       .then((response) => {
-        let u: User;
-        let h: Headers = response.headers;
-        const j = h.get("jwtToken");
+        console.log("received response");
+        console.log(response);
+
         response
           .json()
-          .then((body) => {
-            u = body[0];
+          .then((body: Body) => {
+            console.log(body);
+            const auth = body.auth;
+            const j = auth.jwtToken;
+            console.log("jwtToken", j);
             let jwtToken = j ? j : undefined;
-            if (this.props.user.publicAddress !== u.publicAddress) {
-              console.log("error: publicAddresses do not match");
+            if (this.props.user.publicAddress !== auth.publicAddress) {
+              console.log("error in backend: publicAddresses do not match");
             } else if (jwtToken) {
               console.log(jwtToken);
               this.props.callback({
                 publicAddress: this.props.user.publicAddress,
-                name: u.name,
+                name: this.props.user.name,
                 jwtToken: jwtToken,
               });
             } else {

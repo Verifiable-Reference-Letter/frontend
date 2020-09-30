@@ -65,7 +65,7 @@ class Nav extends React.Component<NavProps, NavState> {
           <Dropdown.Toggle variant="secondary" id="dropdown-basic">
             Menu
           </Dropdown.Toggle>
-          {this.props.connectedTo && (
+          {this.props.loggedIn && (
             <Dropdown.Menu alignRight={true}>
               <Link to={ROUTES.HOME} style={{ textDecoration: "none" }}>
                 <li>
@@ -99,7 +99,7 @@ class Nav extends React.Component<NavProps, NavState> {
               </Link>
             </Dropdown.Menu>
           )}
-          {!this.props.connectedTo && (
+          {!this.props.loggedIn && (
             <Dropdown.Menu alignRight={true}>
               <Link to={ROUTES.HOME} style={{ textDecoration: "none" }}>
                 <li>
