@@ -1,6 +1,7 @@
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
-import React from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import React, {FunctionComponent} from "react";
+import { RouteComponentProps } from "@reach/router";
+import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
 
@@ -18,6 +19,16 @@ import * as ROUTES from "./routes";
 
 import Web3 from "web3";
 export let web3: Web3;
+
+type Props = { component: FunctionComponent, authed: boolean } & RouteComponentProps;
+
+const ProtectedRoute: FunctionComponent<Props> = ({ component: Component, authed, ...rest }) => (
+    authed ? (
+        <Component {...rest}/>
+    ) : (
+        <Redirect to={{ pathname: '/login' }} />
+    )
+);
 
 export const GAS_LIMIT_STANDARD = 6000000;
 export let accounts: string[];
@@ -111,9 +122,8 @@ class App extends React.Component<MyProps, MyState> {
 
   render() {
     const home = <HomePage user={this.state.user} />;
-    const login = (
-      <LoginPage callback={this.onLogin.bind(this)} user={this.state.user} />
-    );
+    const login = <LoginPage callback={this.onLogin.bind(this)} user={this.state.user} />
+
     const dashboard = <DashboardPage user={this.state.user} />;
     const requestor = <RequestorPage user={this.state.user} />;
     const writer = <WriterPage user={this.state.user} />;
@@ -128,14 +138,17 @@ class App extends React.Component<MyProps, MyState> {
           loggedIn={this.state.loggedIn}
         />
         {this.state.loggedIn ? <Redirect to="/dashboard" /> : null}
-        <div>
-          <Route exact path={ROUTES.HOME} render={() => home} />
-          <Route exact path={ROUTES.LOGIN} render={() => login} />
-          <Route exact path={ROUTES.DASHBOARD} render={() => dashboard} />
-          <Route exact path={ROUTES.REQUESTOR} render={() => requestor} />
-          <Route exact path={ROUTES.WRITER} render={() => writer} />
-          <Route exact path={ROUTES.RECIPIENT} render={() => recipient} />
-        </div>
+        <Router>
+
+	          <ProtectedRoute path={ROUTES.HOME} authed={this.state.loggedIn} component={() => home} />
+	          <ProtectedRoute path={ROUTES.REQUESTOR} authed={this.state.loggedIn} component={() => requestor} />
+	          <ProtectedRoute path={ROUTES.WRITER} authed={this.state.loggedIn} component={() => writer} />
+	          <ProtectedRoute path={ROUTES.RECIPIENT} authed={this.state.loggedIn} component={() => recipient} />
+
+	          <Route path={ROUTES.LOGIN} authed={this.state.loggedIn} component={() => login} />
+
+	          <ProtectedRoute path={ROUTES.DASHBOARD} authed={this.state.loggedIn} component={() => dashboard} />
+	      </Router>
       </div>
     );
   }
