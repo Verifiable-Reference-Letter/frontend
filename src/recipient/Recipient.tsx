@@ -130,8 +130,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         console.log(e);
       });
   }
-  getUserName() {
-    return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
+
+  getRequestor() {
+    return this.state.letters[this.state.selectedLetterKey]?.requestor;
+  }
+
+  getWriter() {
+    return this.state.letters[this.state.selectedLetterKey]?.writer;
   }
 
   render() {
@@ -169,7 +174,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              {this.getUserName()} ({selectedLetterId})
+              Letter for {this.getRequestor()?.name} by {this.getWriter?.name} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 

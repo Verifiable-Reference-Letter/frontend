@@ -194,8 +194,12 @@ class Writer extends React.Component<WriterProps, WriterState> {
       });
   }
 
-  getUserName() {
-    return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
+  getRequestor() {
+    return this.state.letters[this.state.selectedLetterKey]?.requestor;
+  }
+
+  getWriter() {
+    return this.state.letters[this.state.selectedLetterKey]?.writer;
   }
 
   render() {
@@ -240,7 +244,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              {this.getUserName()} ({selectedLetterId})
+              Letter for {this.getRequestor()?.name} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 
@@ -267,7 +271,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              {this.getUserName()} ({selectedLetterId})
+              Letter For {this.getRequestor?.name} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 

@@ -151,8 +151,12 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     });
   }
 
-  getUserName() {
-    return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
+  getRequestor() {
+    return this.state.letters[this.state.selectedLetterKey]?.requestor;
+  }
+
+  getWriter() {
+    return this.state.letters[this.state.selectedLetterKey]?.writer;
   }
 
   render() {
@@ -272,7 +276,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              {this.getUserName()} ({selectedLetterId})
+              Letter From {this.getWriter()?.name} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 
@@ -297,7 +301,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              {this.getUserName()} ({selectedLetterId})
+              Letters From {this.getWriter()?.name} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 

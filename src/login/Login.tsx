@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
+import { Button, InputGroup, FormControl } from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
 import Body from "../common/Body.interface";
@@ -61,6 +61,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       //.then(this.doStuffWithToken) // after receiving the token
       .catch((err: Error) => {
         console.log(err);
+        this.setState({displayMessage: "Error. Please Try Again Later."})
       });
 
     return;
@@ -280,17 +281,17 @@ class Login extends React.Component<LoginProps, LoginState> {
 
     const signupDisplay = (
       <form>
-        <label className="label-top">
-          Name &nbsp;
-          <input
+        <InputGroup className="label-top d-flex justify-content-between border-radius">
+          <InputGroup.Prepend className="flex-shrink-1 mt-2">Name &nbsp;</InputGroup.Prepend>
+          <FormControl
             type="text"
             placeholder="Not Yet Verified"
             value={this.state.inputName}
             onChange={this.handleInputChange}
           />
-        </label>
+        </InputGroup>
         <Button
-          className="left-float-right-button"
+          className="left-float-right-button flex-fill"
           onClick={() => {
             this.toggleMode();
             this.setState({ inputName: "" });

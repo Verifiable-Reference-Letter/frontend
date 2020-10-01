@@ -1,6 +1,9 @@
 import React from "react";
-import { Button, ListGroup, Table } from "react-bootstrap";
+import { Modal, Button, ListGroup, Table } from "react-bootstrap";
 import LetterDetails from "../../common/LetterDetails.interface";
+import UserProfile from "../../common/UserProfile.interface";
+import Profile from "../../components/Profile";
+import Body from "../../common/Body.interface";
 import "./FileView.css";
 
 interface FileViewProps {
@@ -11,6 +14,9 @@ interface FileViewProps {
 interface FileViewState {
   letterUrl: any;
   letterType: string;
+  profileIsOpen: boolean;
+  selectedPublicAddress: string;
+  userProfile?: UserProfile;
 }
 
 class FileView extends React.Component<FileViewProps, FileViewState> {
@@ -28,19 +34,71 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
 
   constructor(props: FileViewProps) {
     super(props);
-    this.state = { letterUrl: null, letterType: "" };
+    this.state = {
+      letterUrl: null,
+      letterType: "",
+      profileIsOpen: false,
+      selectedPublicAddress: "",
+    };
   }
 
-  /*decryptLetter(letter: string) {
-    console.log("decrypting letter");
-    return new File([""], "filename.pdf", {type: "application/pdf"});
-  }*/
+  openProfileModal(selectedPublicAddress: string) {
+    console.log("opening view modal");
+    const fetchUrl = `/api/users/${selectedPublicAddress}`;
+    this.retrieveFromServer(fetchUrl);
+  }
 
+  retrieveFromServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "GET",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    };
+
+    // get user profile from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+      .then((response) => {
+        response
+          .json()
+          .then((body: Body) => {
+            const data: UserProfile[] = body.data;
+            console.log(response);
+            this.setState({ userProfile: data[0], profileIsOpen: true });
+          })
+          .catch((e: Error) => {
+            console.log(e);
+
+            // REMOVE TESTING
+            this.setState({
+              userProfile: {
+                publicAddress: "0xTEMPORARYPUBLICADDRESSROUTENOTWRITTEN",
+                name: "TEMPORARYNAMEYESTHATISMYNAME",
+              },
+              profileIsOpen: true,
+            });
+          });
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+  }
+
+  closeProfileModal() {
+    console.log("closing view modal");
+    this.setState({ profileIsOpen: false });
+  }
   render() {
     const { letter, file } = this.props;
     const requestor = letter.requestor;
     const writer = letter.writer;
-    const { letterUrl, letterType } = this.state;
+    const {
+      letterUrl,
+      letterType,
+      profileIsOpen,
+      selectedPublicAddress,
+    } = this.state;
     return (
       <div>
         <div className="mb-3">
@@ -57,7 +115,9 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
         <Table hover className="border border-secondary">
           <thead>
             <tr>
-              <th className="border border-secondary .bg-secondary">Letter ID</th>
+              <th className="border border-secondary .bg-secondary">
+                Letter ID
+              </th>
               <th className="border border-secondary">Requestor</th>
               <th className="border border-secondary">Writer</th>
             </tr>
@@ -66,10 +126,28 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
             <tr>
               <td className="border border-secondary">{letter.letterId}</td>
               <td className="border border-secondary">
-                {requestor.name} ({requestor.publicAddress})
+                <div>
+                  {requestor.name} ({requestor.publicAddress})
+                  <Button
+                    className="form-button float-right mb-3 mr-2"
+                    onClick={(e: any) => {
+                      this.openProfileModal(requestor.publicAddress);
+                    }}
+                  >
+                    *
+                  </Button>
+                </div>
               </td>
               <td className="border border-secondary">
                 {writer.name} ({writer.publicAddress})
+                <Button
+                  className="form-button float-right mb-3"
+                  onClick={(e: any) => {
+                    this.openProfileModal(requestor.publicAddress);
+                  }}
+                >
+                  *
+                </Button>
               </td>
             </tr>
           </tbody>
@@ -83,6 +161,30 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
         >
           Close
         </Button>
+
+        <Modal
+          id="profile-modal"
+          show={profileIsOpen}
+          onHide={this.closeProfileModal.bind(this)}
+          backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>User Profile: ({selectedPublicAddress})</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            {this.state.userProfile && (
+              <Profile
+                user={this.state.userProfile}
+                onClose={this.closeProfileModal.bind(this)}
+              />
+            )}
+          </Modal.Body>
+        </Modal>
       </div>
     );
   }
