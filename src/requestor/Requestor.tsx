@@ -6,6 +6,8 @@ import {
   Modal,
   InputGroup,
   Form,
+  Card,
+  Accordion,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { Fragment } from "react";
@@ -52,6 +54,17 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
+          },
+          requestor: {
+            name: "Simba",
+            publicAddress: "0xabcdefghijklmnop",
+          },
+        },
+        {
+          letterId: 3,
+          writer: {
+            name: "Curious George",
+            publicAddress: "0x142857142857142857",
           },
           requestor: {
             name: "Simba",
@@ -172,28 +185,45 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     } = this.state;
 
     const lettersList = letters.map((l, k) => (
-      <Row key={k}>
-        <div className="full-width">
-          <span className="text-float-left">({l.letterId})&nbsp;</span>
-          <span className="text-float-left">From: {l.writer.name}</span>
+      <Card className="full-width opacity-0">
+        <Accordion.Toggle
+          as={Card.Header}
+          className="d-flex"
+          eventKey={k.toString()}
+        >
+          <div className="flex-fill top-text">
+            ({l.letterId}) From: {l.writer.name}
+          </div>
           <Button
-            className="left-float-right-button"
-            onClick={() => {
+            // disabled
+            className="flex-shrink-1 float-right ml-2"
+            onClick={(e: any) => {
+              e.stopPropagation();
               this.openHistoryModal(k);
             }}
           >
             History
           </Button>
-          <Button
-            className="left-float-right-button"
-            onClick={() => {
-              this.openViewModal(k);
-            }}
-          >
-            View
-          </Button>
-        </div>
-      </Row>
+        </Accordion.Toggle>
+        <Accordion.Collapse as={Card.Body} eventKey={k.toString()}>
+          {/* <Card.Body className="">({l.letterId}) {l.writer.name} ({l.writer.publicAddress})</Card.Body> */}
+          <div className="d-flex acc-body">
+            <div className="flex-fill top-text">
+              {l.writer.name} ({l.writer.publicAddress})
+            </div>
+            <Button
+              variant="info"
+              className="flex-shrink-1 float-right ml-2"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                this.openHistoryModal(k);
+              }}
+            >
+              *
+            </Button>
+          </div>
+        </Accordion.Collapse>
+      </Card>
     ));
 
     // const options = range(0, 1000).map((o) => `Item ${o}`);
@@ -318,21 +348,18 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           <p>
             <em>{name}</em>
           </p>
-          <hr></hr>
         </div>
-
-        <div>
+        <hr></hr>
+        <div className="request">
           <h3> Request </h3>
           {request}
-          <hr></hr>
         </div>
-
+        <hr></hr>
         <div className="letters">
           <h3> Letters </h3>
-          <Container fluid>{lettersList}</Container>
-          <hr></hr>
+          <Accordion>{lettersList}</Accordion>
         </div>
-
+        <hr></hr>
         <div className="requestor-footer">
           <p> Product of Team Gas</p>
         </div>

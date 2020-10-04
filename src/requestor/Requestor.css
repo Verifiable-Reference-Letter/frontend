@@ -1,8 +1,13 @@
 .requestor {
-  padding: 20px 20% 20px
+  padding: 20px 20% 20px;
 }
 .requestor-header {
   text-align: center;
+}
+
+.request {
+  margin-right: 12.5px;
+  margin-left: 12.5px;
 }
 
 h1,
@@ -21,11 +26,11 @@ h6 {
 .left-float-right-button {
   margin-left: 10px;
   float: right;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
 
 .full-width {
-  width: 100%
+  width: 100%;
 }
 
 .text-float-right {
@@ -36,4 +41,21 @@ h6 {
 .text-float-left {
   float: left;
   margin-top: 7px;
+}
+
+.opacity-0 {
+  background-color: rgba(51, 170, 51, 0) !important;
+  border: none;
+}
+
+.top-text {
+  margin-top: 7px;
+}
+
+.card-header {
+  border-bottom: 0px solid rgba(0, 0, 0, 0) !important;
+}
+
+.acc-body {
+  padding: 7.5px 12.5px;
 }
