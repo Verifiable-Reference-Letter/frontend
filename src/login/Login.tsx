@@ -169,16 +169,22 @@ class Login extends React.Component<LoginProps, LoginState> {
     // this.setState({displayMessage: "Sign the Message to Confirm Public Address."})
     console.log("signing the nonce");
     console.log(nonce);
-    const message = web3.utils.sha3(nonce);
+    // const prefix = '\x19Ethereum Signed Message:\n' + String.fromCharCode(nonce.length);
+    // const message = web3.utils.keccak256(prefix + nonce);
+    const message = web3.utils.keccak256(nonce);
     console.log(message);
+    console.log(web3.utils.utf8ToHex(`${message}`));
+    console.log(publicAddress);
     return new Promise((resolve, reject) => {
       // web3.eth.sign doesn't seem to work (never finishes)
-      web3.eth.personal
-        .sign(
-          web3.utils.utf8ToHex(`${message}`),
+      web3.eth.personal.sign(
+          message,
+          // web3.utils.utf8ToHex(`${message}`),
           publicAddress,
           "",
           (err, signature) => {
+            //console.log(web3.eth.accounts.recover(web3.utils.keccak256(nonce), signature));
+            //web3.eth.personal.ecRecover(message, signature).then((v) => console.log(v));
             if (err) {
               console.log("error when signing");
               return reject(err);

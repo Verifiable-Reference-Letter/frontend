@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Table } from "react-bootstrap";
+import { Button, Table, Image } from "react-bootstrap";
 import UserAuth from "../../common/User.interface";
 import "./Profile.css";
 
@@ -28,6 +28,7 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
     const { user } = this.props;
     return (
       <div>
+        <Image className="m-3 float-right" src="https://engineering.lehigh.edu/sites/engineering.lehigh.edu/files/styles/faculty_photo/public/korth.jpg?itok=GfxQ6zFl"/>
         <div className="mb-3">
           <Table hover className="border border-secondary">
             <thead>

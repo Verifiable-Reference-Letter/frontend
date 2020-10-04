@@ -173,7 +173,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
           size="lg"
         >
           <Modal.Header closeButton>
-            <Modal.Title>User Profile: ({selectedPublicAddress})</Modal.Title>
+            <Modal.Title>User Profile</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
