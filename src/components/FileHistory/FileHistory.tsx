@@ -14,7 +14,7 @@ interface FileHistoryState {
   profileIsOpen: boolean;
   selectedUserKey: number;
   selectedUserName: string;
-  userProfile?: UserProfile;
+  selectedUserProfile?: UserProfile;
 }
 
 class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
@@ -58,15 +58,20 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
           .then((body: Body) => {
             const data: UserProfile[] = body.data;
             console.log(response);
-            this.setState({ userProfile: data[0], profileIsOpen: true });
+            this.setState({
+              selectedUserProfile: data[0],
+              profileIsOpen: true,
+            });
           })
           .catch((e: Error) => {
             console.log(e);
 
             // REMOVE TESTING
             this.setState({
-              userProfile: this.getRecipientByKey(this.state.selectedUserKey),
-              profileIsOpen: true
+              selectedUserProfile: this.getRecipientByKey(
+                this.state.selectedUserKey
+              ),
+              profileIsOpen: true,
             });
           });
       })
@@ -89,7 +94,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
           <span className="text-float-left">({l.letterId})&nbsp;</span>
           <span className="text-float-left">Sent to: {l.recipient.name}</span>
           <Button
-            // variant="secondary"
+            variant="primary"
             className="left-float-right-button"
             onClick={() => {
               this.openProfileModal(k);
@@ -130,9 +135,9 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
           </Modal.Header>
 
           <Modal.Body>
-            {this.state.userProfile && (
+            {this.state.selectedUserProfile && (
               <Profile
-                user={this.state.userProfile}
+                user={this.state.selectedUserProfile}
                 onClose={this.closeProfileModal.bind(this)}
               />
             )}
