@@ -81,7 +81,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     if (encryptedLetter === null) {
       this.retrieveFromServer(fetchUrl, key);
     } else {
-      let file = this.cryptService.decrypt(encryptedLetter);
+      let file = this.cryptService.decrypt(encryptedLetter, this.props.user.publicAddress);
       console.log("file", file);
       if (file) {
         this.setState({
@@ -118,7 +118,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       })
       .then((encryptedLetter) => {
         // decrypt letter
-        let file = this.cryptService.decrypt(encryptedLetter);
+        let file = this.cryptService.decrypt(encryptedLetter, this.props.user.publicAddress);
         this.setState({
           file: file,
           viewIsOpen: true,

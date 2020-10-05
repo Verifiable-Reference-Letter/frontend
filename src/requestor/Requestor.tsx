@@ -136,7 +136,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
   }
 
   openRequestModal() {
-    console.log("opening send modal");
+    console.log("opening request modal");
     this.setState({
       requestIsOpen: true,
     });
@@ -188,7 +188,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
   }
 
   closeHistoryModal() {
-    console.log("closing view modal");
+    console.log("closing history modal");
     this.setState({ historyIsOpen: false });
   }
 

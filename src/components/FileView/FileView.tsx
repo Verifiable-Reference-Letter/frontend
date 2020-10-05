@@ -112,7 +112,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
           )}
         </div>
 
-        <Table hover className="border border-secondary">
+        {/* <Table hover className="border border-secondary">
           <thead>
             <tr>
               <th className="border border-secondary .bg-secondary">
@@ -151,7 +151,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
               </td>
             </tr>
           </tbody>
-        </Table>
+        </Table> */}
 
         <Button
           className="form-button"

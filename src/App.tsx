@@ -18,6 +18,7 @@ import * as ROUTES from "./routes";
 
 import Web3 from "web3";
 export let web3: Web3;
+export let ethereum: any;
 
 export const GAS_LIMIT_STANDARD = 6000000;
 export let accounts: string[];
@@ -95,6 +96,15 @@ class App extends React.Component<MyProps, MyState> {
     web3 = new Web3(web3Provider);
     accounts = await ethereum.request({ method: "eth_accounts" });
     // contract = await deployTutorialToken(); // temporary disable
+    console.log(accounts);
+    // ethereum
+    //       .request({
+    //         method: "eth_getEncryptionPublicKey",
+    //         params: [accounts[0]], // you must have access to the specified account
+    //       })
+    //       .then((publicKey: string) => {
+    //         console.log(publicKey);
+    //       });
 
     this.setState({
       contract,

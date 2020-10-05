@@ -102,7 +102,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
   uploadToServer(file: File, fetchUrl: string) {
     console.log("uploading to server");
     // encrypt file
-    let encryptedFile: string = this.cryptService.encrypt(file);
+    let encryptedFile: string = this.cryptService.encrypt(file, this.props.user.publicAddress);
     // cache encrypted file
     // this.cacheService.put(this.state.selectedLetterId, encryptedFile);
     this.testCacheService.put(this.state.selectedLetterId, file);
@@ -181,7 +181,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
       })
       .then((encryptedLetter) => {
         // decrypt letter
-        let file = this.cryptService.decrypt(encryptedLetter);
+        let file = this.cryptService.decrypt(encryptedLetter, this.props.user.publicAddress);
         this.setState({
           viewIsOpen: true,
           selectedLetterKey: key,

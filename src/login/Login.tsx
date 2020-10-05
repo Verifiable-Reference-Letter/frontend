@@ -6,7 +6,6 @@ import Body from "../common/Body.interface";
 
 import { web3 } from "../App";
 
-// let web3: Web3;
 interface LoginProps {
   user: UserAuth;
   callback: (u: UserAuth) => void;
