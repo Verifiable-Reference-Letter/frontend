@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Button, Modal } from "react-bootstrap";
+import { Card, Button, Modal } from "react-bootstrap";
 import "./FileHistory.css";
 import LetterHistory from "../../common/LetterHistory.interface";
 import UserProfile from "../../common/UserProfile.interface";
@@ -89,28 +89,25 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
     const { history } = this.props;
     const { profileIsOpen } = this.state;
     const historyList = history.map((l, k) => (
-      <Row key={k}>
-        <div className="full-width">
-          <span className="text-float-left">({l.letterId})&nbsp;</span>
-          <span className="text-float-left">Sent to: {l.recipient.name}</span>
+      <Card.Header className="d-flex justify-content-between recipient-entry" key={k}>
+          <div className="flex-fill recipient-body">Sent to: {l.recipient.name}</div>
           <Button
             variant="primary"
-            className="left-float-right-button"
+            className="flex-shrink-1 float-right"
             onClick={() => {
               this.openProfileModal(k);
             }}
           >
-            *
+            Profile
           </Button>
-        </div>
-      </Row>
+      </Card.Header>
     ));
 
     return (
       <div>
-        <Container fluid>{historyList}</Container>
+        <div>{historyList}</div>
         <Button
-          className="form-button"
+          className="mt-3"
           onClick={(e: any) => {
             this.props.onClose();
           }}
@@ -126,7 +123,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
           animation={false}
           className="modal"
           scrollable={false}
-          size="lg"
+          size="sm"
         >
           <Modal.Header closeButton>
             <Modal.Title>

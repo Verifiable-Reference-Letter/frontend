@@ -1,0 +1,8 @@
+.recipient-list-body {
+  padding: 8px 0px;
+}
+
+.recipient-entry {
+  background-color: RGBA(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}

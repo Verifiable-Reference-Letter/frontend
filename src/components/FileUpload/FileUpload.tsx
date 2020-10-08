@@ -107,14 +107,14 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
           <div>
             <div className="display-message"> {displayMessage} </div>
             <Button
-              className="form-button"
+              className="mt-3 float-right"
               onClick={(e: any) => {
                 this.props.onClose();
               }}
             >
               Close
             </Button>
-            <Button className="form-button" onClick={this.onFormSubmit}>
+            <Button className="mt-3 mr-3 float-right" onClick={this.onFormSubmit}>
               Upload
             </Button>
            {buffering && <Spinner className="float-right mt-4 mr-3" animation="border" variant="secondary" />}

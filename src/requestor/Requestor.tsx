@@ -1,15 +1,14 @@
 import React from "react";
 import {
   Button,
-  Row,
-  Container,
   Modal,
   InputGroup,
-  Form,
   Card,
   Accordion,
   OverlayTrigger,
   Tooltip,
+  FormGroup,
+  Form,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { Fragment } from "react";
@@ -24,6 +23,7 @@ import Body from "../common/Body.interface";
 import FileView from "../components/FileView";
 import FileHistory from "../components/FileHistory";
 import Profile from "../components/Profile";
+import Request from "../components/Request";
 import "./Requestor.css";
 
 interface RequestorProps {
@@ -39,7 +39,8 @@ interface RequestorState {
   profileIsOpen: boolean;
   historyIsOpen: boolean;
   selectedUserProfile?: UserProfile;
-  requestedUser: User[];
+  requestedWriter: User[];
+  requestedRecipients: User[];
   selectedLetterKey: number;
   selectedLetterId: number;
 }
@@ -54,6 +55,18 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         { name: "Mary Poppins", publicAddress: "0x314159265358979323" },
         { name: "Elton John", publicAddress: "0x101100101001101110100" },
         { name: "Curious George", publicAddress: "0x142857142857142857" },
+        { name: "Jerry Mouse", publicAddress: "0xqwertyuiopasdfghjkl" },
+        { name: "Tom Cat", publicAddress: "qazwsxedcrfvtgbyhnujmi" },
+        { name: "Jane Eyre", publicAddress: "0x1q2w3e4r5t6y7u8i9o0p" },
+        { name: "The Grinch", publicAddress: "0xuioghj567xcvtyu89" },
+        { name: "Eponine Thenardier", publicAddress: "0xtrfdxzmlkpoiujhnbytgfvc" },
+        { name: "Little Prince", publicAddress: "0xm98nb76vc54xz32aq1" },
+        { name: "Winston Smith", publicAddress: "0x30dk49fj58ghuty7610" },
+        { name: "Michael Cassio", publicAddress: "0xp098uhhbvfr43wazxd" },
+        { name: "Buddy Hobbs", publicAddress: "0x10woskdjrutyghvbcnxm" },
+        { name: "Remy Rat", publicAddress: "0xplkio098ujmnhy76tgb" },
+        { name: "Ron Swanson", publicAddress: "0xghvbnjuytfcdresx5678olk" },
+        { name: "David Tennant", publicAddress: "0xpsodkrmvnxjsiqo20fh48" },
       ],
       letters: [
         {
@@ -124,7 +137,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       requestIsOpen: false,
       profileIsOpen: false,
       historyIsOpen: false,
-      requestedUser: [],
+      requestedWriter: [],
+      requestedRecipients: [],
       selectedLetterKey: -1,
       selectedLetterId: -1,
     };
@@ -139,6 +153,17 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     console.log("opening request modal");
     this.setState({
       requestIsOpen: true,
+    });
+  }
+
+  async onSelectSubmit(requestedRecipients: User[]) {
+    console.log("on select submit");
+    console.log(requestedRecipients);
+
+    // TODO: CALL TO BACKEND
+
+    this.setState({
+      requestIsOpen: false,
     });
   }
 
@@ -172,13 +197,33 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           .then((body: Body) => {
             const data: UserProfile[] = body.data;
             console.log(response);
-            this.setState({
-              selectedUserProfile: data[0],
-              profileIsOpen: true,
-            });
+            if (data) {
+              this.setState({
+                selectedUserProfile: data[0],
+                profileIsOpen: true,
+              });
+            } else {
+              // REMOVE TESTING
+              this.setState({
+                selectedUserProfile: {
+                  publicAddress: "0xtemporaryplaceholder",
+                  name: "Professor Korth",
+                },
+                profileIsOpen: true,
+              });
+              // END REMOVE
+            }
           })
           .catch((e: Error) => {
-            this.setState({ profileIsOpen: true }); // DELETE
+            // REMOVE TESTING
+            this.setState({
+              selectedUserProfile: {
+                publicAddress: "0xtemporaryplaceholder",
+                name: "Professor Korth",
+              },
+              profileIsOpen: true,
+            });
+            // END REMOVE
             console.log(e);
           });
       })
@@ -217,7 +262,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       requestIsOpen,
       profileIsOpen,
       historyIsOpen,
-      requestedUser,
+      requestedWriter,
+      requestedRecipients,
       selectedLetterId,
     } = this.state;
 
@@ -255,12 +301,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               History
             </Button>
             <Button
-              // disabled
+              disabled
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
                 e.stopPropagation();
-                this.openHistoryModal(k);
               }}
             >
               Send
@@ -304,28 +349,28 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     // const options = range(0, 1000).map((o) => `Item ${o}`);
     const options = this.state.users;
 
-    const request = (
+    const requestWriter = (
       <Fragment>
         <InputGroup className="d-flex justify-content-between border-radius button-blur mb-0">
           <div
-            className="flex-fill mr-4"
+            className="flex-fill mr-4 single-typeahead"
             onClick={() => {
-              this.setState({ requestedUser: [] });
+              this.setState({ requestedWriter: [] });
             }}
           >
             <Typeahead
-              id="basic-behaviors-example"
+              id="request-writer"
               // minLength={2}
               labelKey="name"
               filterBy={["name", "publicAddress"]}
               options={options}
               placeholder="Select a User"
               paginate={true}
-              selected={this.state.requestedUser}
+              selected={this.state.requestedWriter}
               onChange={(selected) => {
                 console.log("selected", selected);
                 this.setState({
-                  requestedUser: selected,
+                  requestedWriter: selected,
                 });
               }}
               renderMenuItemChildren={
@@ -333,7 +378,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               }
             />
           </div>
-          {requestedUser.length !== 0 && (
+          {requestedWriter.length !== 0 && (
             <Button
               variant="outline-light"
               className="flex-shrink-1"
@@ -342,7 +387,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               Request
             </Button>
           )}
-          {requestedUser.length === 0 && (
+          {requestedWriter.length === 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id="tooltip-disabled" placement="left">
@@ -367,6 +412,35 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       </Fragment>
     );
 
+    // const requestRecipients = (
+    //   <Fragment>
+    //     <InputGroup className="d-flex justify-content-between border-radius button-blur mb-0">
+    //       <div className="flex-fill multiple-typeahead">
+    //         <Typeahead
+    //           id="request-recipients"
+    //           // minLength={2}
+    //           multiple
+    //           labelKey="name"
+    //           filterBy={["name", "publicAddress"]}
+    //           options={options}
+    //           placeholder="Select a User"
+    //           paginate={true}
+    //           selected={this.state.requestedRecipients}
+    //           onChange={(selected) => {
+    //             console.log("selected", selected);
+    //             this.setState({
+    //               requestedRecipients: selected,
+    //             });
+    //           }}
+    //           renderMenuItemChildren={
+    //             (option) => `${option.name} (${option.publicAddress})` // TODO: add padding with service
+    //           }
+    //         />
+    //       </div>
+    //     </InputGroup>
+    //   </Fragment>
+    // );
+
     return (
       <div className="requestor">
         <Modal
@@ -377,17 +451,24 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           animation={false}
           className="modal"
           scrollable={false}
-          size="sm"
+          size="lg"
         >
           <Modal.Header closeButton>
             <Modal.Title>
               <span>
-                {requestedUser[0]?.name} ({requestedUser[0]?.publicAddress})
+                {requestedWriter[0]?.name}
+                {/* ({requestedWriter[0]?.publicAddress}) */}
               </span>
             </Modal.Title>
           </Modal.Header>
 
-          <Modal.Body></Modal.Body>
+          <Modal.Body>
+            <Request
+              onClose={this.closeRequestModal.bind(this)}
+              onSubmit={this.onSelectSubmit.bind(this)}
+              users={this.state.users}
+            ></Request>
+          </Modal.Body>
         </Modal>
 
         <Modal
@@ -398,12 +479,10 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           animation={false}
           className="modal"
           scrollable={false}
-          size="lg"
+          size="sm"
         >
           <Modal.Header closeButton>
-            <Modal.Title>
-              User Profile: ({this.state.selectedUserProfile?.name})
-            </Modal.Title>
+            <Modal.Title>({this.state.selectedUserProfile?.name})</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
@@ -445,9 +524,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           </p>
         </div>
         <hr></hr>
+
         <div>
           <h3> Request </h3>
-          <Card.Header>{request}</Card.Header>
+          <Card.Header>{requestWriter}</Card.Header>
+          {/* <Card.Header>{requestRecipients}</Card.Header> */}
         </div>
         <hr></hr>
         <div className="letters">

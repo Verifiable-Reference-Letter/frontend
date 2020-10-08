@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, InputGroup, FormControl } from "react-bootstrap";
+import { Button, Alert, InputGroup, FormControl } from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
 import Body from "../common/Body.interface";
@@ -12,7 +12,7 @@ interface LoginProps {
 }
 interface LoginState {
   inputName: string;
-  displayMessage: string;
+  // displayMessage: string;
   loginMode: boolean;
 }
 
@@ -21,7 +21,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     super(props);
     this.state = {
       inputName: "",
-      displayMessage: "",
+      // displayMessage: "",
       loginMode: true,
     };
 
@@ -38,14 +38,16 @@ class Login extends React.Component<LoginProps, LoginState> {
     if (publicAddress === "") {
       // comment out conditional for testing signup
       console.log("Invalid public address. Connect to Metamask.");
-      this.setState({ displayMessage: "Please Connect to Metamask." });
+      // this.setState({ displayMessage: "Connect to Metamask." });
+      alert("Connect to Metamask");
       return;
     }
 
     if (this.state.inputName.length <= 1) {
       console.log(this.state.inputName);
-      console.log("Please enter a name.");
-      this.setState({ displayMessage: "Please Enter Your Name." });
+      console.log("Enter a name.");
+      alert("Please Enter Your Name");
+      // this.setState({ displayMessage: "Enter Your Name." });
       return;
     }
 
@@ -60,7 +62,8 @@ class Login extends React.Component<LoginProps, LoginState> {
       //.then(this.doStuffWithToken) // after receiving the token
       .catch((err: Error) => {
         console.log(err);
-        this.setState({displayMessage: "Error. Please Try Again Later."})
+        // this.setState({ displayMessage: "Error. Please Try Again Later." });
+        alert("Error. Please Try Again Later.");
       });
 
     return;
@@ -77,7 +80,8 @@ class Login extends React.Component<LoginProps, LoginState> {
     if (publicAddress === "") {
       // comment out conditional for testing signup
       console.log("Invalid public address. Connect to Metamask.");
-      this.setState({ displayMessage: "Please Connect to Metamask." });
+      alert("Please Connect to Metamask");
+      // this.setState({ displayMessage: "Please Connect to Metamask." });
       return;
     }
 
@@ -88,7 +92,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
-      }
+      },
     };
 
     fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}`, init)
@@ -102,11 +106,10 @@ class Login extends React.Component<LoginProps, LoginState> {
 
         if (users[0] == null) {
           console.log("need to signup.");
-          this.setState({
-            displayMessage: "No Existing Account. Sign Up Instead.",
-            // loginMode: false // automatically redirect to signup form
-          });
-          // this.setState({loginMode: false}); // automatically redirect to signup form
+          // this.setState({
+          //   displayMessage: "No Existing Account. Sign Up Instead.",
+          // });
+          alert("No Existing Account. Sign Up Instead.");
           return Promise.reject("no existing account");
         }
         return users[0];
@@ -118,7 +121,8 @@ class Login extends React.Component<LoginProps, LoginState> {
       //.then(this.doStuffWithToken) // after receiving the token
       .catch((err: Error) => {
         console.log(err);
-        this.setState({displayMessage: "Login Failed. Try Again Later."})
+        // this.setState({ displayMessage: "Login Failed. Try Again Later." });
+        alert("Login Failed.");
       });
 
     return;
@@ -132,7 +136,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     inputName: string;
   }) {
     console.log("publicAddress:", publicAddress, "inputName:", inputName);
-    this.setState({ displayMessage: "Signing You Up . . ." });
+    // this.setState({ displayMessage: "Signing You Up . . ." });
     return await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
       body: JSON.stringify({
         publicAddress: publicAddress,
@@ -176,7 +180,8 @@ class Login extends React.Component<LoginProps, LoginState> {
     console.log(publicAddress);
     return new Promise((resolve, reject) => {
       // web3.eth.sign doesn't seem to work (never finishes)
-      web3.eth.personal.sign(
+      web3.eth.personal
+        .sign(
           message,
           // web3.utils.utf8ToHex(`${message}`),
           publicAddress,
@@ -207,11 +212,11 @@ class Login extends React.Component<LoginProps, LoginState> {
     signature: string;
   }) {
     console.log("authenticating");
-    this.setState({
-      displayMessage: this.state.loginMode
-        ? "Logging You In . . ."
-        : "Signing You Up . . .",
-    });
+    // this.setState({
+    //   displayMessage: this.state.loginMode
+    //     ? "Logging You In . . ."
+    //     : "Signing You Up . . .",
+    // });
     return fetch(`${process.env.REACT_APP_BACKEND_URL}/auth`, {
       body: JSON.stringify({ publicAddress, signature }),
       headers: {
@@ -259,14 +264,16 @@ class Login extends React.Component<LoginProps, LoginState> {
   }
 
   toggleMode() {
-    this.setState({ loginMode: !this.state.loginMode, displayMessage: "" });
+    this.setState({
+      loginMode: !this.state.loginMode,
+    });
   }
 
   render() {
     const loginDisplay = (
       <div>
         <Button
-          className="left-button"
+          className="mr-3"
           onClick={() => {
             this.toggleMode();
           }}
@@ -274,7 +281,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           Sign Up
         </Button>
         <Button
-          className="left-button"
+          className=""
           onClick={() => {
             this.onLoginClick();
           }}
@@ -285,41 +292,46 @@ class Login extends React.Component<LoginProps, LoginState> {
     );
 
     const signupDisplay = (
-      <form>
-        <InputGroup className="label-top d-flex justify-content-between border-radius">
-          <InputGroup.Prepend className="flex-shrink-1 mt-2">Name &nbsp;</InputGroup.Prepend>
+      <form className="justify-content-between">
+        <InputGroup className="label-top border-radius d-flex">
+          {/* <InputGroup.Prepend className="m-2 flex-shrink-1">
+              Sign Up
+            </InputGroup.Prepend> */}
           <FormControl
             type="text"
-            placeholder="Not Yet Verified"
+            className="flex-fill"
+            placeholder="Name"
             value={this.state.inputName}
             onChange={this.handleInputChange}
           />
         </InputGroup>
-        <Button
-          className="left-float-right-button flex-fill"
-          onClick={() => {
-            this.toggleMode();
-            this.setState({ inputName: "" });
-          }}
-        >
-          Back
-        </Button>
-        <Button
-          className="left-float-right-button"
-          onClick={() => {
-            this.onSignupClick();
-          }}
-        >
-          Sign Up
-        </Button>
+        <div className="d-flex">
+          <Button
+            className="float-right flex=fill"
+            onClick={() => {
+              this.onSignupClick();
+            }}
+          >
+            Sign Up
+          </Button>
+          <Button
+            className="float-right flex-fill ml-3"
+            onClick={() => {
+              this.toggleMode();
+              this.setState({ inputName: "" });
+            }}
+          >
+            Back
+          </Button>
+        </div>
       </form>
     );
 
     return (
-      <div>
-        <div className="login">
+      <div className="login">
+        <div className="login-form">
           <div>{this.state.loginMode ? loginDisplay : signupDisplay}</div>
-          <div className="alert"> {this.state.displayMessage}</div>
+          {/* <div className="alert"> {this.state.displayMessage}</div> */}
         </div>
       </div>
     );

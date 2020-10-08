@@ -32,10 +32,10 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
   openProfileModal(selectedPublicAddress: string) {
     console.log("opening view modal");
     const fetchUrl = `/api/users/${selectedPublicAddress}`;
-    this.retrieveUserProfileFromServer(fetchUrl);
+    this.retrieveProfileFromServer(fetchUrl);
   }
 
-  retrieveUserProfileFromServer(fetchUrl: string) {
+  retrieveProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
       method: "GET",
       headers: {
@@ -60,15 +60,25 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
             // REMOVE TESTING
             this.setState({
               userProfile: {
-                publicAddress: "0x TEMPORARY PUBLICADDRESS ROUTENOTWRITTEN",
-                name: "TEMPORARYNAME YES THATIS MYNAME",
+                publicAddress: "0xtemporaryplaceholder",
+                name: "Professor Korth",
               },
               profileIsOpen: true,
             });
+            // END REMOVE
           });
       })
       .catch((e: Error) => {
         console.log(e);
+        // REMOVE TESTING
+        this.setState({
+          userProfile: {
+            publicAddress: "0xtemporaryplaceholder",
+            name: "Professor Korth",
+          },
+          profileIsOpen: true,
+        });
+        // END REMOVE
       });
   }
 
@@ -111,7 +121,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
                 <div>
                   {requestor.name} ({requestor.publicAddress})
                   <Button
-                    className="form-button float-right mb-3 mr-2"
+                    className="mt-3 float-right mb-3 mr-2"
                     onClick={(e: any) => {
                       this.openProfileModal(requestor.publicAddress);
                     }}
@@ -123,7 +133,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
               <td className="border border-secondary">
                 {writer.name} ({writer.publicAddress})
                 <Button
-                  className="form-button float-right mb-3"
+                  className="mt-3 float-right mb-3"
                   onClick={(e: any) => {
                     this.openProfileModal(requestor.publicAddress);
                   }}
@@ -136,7 +146,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
         </Table> */}
 
         <Button
-          className="form-button"
+          className="mt-3"
           onClick={(e: any) => {
             this.props.onClose();
           }}
@@ -152,7 +162,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
           animation={false}
           className="modal"
           scrollable={false}
-          size="lg"
+          size="sm"
         >
           <Modal.Header closeButton>
             <Modal.Title>User Profile</Modal.Title>

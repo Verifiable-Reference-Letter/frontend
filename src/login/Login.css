@@ -10,10 +10,6 @@
   margin-right: 10px;
 } */
 
-.left-button {
-  margin-left: 10px;
-}
-
 .left-float-right-button {
   margin-left: 10px;
   float: right;
@@ -21,4 +17,11 @@
 
 .label-top {
   margin-top: 5px;
+}
+
+.login-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
 }

@@ -70,3 +70,39 @@ h6 {
   color: white !important;
   background-color: rgba(51, 170, 51, 0) !important;
 }
+
+.rbt-input-multi.form-control.rbt-input {
+  height: auto;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.single-typeahead .rbt-input-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.single-typeahead .rbt-token.rbt-token-removeable {
+  padding-left: 7.5px;
+  margin-bottom: 5px;
+  background-color: rgba(32, 158, 145, 0.3);
+  border-radius: 3px;
+}
+
+.multiple-typeahead .rbt-input-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.multiple-typeahead .rbt-token.rbt-token-removeable {
+  padding-left: 7.5px;
+  margin-right: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: rgba(32, 158, 145, 0.3);
+  border-radius: 3px;
+}
+
+button.close.rbt-close.rbt-token-remove-button {
+  margin-left: 5px;
+  margin-right: 5px;
+}
