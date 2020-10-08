@@ -6,6 +6,7 @@ import Container from "react-bootstrap/Container";
 
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
+import FileData from "../common/FileData.interface";
 
 import CryptService from "../services/CryptService";
 import CacheService from "../services/CacheService";
@@ -25,7 +26,7 @@ interface WriterState {
   viewIsOpen: boolean;
   selectedLetterKey: number;
   selectedLetterId: number;
-  selectedFile?: File;
+  selectedFileData?: FileData;
 }
 
 class Writer extends React.Component<WriterProps, WriterState> {
@@ -33,7 +34,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
   private viewModal = React.createRef<FileView>();
   private cryptService: CryptService;
   private cacheService: CacheService<number, string>;
-  private testCacheService: CacheService<number, File>;
 
   componentWillMount() {
     // api call to get letters
@@ -77,7 +77,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
     };
     this.cryptService = new CryptService();
     this.cacheService = new CacheService(1);
-    this.testCacheService = new CacheService(1);
   }
 
   openUploadModal(key: number) {
@@ -99,13 +98,27 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.setState({ uploadIsOpen: false });
   }
 
-  uploadToServer(file: File, fetchUrl: string) {
+  async uploadToServer(file: File, fetchUrl: string) {
     console.log("uploading to server");
+    console.log(file);
+
     // encrypt file
-    let encryptedFile: string = this.cryptService.encrypt(file, this.props.user.publicAddress);
+    let encryptedFile = await this.cryptService.encrypt(
+      file,
+      this.props.user.publicAddress
+    );
+    console.log(encryptedFile);
+
+    if (!encryptedFile) {
+      console.log("encryption failed");
+      this.closeUploadModal();
+      return;
+    }
+
     // cache encrypted file
-    // this.cacheService.put(this.state.selectedLetterId, encryptedFile);
-    this.testCacheService.put(this.state.selectedLetterId, file);
+    console.log(this.state.selectedLetterId);
+    this.cacheService.put(this.state.selectedLetterId, encryptedFile);
+    console.log("put encryptedFile into memcache");
 
     // post encrypted file to server
     fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, {
@@ -113,7 +126,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-type": "application/json",
-        jwtToken: this.props.user.jwtToken,
       },
       method: "POST",
     })
@@ -130,29 +142,36 @@ class Writer extends React.Component<WriterProps, WriterState> {
       })
       .catch((e: Error) => {
         console.log(e);
+        this.closeUploadModal(); // DELETE
       });
   }
 
-  openViewModal(key: number) {
+  async openViewModal(key: number) {
     console.log("opening view modal");
     const letterId = this.state.letters[key].letterId;
     const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
+    console.log(letterId);
+    let encryptedLetter = this.cacheService.get(letterId);
+    // console.log(encryptedLetter);
 
-    // let encryptedLetter = this.cacheService.get(letterId);
-    let encryptedLetter = this.testCacheService.get(letterId); // DELETE
     if (encryptedLetter === null) {
-      this.retrieveFromServer(fetchUrl, key);
+      this.retrieveLetterContentsFromServer(fetchUrl, key);
     } else {
-      // let file = this.cryptService.decrypt(encryptedLetter);
-      let file = encryptedLetter; // DELETE
-      console.log("file", file);
-      if (file) {
+      try {
+        let fileData = await this.cryptService.decrypt(
+          encryptedLetter,
+          this.props.user.publicAddress
+        );
+        // console.log("fileData", fileData);
+        console.log(fileData.letterType);
         this.setState({
           viewIsOpen: true,
           selectedLetterKey: key,
           selectedLetterId: letterId,
-          selectedFile: file,
+          selectedFileData: fileData,
         });
+      } catch (error) {
+        console.log("error with decryption");
       }
     }
   }
@@ -162,7 +181,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.setState({ viewIsOpen: false });
   }
 
-  retrieveFromServer(fetchUrl: string, key: number) {
+  retrieveLetterContentsFromServer(fetchUrl: string, key: number) {
     console.log("retrieving from server");
     const init: RequestInit = {
       method: "GET",
@@ -181,13 +200,18 @@ class Writer extends React.Component<WriterProps, WriterState> {
       })
       .then((encryptedLetter) => {
         // decrypt letter
-        let file = this.cryptService.decrypt(encryptedLetter, this.props.user.publicAddress);
-        this.setState({
-          viewIsOpen: true,
-          selectedLetterKey: key,
-          selectedLetterId: letterId,
-          selectedFile: file,
-        });
+        this.cryptService
+          .decrypt(encryptedLetter, this.props.user.publicAddress)
+          .then((fileData) => {
+            if (fileData) {
+              this.setState({
+                viewIsOpen: true,
+                selectedLetterKey: key,
+                selectedLetterId: letterId,
+                selectedFileData: fileData,
+              });
+            }
+          });
       })
       .catch((e: Error) => {
         console.log(e);
@@ -205,6 +229,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
   render() {
     const { name } = this.props.user;
     const { letters, uploadIsOpen, viewIsOpen, selectedLetterId } = this.state;
+    let requestor = this.getRequestor();
 
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
@@ -244,7 +269,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              Letter for {this.getRequestor()?.name} ({selectedLetterId})
+              Letter for {requestor?.name} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 
@@ -271,13 +296,13 @@ class Writer extends React.Component<WriterProps, WriterState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              Letter For {this.getRequestor?.name} ({selectedLetterId})
+              Letter For {requestor?.name} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
             <FileView
-              file={this.state.selectedFile}
+              fileData={this.state.selectedFileData}
               ref={this.viewModal}
               letter={letters[this.state.selectedLetterKey]}
               onClose={this.closeViewModal.bind(this)}

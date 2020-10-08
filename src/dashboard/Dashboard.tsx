@@ -1,5 +1,6 @@
 import React from "react";
 import UserAuth from "../common/UserAuth.interface";
+import { Card } from "react-bootstrap";
 import "./Dashboard.css";
 
 const headers = new Headers();
@@ -9,22 +10,31 @@ headers.set("Content-Type", "application/json");
 interface DashboardProps {
   user: UserAuth;
 }
-interface DashboardState {
-}
+interface DashboardState {}
 
 class Dashboard extends React.Component<DashboardProps, DashboardState> {
   constructor(props: DashboardProps) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   render() {
-
     return (
-      <div>
-        <div className="dashboard">
-          Dashboard
+      <div className="dashboard">
+        <div className="dashboard-header">
+          <h1> Dashboard </h1>
+        </div>
+        <hr></hr>
+        <Card.Header>
+          Notifications
+        </Card.Header>
+        <hr></hr>
+        <Card.Header>
+          Pending
+        </Card.Header>
+        <hr></hr>
+        <div className="dashboard-footer">
+          <p> Product of Team Gas</p>
         </div>
       </div>
     );

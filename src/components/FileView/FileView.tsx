@@ -1,42 +1,29 @@
 import React from "react";
-import { Modal, Button, ListGroup, Table } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 import LetterDetails from "../../common/LetterDetails.interface";
 import UserProfile from "../../common/UserProfile.interface";
+import FileData from "../../common/FileData.interface";
 import Profile from "../../components/Profile";
 import Body from "../../common/Body.interface";
 import "./FileView.css";
 
 interface FileViewProps {
   letter: LetterDetails;
-  file?: File;
+  fileData?: FileData;
   onClose: () => void;
 }
 interface FileViewState {
-  letterUrl: any;
-  letterType: string;
+  // letterUrl: any;
+  // letterType: string;
   profileIsOpen: boolean;
   selectedPublicAddress: string;
   userProfile?: UserProfile;
 }
 
 class FileView extends React.Component<FileViewProps, FileViewState> {
-  componentWillMount() {
-    const file = this.props.file;
-    let reader = new FileReader();
-    if (file !== undefined) {
-      reader.readAsDataURL(file);
-      reader.onload = (e: any) => {
-        this.setState({ letterUrl: reader.result, letterType: file.type });
-      };
-      console.log("letterUrl", this.state.letterUrl);
-    }
-  }
-
   constructor(props: FileViewProps) {
     super(props);
     this.state = {
-      letterUrl: null,
-      letterType: "",
       profileIsOpen: false,
       selectedPublicAddress: "",
     };
@@ -45,10 +32,10 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
   openProfileModal(selectedPublicAddress: string) {
     console.log("opening view modal");
     const fetchUrl = `/api/users/${selectedPublicAddress}`;
-    this.retrieveFromServer(fetchUrl);
+    this.retrieveUserProfileFromServer(fetchUrl);
   }
 
-  retrieveFromServer(fetchUrl: string) {
+  retrieveUserProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
       method: "GET",
       headers: {
@@ -73,8 +60,8 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
             // REMOVE TESTING
             this.setState({
               userProfile: {
-                publicAddress: "0xTEMPORARYPUBLICADDRESSROUTENOTWRITTEN",
-                name: "TEMPORARYNAMEYESTHATISMYNAME",
+                publicAddress: "0x TEMPORARY PUBLICADDRESS ROUTENOTWRITTEN",
+                name: "TEMPORARYNAME YES THATIS MYNAME",
               },
               profileIsOpen: true,
             });
@@ -90,22 +77,17 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
     this.setState({ profileIsOpen: false });
   }
   render() {
-    const { letter, file } = this.props;
+    const { letter, fileData } = this.props;
     const requestor = letter.requestor;
     const writer = letter.writer;
-    const {
-      letterUrl,
-      letterType,
-      profileIsOpen,
-      selectedPublicAddress,
-    } = this.state;
+    const { profileIsOpen, selectedPublicAddress } = this.state;
     return (
       <div>
         <div className="mb-3">
-          {file && (
+          {fileData && (
             <embed
-              type={letterType}
-              src={letterUrl}
+              type={fileData.letterType}
+              src={fileData.letterUrl}
               width="100%"
               height="360px"
             />

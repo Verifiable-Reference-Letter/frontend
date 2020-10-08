@@ -6,6 +6,7 @@ import Modal from "react-bootstrap/Modal";
 
 import UserAuth from "../common/UserAuth.interface";
 import Letter from "../common/LetterDetails.interface";
+import FileData from "../common/FileData.interface";
 
 import CryptService from "../services/CryptService";
 import CacheService from "../services/CacheService";
@@ -22,7 +23,7 @@ interface RecipientState {
   viewIsOpen: boolean;
   selectedLetterKey: number;
   selectedLetterId: number;
-  file: File;
+  fileData?: FileData;
 }
 
 class Recipient extends React.Component<RecipientProps, RecipientState> {
@@ -67,13 +68,12 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       viewIsOpen: false,
       selectedLetterKey: -1,
       selectedLetterId: -1,
-      file: new File([], ""),
     };
     this.cryptService = new CryptService();
     this.cacheService = new CacheService(1);
   }
 
-  openViewModal(key: number) {
+  async openViewModal(key: number) {
     console.log("opening view modal");
     const letterId = this.state.letters[key].letterId;
     const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
@@ -81,11 +81,14 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     if (encryptedLetter === null) {
       this.retrieveFromServer(fetchUrl, key);
     } else {
-      let file = this.cryptService.decrypt(encryptedLetter, this.props.user.publicAddress);
-      console.log("file", file);
-      if (file) {
+      let fileData = await this.cryptService.decrypt(
+        encryptedLetter,
+        this.props.user.publicAddress
+      );
+      console.log("fileData", fileData);
+      if (fileData) {
         this.setState({
-          file: file,
+          fileData: fileData,
           viewIsOpen: true,
           selectedLetterKey: key,
           selectedLetterId: letterId,
@@ -99,7 +102,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     this.setState({ viewIsOpen: false });
   }
 
-  retrieveFromServer(fetchUrl: string, key: number) {
+  async retrieveFromServer(fetchUrl: string, key: number) {
     console.log("retrieving from server");
     const init: RequestInit = {
       method: "GET",
@@ -118,12 +121,18 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       })
       .then((encryptedLetter) => {
         // decrypt letter
-        let file = this.cryptService.decrypt(encryptedLetter, this.props.user.publicAddress);
-        this.setState({
-          file: file,
-          viewIsOpen: true,
-          selectedLetterKey: key,
-          selectedLetterId: letterId,
+        this.cryptService.decrypt(
+          encryptedLetter,
+          this.props.user.publicAddress
+        ).then((fileData) => {
+          if (fileData) {
+            this.setState({
+              fileData: fileData,
+              viewIsOpen: true,
+              selectedLetterKey: key,
+              selectedLetterId: letterId,
+            });
+          }
         });
       })
       .catch((e: Error) => {
@@ -174,7 +183,8 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              Letter for {this.getRequestor()?.name} by {this.getWriter?.name} ({selectedLetterId})
+              Letter for {this.getRequestor()?.name} by {this.getWriter?.name} (
+              {selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 
