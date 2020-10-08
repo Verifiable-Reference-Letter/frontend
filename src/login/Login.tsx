@@ -174,7 +174,8 @@ class Login extends React.Component<LoginProps, LoginState> {
     console.log(nonce);
     // const prefix = '\x19Ethereum Signed Message:\n' + String.fromCharCode(nonce.length);
     // const message = web3.utils.keccak256(prefix + nonce);
-    const message = web3.utils.keccak256(nonce);
+    const message = nonce;
+    // const message = web3.utils.keccak256(nonce);
     console.log(message);
     console.log(web3.utils.utf8ToHex(`${message}`));
     console.log(publicAddress);

@@ -59,7 +59,10 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         { name: "Tom Cat", publicAddress: "qazwsxedcrfvtgbyhnujmi" },
         { name: "Jane Eyre", publicAddress: "0x1q2w3e4r5t6y7u8i9o0p" },
         { name: "The Grinch", publicAddress: "0xuioghj567xcvtyu89" },
-        { name: "Eponine Thenardier", publicAddress: "0xtrfdxzmlkpoiujhnbytgfvc" },
+        {
+          name: "Eponine Thenardier",
+          publicAddress: "0xtrfdxzmlkpoiujhnbytgfvc",
+        },
         { name: "Little Prince", publicAddress: "0xm98nb76vc54xz32aq1" },
         { name: "Winston Smith", publicAddress: "0x30dk49fj58ghuty7610" },
         { name: "Michael Cassio", publicAddress: "0xp098uhhbvfr43wazxd" },
@@ -276,10 +279,9 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         >
           <div className="flex-fill button-blur">
             {/* ({l.letterId}) From {l.writer.name} */}
-            <a>From:</a>
+            <a className="mr-3">From:</a>
             <Button
               variant="outline-light"
-              className="ml-3"
               onClick={(e: any) => {
                 e.stopPropagation();
                 this.openProfileModal(l.writer.publicAddress);

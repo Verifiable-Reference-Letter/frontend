@@ -105,18 +105,34 @@ class Request extends React.Component<RequestProps, RequestState> {
       requestedRecipients,
     } = this.state;
 
-    const recipientList = requestedRecipients.map((r, k) => (
-      <Card.Header className="d-flex justify-content-between recipient-entry">
-        <div className="flex-fill recipient-list-body">{r.name}</div>
-        <Button
-          variant="primary"
-          className="flex-shrink-1 float-right"
-          onClick={() => this.openProfileModal(r.publicAddress)}
-        >
-          Profile
-        </Button>
-      </Card.Header>
-    ));
+    let recipientList;
+    if (requestedRecipients.length % 2 === 0) {
+      recipientList = requestedRecipients.map((r, k) => (
+        <Card.Header className="d-flex justify-content-between recipient-entry">
+          <div className="flex-fill recipient-list-body">{r.name}</div>
+          <Button
+            variant="primary"
+            className="flex-shrink-1 float-right"
+            onClick={() => this.openProfileModal(r.publicAddress)}
+          >
+            Profile
+          </Button>
+        </Card.Header>
+      ));
+    } else {
+      recipientList = requestedRecipients.map((r, k) => (
+        <Card.Header className="d-flex justify-content-between recipient-entry">
+          <div className="flex-fill recipient-list-body">{r.name}</div>
+          <Button
+            variant="primary"
+            className="flex-shrink-1 float-right"
+            onClick={() => this.openProfileModal(r.publicAddress)}
+          >
+            Profile
+          </Button>
+        </Card.Header>
+      ));
+    }
 
     return (
       <div>
@@ -134,7 +150,7 @@ class Request extends React.Component<RequestProps, RequestState> {
                 paginate={true}
                 selected={this.state.requestedRecipients}
                 onChange={(selected) => {
-                  console.log("selected", selected);
+                  console.log(selected);
                   this.setState({
                     requestedRecipients: selected,
                   });
@@ -146,7 +162,18 @@ class Request extends React.Component<RequestProps, RequestState> {
             </div>
           </InputGroup>
         </Fragment>
-        <div className="mt-4">{recipientList}</div>
+        {requestedRecipients.length !== 0 &&
+          requestedRecipients.length % 2 === 1 && (
+            <div className="mt-4 recipient-display">
+              {recipientList}
+              <div className="d-flex justify-content-between recipient-placeholder"></div>
+            </div>
+          )}
+
+        {requestedRecipients.length !== 0 &&
+          requestedRecipients.length % 2 === 0 && (
+            <div className="mt-4 recipient-display">{recipientList}</div>
+          )}
 
         <div className="d-flex mt-4 border-radius">
           {requestedRecipients.length !== 0 && (
@@ -191,7 +218,7 @@ class Request extends React.Component<RequestProps, RequestState> {
           <div className="flex-fill"></div>
           <Button
             variant="primary"
-            className="flex-shrink-1 float-right ml-2"
+            className="flex-shrink-1 float-right ml-2 close-button"
             onClick={() => {
               this.props.onClose();
             }}
