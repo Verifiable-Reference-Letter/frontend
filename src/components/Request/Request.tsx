@@ -115,7 +115,7 @@ class Request extends React.Component<RequestProps, RequestState> {
             className="flex-shrink-1 float-right"
             onClick={() => this.openProfileModal(r.publicAddress)}
           >
-            Profile
+            View
           </Button>
         </Card.Header>
       ));
@@ -128,7 +128,7 @@ class Request extends React.Component<RequestProps, RequestState> {
             className="flex-shrink-1 float-right"
             onClick={() => this.openProfileModal(r.publicAddress)}
           >
-            Profile
+            View
           </Button>
         </Card.Header>
       ));

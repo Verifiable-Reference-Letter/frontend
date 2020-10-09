@@ -98,7 +98,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
               this.openProfileModal(k);
             }}
           >
-            Profile
+            View
           </Button>
       </Card.Header>
     ));

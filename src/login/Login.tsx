@@ -135,12 +135,12 @@ class Login extends React.Component<LoginProps, LoginState> {
     publicAddress: string;
     inputName: string;
   }) {
-    console.log("publicAddress:", publicAddress, "inputName:", inputName);
+    console.log("publicAddress:", publicAddress, "name:", inputName);
     // this.setState({ displayMessage: "Signing You Up . . ." });
     return await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
       body: JSON.stringify({
         publicAddress: publicAddress,
-        inputName: inputName,
+        name: inputName,
       }),
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -308,7 +308,7 @@ class Login extends React.Component<LoginProps, LoginState> {
         </InputGroup>
         <div className="d-flex">
           <Button
-            className="float-right flex=fill"
+            className="float-right flex-fill"
             onClick={() => {
               this.onSignupClick();
             }}
