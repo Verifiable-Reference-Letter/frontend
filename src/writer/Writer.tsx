@@ -158,7 +158,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
   }
 
   onUploadSubmit(file: File) {
-    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${this.state.selectedLetterId}/content`;
+    const fetchUrl = `/api/v1/letters/${this.state.selectedLetterId}/content`;
     this.uploadToServer(file, fetchUrl);
   }
 
@@ -191,7 +191,13 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
     // post encrypted file to server
     fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, {
-      body: JSON.stringify({ content: encryptedFile }),
+      body: JSON.stringify({
+        auth: {
+          publicAddress: this.props.user.publicAddress,
+          jwtToken: this.props.user.jwtToken,
+        },
+        data: { contents: encryptedFile },
+      }),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-type": "application/json",
@@ -218,7 +224,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
   async openViewModal(key: number) {
     console.log("opening view modal");
     const letterId = this.state.letters[key].letterId;
-    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
+    const fetchUrl = `/api/v1/letters/${letterId}/content`;
     console.log(letterId);
     let encryptedLetter = this.cacheService.get(letterId);
     // console.log(encryptedLetter);

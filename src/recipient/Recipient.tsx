@@ -132,7 +132,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
   async openViewModal(key: number) {
     console.log("opening view modal");
     const letterId = this.state.letters[key].letterId;
-    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
+    const fetchUrl = `/api/v1/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
       this.retrieveContentsFromServer(fetchUrl, key);

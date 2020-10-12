@@ -34,13 +34,13 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
 
   openProfileModal(selectedPublicAddress: string) {
     console.log("opening view modal");
-    const fetchUrl = `/api/users/${selectedPublicAddress}/profile`;
+    const fetchUrl = `/api/v1/users/${selectedPublicAddress}/profile`;
     this.retrieveProfileFromServer(fetchUrl);
   }
 
   retrieveProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
-      method: "PoST",
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",

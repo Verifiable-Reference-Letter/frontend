@@ -37,7 +37,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
     console.log("opening view modal");
     const recipient: User = this.getRecipientByKey(key);
     this.setState({ selectedUserKey: key, selectedUserName: recipient.name });
-    const fetchUrl = `/api/users/${recipient.publicAddress}/profile`;
+    const fetchUrl = `/api/v1/users/${recipient.publicAddress}/profile`;
     this.retrieveProfileFromServer(fetchUrl);
   }
 

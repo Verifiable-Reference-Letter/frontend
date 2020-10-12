@@ -45,7 +45,7 @@ class Request extends React.Component<RequestProps, RequestState> {
 
   openProfileModal(selectedPublicAddress: string) {
     console.log("opening view modal");
-    const fetchUrl = `/api/users/${selectedPublicAddress}/profile`;
+    const fetchUrl = `/api/v1/users/${selectedPublicAddress}/profile`;
     this.retrieveProfileFromServer(fetchUrl);
   }
 
