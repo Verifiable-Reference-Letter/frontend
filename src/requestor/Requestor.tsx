@@ -50,6 +50,48 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
   componentWillMount() {
     // api call to get users and letters
+    // TODO: fetch all users for request typeahead
+
+    const letterFetchUrl = `/api/v1/letters/requested`;
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    // get user profile from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, init)
+      .then((response) => {
+        response
+          .json()
+          .then((body: Body) => {
+            const data: LetterDetails[] = body.data;
+            console.log(response);
+            if (data) {
+              this.setState({
+                letters: data,
+              });
+            } else {
+              console.log("problem with response data for requestor");
+            }
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+
     this.setState({
       users: [
         { name: "Mary Poppins", publicAddress: "0x314159265358979323" },
@@ -179,17 +221,24 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     console.log("opening profile modal");
 
     const writer = this.getWriter();
-    const fetchUrl = `/api/users/${publicAddress}`;
+    const fetchUrl = `/api/v1/users/${publicAddress}`;
     this.retrieveProfileFromServer(fetchUrl);
   }
 
   retrieveProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
-      method: "GET",
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
     };
 
     // get user profile from server
@@ -242,11 +291,58 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
   openHistoryModal(key: number) {
     console.log("opening history modal");
+    const letterId = this.state.letters[key].letterId;
     this.setState({
       historyIsOpen: true,
       selectedLetterKey: key,
-      selectedLetterId: this.state.letters[key].letterId,
+      selectedLetterId: letterId,
     });
+    // const fetchUrl = `/api/v1/users/${this.props.user.publicAddress}/letters/${letterId}/history`;
+    const fetchUrl = `/api/v1/letters/${letterId}/history`;
+
+    this.retrieveHistoryFromServer(fetchUrl);
+  }
+
+  retrieveHistoryFromServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    // get user profile from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+      .then((response) => {
+        response
+          .json()
+          .then((body: Body) => {
+            const data: LetterHistory[] = body.data;
+            console.log(response);
+            if (data) {
+              this.setState({
+                history: data,
+                historyIsOpen: true,
+              });
+            } else {
+              console.log("fetch for letterHistory failed");
+            }
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
   }
 
   getRequestor() {

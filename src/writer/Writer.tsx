@@ -7,6 +7,8 @@ import Container from "react-bootstrap/Container";
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
 import FileData from "../common/FileData.interface";
+import Body from "../common/Body.interface";
+
 
 import CryptService from "../services/CryptService";
 import CacheService from "../services/CacheService";
@@ -37,6 +39,46 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
   componentWillMount() {
     // api call to get letters
+    const letterFetchUrl = `/api/v1/letters/written`;
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    // get user profile from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, init)
+      .then((response) => {
+        response
+          .json()
+          .then((body: Body) => {
+            const data: LetterDetails[] = body.data;
+            console.log(response);
+            if (data) {
+              this.setState({
+                letters: data,
+              });
+            } else {
+              console.log("problem with response data for writer");
+            }
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+
     console.log("componentWillMount");
     this.setState({
       letters: [

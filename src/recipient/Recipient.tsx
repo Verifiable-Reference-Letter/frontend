@@ -5,8 +5,9 @@ import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
 
 import UserAuth from "../common/UserAuth.interface";
-import Letter from "../common/LetterDetails.interface";
+import LetterHistory from "../common/LetterHistory.interface";
 import FileData from "../common/FileData.interface";
+import Body from "../common/Body.interface";
 
 import CryptService from "../services/CryptService";
 import CacheService from "../services/CacheService";
@@ -14,12 +15,13 @@ import CacheService from "../services/CacheService";
 import FileView from "../components/FileView/FileView";
 
 import "./Recipient.css";
+import Letter from "../common/LetterContents.interface";
 
 interface RecipientProps {
   user: UserAuth;
 }
 interface RecipientState {
-  letters: Letter[];
+  letters: LetterHistory[];
   viewIsOpen: boolean;
   selectedLetterKey: number;
   selectedLetterId: number;
@@ -32,7 +34,47 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
   private cacheService: CacheService<number, string>;
 
   componentWillMount() {
-    // api call to get letters
+    // api call to get letterhistory
+
+    const letterFetchUrl = `/api/v1/letters/received`;
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    // get user profile from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, init)
+      .then((response) => {
+        response
+          .json()
+          .then((body: Body) => {
+            const data: LetterHistory[] = body.data;
+            console.log(response);
+            if (data) {
+              this.setState({
+                letters: data,
+              });
+            } else {
+              console.log("problem with response data for requestor");
+            }
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
     this.setState({
       letters: [
         {
@@ -45,6 +87,10 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
           },
+          recipient: {
+            name: "Curious George",
+            publicAddress: "0x142857142857142857",
+          },
         },
         {
           letterId: 2,
@@ -53,6 +99,10 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             publicAddress: "0x314159265358979323",
           },
           requestor: {
+            name: "Curious George",
+            publicAddress: "0x142857142857142857",
+          },
+          recipient: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
           },
@@ -121,19 +171,18 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       })
       .then((encryptedLetter) => {
         // decrypt letter
-        this.cryptService.decrypt(
-          encryptedLetter,
-          this.props.user.publicAddress
-        ).then((fileData) => {
-          if (fileData) {
-            this.setState({
-              fileData: fileData,
-              viewIsOpen: true,
-              selectedLetterKey: key,
-              selectedLetterId: letterId,
-            });
-          }
-        });
+        this.cryptService
+          .decrypt(encryptedLetter, this.props.user.publicAddress)
+          .then((fileData) => {
+            if (fileData) {
+              this.setState({
+                fileData: fileData,
+                viewIsOpen: true,
+                selectedLetterKey: key,
+                selectedLetterId: letterId,
+              });
+            }
+          });
       })
       .catch((e: Error) => {
         console.log(e);

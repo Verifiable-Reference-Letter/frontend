@@ -95,7 +95,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       },
     };
 
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}`, init)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/users/${publicAddress}`, init)
       .then((response) => {
         console.log("logging nonce fetch response");
         console.log(response);
@@ -137,7 +137,7 @@ class Login extends React.Component<LoginProps, LoginState> {
   }) {
     console.log("publicAddress:", publicAddress, "name:", inputName);
     // this.setState({ displayMessage: "Signing You Up . . ." });
-    return await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
+    return await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/users`, {
       body: JSON.stringify({
         publicAddress: publicAddress,
         name: inputName,
