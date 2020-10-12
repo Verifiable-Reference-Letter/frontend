@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button, Image } from "react-bootstrap";
+import { Button, Image } from "react-bootstrap";
 import UserAuth from "../../common/User.interface";
 import "./Profile.css";
 

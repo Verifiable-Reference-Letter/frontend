@@ -15,7 +15,6 @@ import CacheService from "../services/CacheService";
 import FileView from "../components/FileView/FileView";
 
 import "./Recipient.css";
-import Letter from "../common/LetterContents.interface";
 
 interface RecipientProps {
   user: UserAuth;
@@ -24,14 +23,14 @@ interface RecipientState {
   letters: LetterHistory[];
   viewIsOpen: boolean;
   selectedLetterKey: number;
-  selectedLetterId: number;
+  selectedLetterId: string;
   fileData?: FileData;
 }
 
 class Recipient extends React.Component<RecipientProps, RecipientState> {
   private viewModal = React.createRef<FileView>();
   private cryptService: CryptService;
-  private cacheService: CacheService<number, string>;
+  private cacheService: CacheService<string, string>;
 
   componentWillMount() {
     // api call to get letterhistory
@@ -78,7 +77,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     this.setState({
       letters: [
         {
-          letterId: 1,
+          letterId: "1",
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
@@ -96,7 +95,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           sentAt: null,
         },
         {
-          letterId: 2,
+          letterId: "2",
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
@@ -123,7 +122,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       letters: [],
       viewIsOpen: false,
       selectedLetterKey: -1,
-      selectedLetterId: -1,
+      selectedLetterId: "",
     };
     this.cryptService = new CryptService();
     this.cacheService = new CacheService(1);

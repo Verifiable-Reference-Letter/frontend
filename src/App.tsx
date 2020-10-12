@@ -1,6 +1,6 @@
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
 

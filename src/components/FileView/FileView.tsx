@@ -33,7 +33,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
 
   openProfileModal(selectedPublicAddress: string) {
     console.log("opening view modal");
-    const fetchUrl = `/api/users/${selectedPublicAddress}`;
+    const fetchUrl = `/api/users/${selectedPublicAddress}/profile`;
     this.retrieveProfileFromServer(fetchUrl);
   }
 
@@ -77,10 +77,8 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
     this.setState({ profileIsOpen: false });
   }
   render() {
-    const { letter, fileData } = this.props;
-    const requestor = letter.requestor;
-    const writer = letter.writer;
-    const { profileIsOpen, selectedPublicAddress } = this.state;
+    const { fileData } = this.props;
+    const { profileIsOpen } = this.state;
     return (
       <div>
         <div className="mb-3">

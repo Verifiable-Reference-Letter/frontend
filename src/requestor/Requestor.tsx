@@ -7,8 +7,6 @@ import {
   Accordion,
   OverlayTrigger,
   Tooltip,
-  FormGroup,
-  Form,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { Fragment } from "react";
@@ -42,7 +40,7 @@ interface RequestorState {
   requestedWriter: User[];
   requestedRecipients: User[];
   selectedLetterKey: number;
-  selectedLetterId: number;
+  selectedLetterId: string;
 }
 
 class Requestor extends React.Component<RequestorProps, RequestorState> {
@@ -115,7 +113,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       ],
       letters: [
         {
-          letterId: 1,
+          letterId: "1",
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
@@ -128,7 +126,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           uploadedAt: null,
         },
         {
-          letterId: 3,
+          letterId: "3",
           writer: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
@@ -143,7 +141,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       ],
       history: [
         {
-          letterId: 1,
+          letterId: "1",
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
@@ -161,7 +159,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           sentAt: null,
         },
         {
-          letterId: 1,
+          letterId: "1",
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
@@ -195,7 +193,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       requestedWriter: [],
       requestedRecipients: [],
       selectedLetterKey: -1,
-      selectedLetterId: -1,
+      selectedLetterId: "",
     };
   }
 
@@ -229,9 +227,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
   openProfileModal(publicAddress: string) {
     console.log("opening profile modal");
-
-    const writer = this.getWriter();
-    const fetchUrl = `/api/v1/users/${publicAddress}`;
+    const fetchUrl = `/api/v1/users/${publicAddress}/profile`;
     this.retrieveProfileFromServer(fetchUrl);
   }
 
@@ -354,8 +350,6 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       profileIsOpen,
       historyIsOpen,
       requestedWriter,
-      requestedRecipients,
-      selectedLetterId,
     } = this.state;
 
     const lettersList = letters.map((l, k) => (
@@ -367,7 +361,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         >
           <div className="flex-fill button-blur">
             {/* ({l.letterId}) From {l.writer.name} */}
-            <a className="mr-3">From:</a>
+            <p className="mr-3">From:</p>
             <Button
               variant="outline-light"
               onClick={(e: any) => {
@@ -419,9 +413,9 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               {l.writer.name}
             </Button>
           </div>*/}
-          <a className="acc-body display-text float-right">
+          <p className="acc-body display-text float-right">
             Request Date / Upload Date
-          </a>
+          </p>
           {/* <Button
               variant="outline-light"
               className="flex-shrink-1 float-right ml-2"

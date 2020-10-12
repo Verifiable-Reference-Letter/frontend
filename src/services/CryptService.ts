@@ -1,4 +1,3 @@
-import { web3 } from "../App";
 import * as EthUtil from "ethereumjs-util";
 import * as SigUtil from "eth-sig-util";
 import FileData from "../common/FileData.interface";

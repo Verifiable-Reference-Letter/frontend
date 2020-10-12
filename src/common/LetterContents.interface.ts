@@ -1,6 +1,6 @@
 import User from "./User.interface";
 export default interface Letter {
-    letterId: number;
+    letterId: string;
     contents: string;
     requestor: User;
     writer: User;

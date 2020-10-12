@@ -28,7 +28,7 @@ interface WriterState {
   uploadIsOpen: boolean;
   viewIsOpen: boolean;
   selectedLetterKey: number;
-  selectedLetterId: number;
+  selectedLetterId: string;
   selectedFileData?: FileData;
 }
 
@@ -36,7 +36,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
   private uploadModal = React.createRef<FileUpload>();
   private viewModal = React.createRef<FileView>();
   private cryptService: CryptService;
-  private cacheService: CacheService<number, string>;
+  private cacheService: CacheService<string, string>;
 
   componentWillMount() {
     // api call to get letters
@@ -84,7 +84,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.setState({
       letters: [
         {
-          letterId: 1,
+          letterId: "1",
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
@@ -97,7 +97,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
           uploadedAt: null,
         },
         {
-          letterId: 2,
+          letterId: "2",
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
@@ -112,7 +112,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
       ],
       history: [
         {
-          letterId: 1,
+          letterId: "1",
           writer: {
             name: "Mary Poppins",
             publicAddress: "0x314159265358979323",
@@ -141,7 +141,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
       viewIsOpen: false,
       uploadIsOpen: false,
       selectedLetterKey: -1,
-      selectedLetterId: -1,
+      selectedLetterId: "",
     };
     this.cryptService = new CryptService();
     this.cacheService = new CacheService(1);

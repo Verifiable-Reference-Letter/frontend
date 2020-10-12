@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { Fragment } from "react";
 import {
   Card,
@@ -10,9 +10,9 @@ import {
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 
-import LetterDetails from "../../common/LetterDetails.interface";
+// import LetterDetails from "../../common/LetterDetails.interface";
+// import FileData from "../../common/FileData.interface";
 import UserProfile from "../../common/UserProfile.interface";
-import FileData from "../../common/FileData.interface";
 import Profile from "../../components/Profile";
 import Body from "../../common/Body.interface";
 import User from "../../common/User.interface";
@@ -44,7 +44,7 @@ class Request extends React.Component<RequestProps, RequestState> {
 
   openProfileModal(selectedPublicAddress: string) {
     console.log("opening view modal");
-    const fetchUrl = `/api/users/${selectedPublicAddress}`;
+    const fetchUrl = `/api/users/${selectedPublicAddress}/profile`;
     this.retrieveProfileFromServer(fetchUrl);
   }
 
@@ -100,7 +100,6 @@ class Request extends React.Component<RequestProps, RequestState> {
     const { users } = this.props;
     const {
       profileIsOpen,
-      selectedPublicAddress,
       requestedRecipients,
     } = this.state;
 

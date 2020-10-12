@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Alert, InputGroup, FormControl } from "react-bootstrap";
+import { Button, InputGroup, FormControl } from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
 import Body from "../common/Body.interface";

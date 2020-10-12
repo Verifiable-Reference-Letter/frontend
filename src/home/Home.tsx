@@ -1,6 +1,5 @@
 import React from "react";
-import { Link, Redirect } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Redirect } from "react-router-dom";
 import User from "../common/UserAuth.interface";
 import * as ROUTES from "../routes";
 import "./Home.css";
@@ -23,7 +22,7 @@ class Home extends React.Component<HomeProps, HomeState> {
   render() {
     return (
       <div className="home">
-        <Redirect to="/login" />
+        <Redirect to={ROUTES.LOGIN} />
       </div>
     );
   }

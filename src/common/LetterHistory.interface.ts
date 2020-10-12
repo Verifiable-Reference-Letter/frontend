@@ -1,6 +1,6 @@
 import User from "./User.interface";
 export default interface LetterHistory {
-    letterId: number;
+    letterId: string;
     requestor: User;
     writer: User;
     requestedAt: Date | null;
