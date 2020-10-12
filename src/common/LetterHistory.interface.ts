@@ -1,10 +1,10 @@
 import User from "./User.interface";
 export default interface LetterHistory {
     letterId: string;
-    requestor: User;
-    writer: User;
+    letterRequestor: User;
+    letterWriter: User;
     requestedAt: Date | null;
     uploadedAt: Date | null;
-    recipient: User;
+    letterRecipient: User;
     sentAt: Date | null;
 }

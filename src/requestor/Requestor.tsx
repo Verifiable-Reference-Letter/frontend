@@ -75,6 +75,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           .then((body: ResponseBody) => {
             const data: LetterDetails[] = body.data;
             console.log(response);
+            console.log(body.data);
             if (data) {
               this.setState({
                 letters: data,
@@ -91,94 +92,94 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         console.log(e);
       });
 
-    this.setState({
-      users: [
-        { name: "Mary Poppins", publicAddress: "0x314159265358979323" },
-        { name: "Elton John", publicAddress: "0x101100101001101110100" },
-        { name: "Curious George", publicAddress: "0x142857142857142857" },
-        { name: "Jerry Mouse", publicAddress: "0xqwertyuiopasdfghjkl" },
-        { name: "Tom Cat", publicAddress: "qazwsxedcrfvtgbyhnujmi" },
-        { name: "Jane Eyre", publicAddress: "0x1q2w3e4r5t6y7u8i9o0p" },
-        { name: "The Grinch", publicAddress: "0xuioghj567xcvtyu89" },
-        {
-          name: "Eponine Thenardier",
-          publicAddress: "0xtrfdxzmlkpoiujhnbytgfvc",
-        },
-        { name: "Little Prince", publicAddress: "0xm98nb76vc54xz32aq1" },
-        { name: "Winston Smith", publicAddress: "0x30dk49fj58ghuty7610" },
-        { name: "Michael Cassio", publicAddress: "0xp098uhhbvfr43wazxd" },
-        { name: "Buddy Hobbs", publicAddress: "0x10woskdjrutyghvbcnxm" },
-        { name: "Remy Rat", publicAddress: "0xplkio098ujmnhy76tgb" },
-        { name: "Ron Swanson", publicAddress: "0xghvbnjuytfcdresx5678olk" },
-        { name: "David Tennant", publicAddress: "0xpsodkrmvnxjsiqo20fh48" },
-      ],
-      letters: [
-        {
-          letterId: "1",
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Simba",
-            publicAddress: "0xabcdefghijklmnop",
-          },
-          requestedAt: null,
-          uploadedAt: null,
-        },
-        {
-          letterId: "3",
-          writer: {
-            name: "Curious George",
-            publicAddress: "0x142857142857142857",
-          },
-          requestor: {
-            name: "Simba",
-            publicAddress: "0xabcdefghijklmnop",
-          },
-          requestedAt: null,
-          uploadedAt: null,
-        },
-      ],
-      history: [
-        {
-          letterId: "1",
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Simba",
-            publicAddress: "0xabcdefghijklmnop",
-          },
-          requestedAt: null,
-          uploadedAt: null,
-          recipient: {
-            name: "Elton John",
-            publicAddress: "0x101100101001101110100",
-          },
-          sentAt: null,
-        },
-        {
-          letterId: "1",
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Simba",
-            publicAddress: "0xabcdefghijklmnop",
-          },
-          requestedAt: null,
-          uploadedAt: null,
-          recipient: {
-            name: "Curious George",
-            publicAddress: "0x142857142857142857",
-          },
-          sentAt: null,
-        },
-      ],
-    });
+    // this.setState({
+    //   users: [
+    //     { name: "Mary Poppins", publicAddress: "0x314159265358979323" },
+    //     { name: "Elton John", publicAddress: "0x101100101001101110100" },
+    //     { name: "Curious George", publicAddress: "0x142857142857142857" },
+    //     { name: "Jerry Mouse", publicAddress: "0xqwertyuiopasdfghjkl" },
+    //     { name: "Tom Cat", publicAddress: "0xqazwsxedcrfvtgbyhnujmi" },
+    //     { name: "Jane Eyre", publicAddress: "0x1q2w3e4r5t6y7u8i9o0p" },
+    //     { name: "The Grinch", publicAddress: "0xuioghj567xcvtyu89" },
+    //     {
+    //       name: "Eponine Thenardier",
+    //       publicAddress: "0xtrfdxzmlkpoiujhnbytgfvc",
+    //     },
+    //     { name: "Little Prince", publicAddress: "0xm98nb76vc54xz32aq1" },
+    //     { name: "Winston Smith", publicAddress: "0x30dk49fj58ghuty7610" },
+    //     { name: "Michael Cassio", publicAddress: "0xp098uhhbvfr43wazxd" },
+    //     { name: "Buddy Hobbs", publicAddress: "0x10woskdjrutyghvbcnxm" },
+    //     { name: "Remy Rat", publicAddress: "0xplkio098ujmnhy76tgb" },
+    //     { name: "Ron Swanson", publicAddress: "0xghvbnjuytfcdresx5678olk" },
+    //     { name: "David Tennant", publicAddress: "0xpsodkrmvnxjsiqo20fh48" },
+    //   ],
+    //   letters: [
+    //     {
+    //       letterId: "1",
+    //       writer: {
+    //         name: "Mary Poppins",
+    //         publicAddress: "0x314159265358979323",
+    //       },
+    //       requestor: {
+    //         name: "Simba",
+    //         publicAddress: "0xabcdefghijklmnop",
+    //       },
+    //       requestedAt: null,
+    //       uploadedAt: null,
+    //     },
+    //     {
+    //       letterId: "3",
+    //       writer: {
+    //         name: "Curious George",
+    //         publicAddress: "0x142857142857142857",
+    //       },
+    //       requestor: {
+    //         name: "Simba",
+    //         publicAddress: "0xabcdefghijklmnop",
+    //       },
+    //       requestedAt: null,
+    //       uploadedAt: null,
+    //     },
+    //   ],
+    //   history: [
+    //     {
+    //       letterId: "1",
+    //       writer: {
+    //         name: "Mary Poppins",
+    //         publicAddress: "0x314159265358979323",
+    //       },
+    //       requestor: {
+    //         name: "Simba",
+    //         publicAddress: "0xabcdefghijklmnop",
+    //       },
+    //       requestedAt: null,
+    //       uploadedAt: null,
+    //       recipient: {
+    //         name: "Elton John",
+    //         publicAddress: "0x101100101001101110100",
+    //       },
+    //       sentAt: null,
+    //     },
+    //     {
+    //       letterId: "1",
+    //       writer: {
+    //         name: "Mary Poppins",
+    //         publicAddress: "0x314159265358979323",
+    //       },
+    //       requestor: {
+    //         name: "Simba",
+    //         publicAddress: "0xabcdefghijklmnop",
+    //       },
+    //       requestedAt: null,
+    //       uploadedAt: null,
+    //       recipient: {
+    //         name: "Curious George",
+    //         publicAddress: "0x142857142857142857",
+    //       },
+    //       sentAt: null,
+    //     },
+    //   ],
+    // });
   }
 
   constructor(props: RequestorProps) {
@@ -256,12 +257,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           .then((body: ResponseBody) => {
             const data: UserProfile[] = body.data;
             console.log(response);
-            if (data) {
+            if (data && data.length !== 0) {
               this.setState({
                 selectedUserProfile: data[0],
                 profileIsOpen: true,
               });
-            } else {
             }
           })
           .catch((e: Error) => {
@@ -335,11 +335,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
   }
 
   getRequestor() {
-    return this.state.letters[this.state.selectedLetterKey]?.requestor;
+    return this.state.letters[this.state.selectedLetterKey]?.letterRequestor;
   }
 
   getWriter() {
-    return this.state.letters[this.state.selectedLetterKey]?.writer;
+    return this.state.letters[this.state.selectedLetterKey]?.letterWriter;
   }
 
   render() {
@@ -367,10 +367,10 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               variant="outline-light"
               onClick={(e: any) => {
                 e.stopPropagation();
-                this.openProfileModal(l.writer.publicAddress);
+                this.openProfileModal(l.letterWriter.publicAddress);
               }}
             >
-              {l.writer.name}
+              {l.letterWriter.name}
             </Button>
           </div>
           <div className="button-blur">

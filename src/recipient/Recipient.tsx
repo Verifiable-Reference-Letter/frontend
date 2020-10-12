@@ -75,46 +75,46 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       .catch((e: Error) => {
         console.log(e);
       });
-    this.setState({
-      letters: [
-        {
-          letterId: "1",
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Simba",
-            publicAddress: "0xabcdefghijklmnop",
-          },
-          requestedAt: null,
-          uploadedAt: null,
-          recipient: {
-            name: "Curious George",
-            publicAddress: "0x142857142857142857",
-          },
-          sentAt: null,
-        },
-        {
-          letterId: "2",
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Curious George",
-            publicAddress: "0x142857142857142857",
-          },
-          requestedAt: null,
-          uploadedAt: null,
-          recipient: {
-            name: "Curious George",
-            publicAddress: "0x142857142857142857",
-          },
-          sentAt: null,
-        },
-      ],
-    });
+    // this.setState({
+    //   letters: [
+    //     {
+    //       letterId: "1",
+    //       writer: {
+    //         name: "Mary Poppins",
+    //         publicAddress: "0x314159265358979323",
+    //       },
+    //       requestor: {
+    //         name: "Simba",
+    //         publicAddress: "0xabcdefghijklmnop",
+    //       },
+    //       requestedAt: null,
+    //       uploadedAt: null,
+    //       recipient: {
+    //         name: "Curious George",
+    //         publicAddress: "0x142857142857142857",
+    //       },
+    //       sentAt: null,
+    //     },
+    //     {
+    //       letterId: "2",
+    //       writer: {
+    //         name: "Mary Poppins",
+    //         publicAddress: "0x314159265358979323",
+    //       },
+    //       requestor: {
+    //         name: "Curious George",
+    //         publicAddress: "0x142857142857142857",
+    //       },
+    //       requestedAt: null,
+    //       uploadedAt: null,
+    //       recipient: {
+    //         name: "Curious George",
+    //         publicAddress: "0x142857142857142857",
+    //       },
+    //       sentAt: null,
+    //     },
+    //   ],
+    // });
   }
 
   constructor(props: RecipientProps) {
@@ -203,11 +203,11 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
   }
 
   getRequestor() {
-    return this.state.letters[this.state.selectedLetterKey]?.requestor;
+    return this.state.letters[this.state.selectedLetterKey]?.letterRequestor;
   }
 
   getWriter() {
-    return this.state.letters[this.state.selectedLetterKey]?.writer;
+    return this.state.letters[this.state.selectedLetterKey]?.letterWriter;
   }
 
   render() {
@@ -218,7 +218,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       <Row key={k}>
         <div className="full-width">
           <span className="text-float-left">({l.letterId})&nbsp;</span>
-          <span className="text-float-left">For: {l.requestor.name}</span>
+          <span className="text-float-left">For: {l.letterRequestor.name}</span>
           <Button
             className="left-float-right-button"
             onClick={() => {

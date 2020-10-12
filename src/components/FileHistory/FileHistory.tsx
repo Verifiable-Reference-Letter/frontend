@@ -42,7 +42,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
   }
 
   getRecipientByKey(key: number) {
-    return this.props.history[key].recipient;
+    return this.props.history[key].letterRecipient;
   }
 
   retrieveProfileFromServer(fetchUrl: string) {
@@ -69,10 +69,12 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
           .then((body: ResponseBody) => {
             const data: UserProfile[] = body.data;
             console.log(response);
-            this.setState({
-              selectedUserProfile: data[0],
-              profileIsOpen: true,
-            });
+            if (data && data.length !== 0) {
+              this.setState({
+                selectedUserProfile: data[0],
+                profileIsOpen: true,
+              });
+            }
           })
           .catch((e: Error) => {
             console.log(e);
@@ -93,7 +95,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
     const { profileIsOpen } = this.state;
     const historyList = history.map((l, k) => (
       <Card.Header className="d-flex justify-content-between recipient-entry" key={k}>
-          <div className="flex-fill recipient-body">Sent to: {l.recipient.name}</div>
+          <div className="flex-fill recipient-body">Sent to: {l.letterRecipient.name}</div>
           <Button
             variant="primary"
             className="flex-shrink-1 float-right"

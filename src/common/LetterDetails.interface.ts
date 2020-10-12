@@ -1,8 +1,8 @@
 import User from "./User.interface";
 export default interface LetterDetails {
     letterId: string;
-    requestor: User;
-    writer: User;
+    letterRequestor: User;
+    letterWriter: User;
     requestedAt: Date | null;
     uploadedAt: Date | null;
 }

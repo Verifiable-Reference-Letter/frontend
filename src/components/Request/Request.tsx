@@ -73,10 +73,12 @@ class Request extends React.Component<RequestProps, RequestState> {
           .then((body: ResponseBody) => {
             const data: UserProfile[] = body.data;
             console.log(response);
-            this.setState({
-              selectedUserProfile: data[0],
-              profileIsOpen: true,
-            });
+            if (data && data.length !== 0) {
+              this.setState({
+                selectedUserProfile: data[0],
+                profileIsOpen: true,
+              });
+            }
           })
           .catch((e: Error) => {
             console.log(e);

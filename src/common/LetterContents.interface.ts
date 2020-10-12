@@ -2,8 +2,8 @@ import User from "./User.interface";
 export default interface Letter {
     letterId: string;
     contents: string;
-    requestor: User;
-    writer: User;
+    letterRequestor: User;
+    letterWriter: User;
     requestedAt: Date | null;
     uploadedAt: Date | null;
 }

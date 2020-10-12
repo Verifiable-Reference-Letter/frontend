@@ -20,7 +20,7 @@ interface FileViewState {
   // letterType: string;
   profileIsOpen: boolean;
   selectedPublicAddress: string;
-  userProfile?: UserProfile;
+  selectedUserProfile?: UserProfile;
 }
 
 class FileView extends React.Component<FileViewProps, FileViewState> {
@@ -62,7 +62,12 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
           .then((body: ResponseBody) => {
             const data: UserProfile[] = body.data;
             console.log(response);
-            this.setState({ userProfile: data[0], profileIsOpen: true });
+            if (data && data.length !== 0) {
+              this.setState({
+                selectedUserProfile: data[0],
+                profileIsOpen: true,
+              });
+            }
           })
           .catch((e: Error) => {
             console.log(e);
@@ -158,9 +163,9 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
           </Modal.Header>
 
           <Modal.Body>
-            {this.state.userProfile && (
+            {this.state.selectedUserProfile && (
               <Profile
-                user={this.state.userProfile}
+                user={this.state.selectedUserProfile}
                 onClose={this.closeProfileModal.bind(this)}
               />
             )}
