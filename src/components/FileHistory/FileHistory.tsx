@@ -5,6 +5,7 @@ import LetterHistory from "../../common/LetterHistory.interface";
 import UserProfile from "../../common/UserProfile.interface";
 import Profile from "../../components/Profile";
 import Body from "../../common/Body.interface";
+import User from "../../common/User.interface";
 
 interface FileHistoryProps {
   history: LetterHistory[];
@@ -31,7 +32,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
 
   openProfileModal(key: number) {
     console.log("opening view modal");
-    const recipient: UserProfile = this.getRecipientByKey(key);
+    const recipient: User = this.getRecipientByKey(key);
     this.setState({ selectedUserKey: key, selectedUserName: recipient.name });
     const fetchUrl = `/api/users/${recipient.publicAddress}`;
     this.retrieveFromServer(fetchUrl);
@@ -65,14 +66,6 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
           })
           .catch((e: Error) => {
             console.log(e);
-
-            // REMOVE TESTING
-            this.setState({
-              selectedUserProfile: this.getRecipientByKey(
-                this.state.selectedUserKey
-              ),
-              profileIsOpen: true,
-            });
           });
       })
       .catch((e: Error) => {

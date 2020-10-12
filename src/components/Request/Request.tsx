@@ -70,16 +70,6 @@ class Request extends React.Component<RequestProps, RequestState> {
           })
           .catch((e: Error) => {
             console.log(e);
-
-            // REMOVE TESTING
-            this.setState({
-              selectedUserProfile: {
-                publicAddress: "0xtemporaryplaceholder",
-                name: "Professor Korth",
-              },
-              profileIsOpen: true,
-            });
-            // END REMOVE
           });
       })
       .catch((e: Error) => {

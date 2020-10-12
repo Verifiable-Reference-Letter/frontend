@@ -9,7 +9,6 @@ import LetterDetails from "../common/LetterDetails.interface";
 import FileData from "../common/FileData.interface";
 import Body from "../common/Body.interface";
 
-
 import CryptService from "../services/CryptService";
 import CacheService from "../services/CacheService";
 
@@ -17,6 +16,7 @@ import FileUpload from "../components/FileUpload/FileUpload";
 import FileView from "../components/FileView/FileView";
 
 import "./Writer.css";
+import LetterHistory from "../common/LetterHistory.interface";
 
 interface WriterProps {
   user: UserAuth;
@@ -24,6 +24,7 @@ interface WriterProps {
 
 interface WriterState {
   letters: LetterDetails[];
+  history: LetterHistory[];
   uploadIsOpen: boolean;
   viewIsOpen: boolean;
   selectedLetterKey: number;
@@ -92,6 +93,8 @@ class Writer extends React.Component<WriterProps, WriterState> {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
           },
+          requestedAt: null,
+          uploadedAt: null,
         },
         {
           letterId: 2,
@@ -103,6 +106,28 @@ class Writer extends React.Component<WriterProps, WriterState> {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
           },
+          requestedAt: null,
+          uploadedAt: null,
+        },
+      ],
+      history: [
+        {
+          letterId: 1,
+          writer: {
+            name: "Mary Poppins",
+            publicAddress: "0x314159265358979323",
+          },
+          requestor: {
+            name: "Simba",
+            publicAddress: "0xabcdefghijklmnop",
+          },
+          requestedAt: null,
+          uploadedAt: null,
+          recipient: {
+            name: "Elton John",
+            publicAddress: "0x101100101001101110100",
+          },
+          sentAt: null,
         },
       ],
     });
@@ -112,6 +137,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     super(props);
     this.state = {
       letters: [],
+      history: [],
       viewIsOpen: false,
       uploadIsOpen: false,
       selectedLetterKey: -1,

@@ -87,10 +87,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
           },
+          requestedAt: null,
+          uploadedAt: null,
           recipient: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
           },
+          sentAt: null,
         },
         {
           letterId: 2,
@@ -102,10 +105,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
           },
+          requestedAt: null,
+          uploadedAt: null,
           recipient: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
           },
+          sentAt: null,
         },
       ],
     });

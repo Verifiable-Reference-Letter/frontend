@@ -124,6 +124,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
           },
+          requestedAt: null,
+          uploadedAt: null,
         },
         {
           letterId: 3,
@@ -135,6 +137,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
           },
+          requestedAt: null,
+          uploadedAt: null,
         },
       ],
       history: [
@@ -148,10 +152,13 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
           },
+          requestedAt: null,
+          uploadedAt: null,
           recipient: {
             name: "Elton John",
             publicAddress: "0x101100101001101110100",
           },
+          sentAt: null,
         },
         {
           letterId: 1,
@@ -163,10 +170,13 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             name: "Simba",
             publicAddress: "0xabcdefghijklmnop",
           },
+          requestedAt: null,
+          uploadedAt: null,
           recipient: {
             name: "Curious George",
             publicAddress: "0x142857142857142857",
           },
+          sentAt: null,
         },
       ],
     });
@@ -255,27 +265,9 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                 profileIsOpen: true,
               });
             } else {
-              // REMOVE TESTING
-              this.setState({
-                selectedUserProfile: {
-                  publicAddress: "0xtemporaryplaceholder",
-                  name: "Professor Korth",
-                },
-                profileIsOpen: true,
-              });
-              // END REMOVE
             }
           })
           .catch((e: Error) => {
-            // REMOVE TESTING
-            this.setState({
-              selectedUserProfile: {
-                publicAddress: "0xtemporaryplaceholder",
-                name: "Professor Korth",
-              },
-              profileIsOpen: true,
-            });
-            // END REMOVE
             console.log(e);
           });
       })

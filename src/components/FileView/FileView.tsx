@@ -56,29 +56,10 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
           })
           .catch((e: Error) => {
             console.log(e);
-
-            // REMOVE TESTING
-            this.setState({
-              userProfile: {
-                publicAddress: "0xtemporaryplaceholder",
-                name: "Professor Korth",
-              },
-              profileIsOpen: true,
-            });
-            // END REMOVE
           });
       })
       .catch((e: Error) => {
         console.log(e);
-        // REMOVE TESTING
-        this.setState({
-          userProfile: {
-            publicAddress: "0xtemporaryplaceholder",
-            name: "Professor Korth",
-          },
-          profileIsOpen: true,
-        });
-        // END REMOVE
       });
   }
 
