@@ -252,11 +252,18 @@ class Writer extends React.Component<WriterProps, WriterState> {
   retrieveLetterContentsFromServer(fetchUrl: string, key: number) {
     console.log("retrieving from server");
     const init: RequestInit = {
-      method: "GET",
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
     };
     const letterId = this.state.letters[key].letterId;
     // get letter from server
@@ -372,6 +379,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             <FileView
               fileData={this.state.selectedFileData}
               ref={this.viewModal}
+              user={this.props.user}
               letter={letters[this.state.selectedLetterKey]}
               onClose={this.closeViewModal.bind(this)}
             ></FileView>

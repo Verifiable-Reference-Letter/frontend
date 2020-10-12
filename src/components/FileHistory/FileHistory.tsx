@@ -6,8 +6,10 @@ import UserProfile from "../../common/UserProfile.interface";
 import Profile from "../../components/Profile";
 import Body from "../../common/Body.interface";
 import User from "../../common/User.interface";
+import UserAuth from "../../common/UserAuth.interface";
 
 interface FileHistoryProps {
+  user: UserAuth;
   history: LetterHistory[];
   onClose: () => void;
 }
@@ -34,21 +36,28 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
     console.log("opening view modal");
     const recipient: User = this.getRecipientByKey(key);
     this.setState({ selectedUserKey: key, selectedUserName: recipient.name });
-    const fetchUrl = `/api/users/${recipient.publicAddress}`;
-    this.retrieveFromServer(fetchUrl);
+    const fetchUrl = `/api/users/${recipient.publicAddress}/profile`;
+    this.retrieveProfileFromServer(fetchUrl);
   }
 
   getRecipientByKey(key: number) {
     return this.props.history[key].recipient;
   }
 
-  retrieveFromServer(fetchUrl: string) {
+  retrieveProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
-      method: "GET",
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
     };
 
     // get user profile from server

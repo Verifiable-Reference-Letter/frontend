@@ -346,7 +346,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
   }
 
   render() {
-    const { name } = this.props.user;
+    const user = this.props.user;
     const {
       letters,
       history,
@@ -554,6 +554,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
           <Modal.Body>
             <Request
+              user={this.props.user}
               onClose={this.closeRequestModal.bind(this)}
               onSubmit={this.onSelectSubmit.bind(this)}
               users={this.state.users}
@@ -601,6 +602,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
           <Modal.Body>
             <FileHistory
+              user={user}
               history={history}
               onClose={this.closeHistoryModal.bind(this)}
             ></FileHistory>
@@ -610,7 +612,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         <div className="requestor-header">
           <h1> Requestor Page </h1>
           <p>
-            <em>{name}</em>
+            <em>{user.name}</em>
           </p>
         </div>
         <hr></hr>

@@ -17,8 +17,10 @@ import Profile from "../../components/Profile";
 import Body from "../../common/Body.interface";
 import User from "../../common/User.interface";
 import "./Request.css";
+import UserAuth from "../../common/UserAuth.interface";
 
 interface RequestProps {
+  user: UserAuth;
   users: User[];
   onSubmit: (requestedRecipients: User[]) => void;
   onClose: () => void;
@@ -48,11 +50,18 @@ class Request extends React.Component<RequestProps, RequestState> {
 
   retrieveProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
-      method: "GET",
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
     };
 
     // get user profile from server

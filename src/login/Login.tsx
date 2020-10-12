@@ -137,7 +137,7 @@ class Login extends React.Component<LoginProps, LoginState> {
   }) {
     console.log("publicAddress:", publicAddress, "name:", inputName);
     // this.setState({ displayMessage: "Signing You Up . . ." });
-    return await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/users`, {
+    return await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/users/create`, {
       body: JSON.stringify({
         publicAddress: publicAddress,
         name: inputName,

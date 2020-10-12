@@ -6,8 +6,10 @@ import FileData from "../../common/FileData.interface";
 import Profile from "../../components/Profile";
 import Body from "../../common/Body.interface";
 import "./FileView.css";
+import UserAuth from "../../common/UserAuth.interface";
 
 interface FileViewProps {
+  user: UserAuth;
   letter: LetterDetails;
   fileData?: FileData;
   onClose: () => void;
@@ -37,11 +39,18 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
 
   retrieveProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
-      method: "GET",
+      method: "PoST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
     };
 
     // get user profile from server

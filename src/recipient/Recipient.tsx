@@ -135,7 +135,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
-      this.retrieveFromServer(fetchUrl, key);
+      this.retrieveContentsFromServer(fetchUrl, key);
     } else {
       let fileData = await this.cryptService.decrypt(
         encryptedLetter,
@@ -158,14 +158,21 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     this.setState({ viewIsOpen: false });
   }
 
-  async retrieveFromServer(fetchUrl: string, key: number) {
-    console.log("retrieving from server");
+  async retrieveContentsFromServer(fetchUrl: string, key: number) {
+    console.log("retrieving letter contents from server");
     const init: RequestInit = {
-      method: "GET",
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
     };
     const letterId = this.state.letters[key].letterId;
     // get letter from server
@@ -246,6 +253,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           <Modal.Body>
             <FileView
               ref={this.viewModal}
+              user={this.props.user}
               letter={letters[this.state.selectedLetterKey]}
               onClose={this.closeViewModal.bind(this)}
             ></FileView>
