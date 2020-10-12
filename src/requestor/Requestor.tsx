@@ -361,7 +361,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         >
           <div className="flex-fill button-blur">
             {/* ({l.letterId}) From {l.writer.name} */}
-            <p className="mr-3">From:</p>
+            <span className="mr-3">From:</span>
             <Button
               variant="outline-light"
               onClick={(e: any) => {
