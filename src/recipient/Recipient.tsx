@@ -34,7 +34,6 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
   private cacheService: CacheService<string, string>;
 
   componentWillMount() {
-    // api call to get letterhistory
 
     const letterFetchUrl = `/api/v1/letters/received`;
     const init: RequestInit = {
@@ -218,7 +217,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       <Row key={k}>
         <div className="full-width">
           <span className="text-float-left">({l.letterId})&nbsp;</span>
-          <span className="text-float-left">For: {l.letterRequestor.name}</span>
+          <span className="text-float-left">For: {l.letterRequestor?.name}</span>
           <Button
             className="left-float-right-button"
             onClick={() => {

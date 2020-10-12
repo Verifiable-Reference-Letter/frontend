@@ -57,7 +57,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
       }),
     };
 
-    // get user profile from server
+    // get letters from server
     fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, init)
       .then((response) => {
         response
@@ -317,7 +317,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
       <Row key={k}>
         <div className="full-width">
           <span className="text-float-left">({l.letterId})&nbsp;</span>
-          <span className="text-float-left">For: {l.letterRequestor.name}</span>
+          <span className="text-float-left">For: {l.letterRequestor?.name}</span>
           <Button
             className="left-float-right-button"
             onClick={() => {

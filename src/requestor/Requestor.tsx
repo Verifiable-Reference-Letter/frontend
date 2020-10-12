@@ -49,10 +49,9 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
   componentWillMount() {
     // api call to get users and letters
-    // TODO: fetch all users for request typeahead
 
-    const letterFetchUrl = `/api/v1/letters/requested`;
-    const init: RequestInit = {
+    const userFetchUrl = `/api/v1/users`;
+    const userInit: RequestInit = {
       method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -68,7 +67,48 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     };
 
     // get user profile from server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, init)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${userFetchUrl}`, userInit)
+      .then((response) => {
+        response
+          .json()
+          .then((body: ResponseBody) => {
+            const data: User[] = body.data;
+            console.log(response);
+            console.log(body.data);
+            if (data) {
+              this.setState({
+                users: data,
+              });
+            } else {
+              console.log("problem with response data for requestor");
+            }
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+
+    const letterFetchUrl = `/api/v1/letters/requested`;
+    const letterInit: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    // get user profile from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, letterInit)
       .then((response) => {
         response
           .json()
@@ -257,6 +297,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           .then((body: ResponseBody) => {
             const data: UserProfile[] = body.data;
             console.log(response);
+            console.log(data);
             if (data && data.length !== 0) {
               this.setState({
                 selectedUserProfile: data[0],
@@ -361,7 +402,6 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           eventKey={k.toString()}
         >
           <div className="flex-fill button-blur">
-            {/* ({l.letterId}) From {l.writer.name} */}
             <span className="mr-3">From:</span>
             <Button
               variant="outline-light"
@@ -370,7 +410,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                 this.openProfileModal(l.letterWriter.publicAddress);
               }}
             >
-              {l.letterWriter.name}
+              {l.letterWriter?.name}
             </Button>
           </div>
           <div className="button-blur">
