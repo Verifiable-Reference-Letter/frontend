@@ -1,4 +1,4 @@
-export default interface Body {
+export default interface RequestBody {
   auth: {
     publicAddress: string;
     jwtToken: string;

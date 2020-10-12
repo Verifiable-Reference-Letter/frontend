@@ -7,7 +7,8 @@ import Modal from "react-bootstrap/Modal";
 import UserAuth from "../common/UserAuth.interface";
 import LetterHistory from "../common/LetterHistory.interface";
 import FileData from "../common/FileData.interface";
-import Body from "../common/Body.interface";
+import RequestBody from "../common/RequestBody.interface";
+import ResponseBody from "../common/ResponseBody.interface";
 
 import CryptService from "../services/CryptService";
 import CacheService from "../services/CacheService";
@@ -56,7 +57,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       .then((response) => {
         response
           .json()
-          .then((body: Body) => {
+          .then((body: ResponseBody) => {
             const data: LetterHistory[] = body.data;
             console.log(response);
             if (data) {

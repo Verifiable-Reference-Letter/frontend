@@ -2,7 +2,8 @@ import React from "react";
 import { Button, InputGroup, FormControl } from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
-import Body from "../common/Body.interface";
+import RequestBody from "../common/RequestBody.interface";
+import ResponseBody from "../common/ResponseBody.interface";
 
 import { web3 } from "../App";
 
@@ -95,7 +96,10 @@ class Login extends React.Component<LoginProps, LoginState> {
       },
     };
 
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/users/${publicAddress}`, init)
+    fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/auth/users/${publicAddress}`,
+      init
+    )
       .then((response) => {
         console.log("logging nonce fetch response");
         console.log(response);
@@ -137,17 +141,20 @@ class Login extends React.Component<LoginProps, LoginState> {
   }) {
     console.log("publicAddress:", publicAddress, "name:", inputName);
     // this.setState({ displayMessage: "Signing You Up . . ." });
-    return await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/users/create`, {
-      body: JSON.stringify({
-        publicAddress: publicAddress,
-        name: inputName,
-      }),
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    })
+    return await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/auth/users/create`,
+      {
+        body: JSON.stringify({
+          publicAddress: publicAddress,
+          name: inputName,
+        }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      }
+    )
       .then((response) => {
         console.log("logging signup response");
         console.log(response);
@@ -232,15 +239,13 @@ class Login extends React.Component<LoginProps, LoginState> {
 
         response
           .json()
-          .then((body: Body) => {
+          .then((body: ResponseBody) => {
             console.log(body);
-            const auth = body.auth;
-            const j = auth.jwtToken;
+            const data = body.data;
+            const j = data.jwtToken;
             console.log("jwtToken", j);
             let jwtToken = j ? j : undefined;
-            if (this.props.user.publicAddress !== auth.publicAddress) {
-              console.log("error in backend: publicAddresses do not match");
-            } else if (jwtToken) {
+            if (jwtToken) {
               console.log(jwtToken);
               this.props.callback({
                 publicAddress: this.props.user.publicAddress,

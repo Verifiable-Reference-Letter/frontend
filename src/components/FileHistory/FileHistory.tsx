@@ -4,7 +4,8 @@ import "./FileHistory.css";
 import LetterHistory from "../../common/LetterHistory.interface";
 import UserProfile from "../../common/UserProfile.interface";
 import Profile from "../../components/Profile";
-import Body from "../../common/Body.interface";
+import RequestBody from "../../common/RequestBody.interface";
+import ResponseBody from "../../common/ResponseBody.interface";
 import User from "../../common/User.interface";
 import UserAuth from "../../common/UserAuth.interface";
 
@@ -65,7 +66,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
       .then((response) => {
         response
           .json()
-          .then((body: Body) => {
+          .then((body: ResponseBody) => {
             const data: UserProfile[] = body.data;
             console.log(response);
             this.setState({

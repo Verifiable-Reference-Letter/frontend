@@ -7,7 +7,8 @@ import Container from "react-bootstrap/Container";
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
 import FileData from "../common/FileData.interface";
-import Body from "../common/Body.interface";
+import RequestBody from "../common/RequestBody.interface";
+import ResponseBody from "../common/ResponseBody.interface";
 
 import CryptService from "../services/CryptService";
 import CacheService from "../services/CacheService";
@@ -61,7 +62,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
       .then((response) => {
         response
           .json()
-          .then((body: Body) => {
+          .then((body: ResponseBody) => {
             const data: LetterDetails[] = body.data;
             console.log(response);
             if (data) {

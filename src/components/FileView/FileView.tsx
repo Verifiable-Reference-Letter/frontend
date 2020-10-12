@@ -4,7 +4,8 @@ import LetterDetails from "../../common/LetterDetails.interface";
 import UserProfile from "../../common/UserProfile.interface";
 import FileData from "../../common/FileData.interface";
 import Profile from "../../components/Profile";
-import Body from "../../common/Body.interface";
+import RequestBody from "../../common/RequestBody.interface";
+import ResponseBody from "../../common/ResponseBody.interface";
 import "./FileView.css";
 import UserAuth from "../../common/UserAuth.interface";
 
@@ -58,7 +59,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
       .then((response) => {
         response
           .json()
-          .then((body: Body) => {
+          .then((body: ResponseBody) => {
             const data: UserProfile[] = body.data;
             console.log(response);
             this.setState({ userProfile: data[0], profileIsOpen: true });

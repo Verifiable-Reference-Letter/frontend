@@ -14,7 +14,8 @@ import { Typeahead } from "react-bootstrap-typeahead";
 // import FileData from "../../common/FileData.interface";
 import UserProfile from "../../common/UserProfile.interface";
 import Profile from "../../components/Profile";
-import Body from "../../common/Body.interface";
+import RequestBody from "../../common/RequestBody.interface";
+import ResponseBody from "../../common/ResponseBody.interface";
 import User from "../../common/User.interface";
 import "./Request.css";
 import UserAuth from "../../common/UserAuth.interface";
@@ -69,7 +70,7 @@ class Request extends React.Component<RequestProps, RequestState> {
       .then((response) => {
         response
           .json()
-          .then((body: Body) => {
+          .then((body: ResponseBody) => {
             const data: UserProfile[] = body.data;
             console.log(response);
             this.setState({
