@@ -35,7 +35,7 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
         />
 
         <div>Name: {user.name}</div>
-        <div>ID: {user.publicAddress}</div>
+        <div className="text-break">ID: {user.publicAddress}</div>
 
         {/* <div>
         </div>
@@ -61,7 +61,7 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
         </div>*/}
 
         <Button
-          className="mt-3"
+          className="mt-3 float-right" 
           onClick={(e: any) => {
             this.props.onClose();
           }}

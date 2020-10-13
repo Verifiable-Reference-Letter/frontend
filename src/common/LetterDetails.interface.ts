@@ -3,6 +3,6 @@ export default interface LetterDetails {
     letterId: string;
     letterRequestor: User;
     letterWriter: User;
-    requestedAt: Date | null;
+    requestedAt: Date;
     uploadedAt: Date | null;
 }

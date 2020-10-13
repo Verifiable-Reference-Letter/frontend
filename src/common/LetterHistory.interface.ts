@@ -3,7 +3,7 @@ export default interface LetterHistory {
     letterId: string;
     letterRequestor: User;
     letterWriter: User;
-    requestedAt: Date | null;
+    requestedAt: Date;
     uploadedAt: Date | null;
     letterRecipient: User;
     sentAt: Date | null;

@@ -219,7 +219,7 @@ class Request extends React.Component<RequestProps, RequestState> {
           <div className="flex-fill"></div>
           <Button
             variant="primary"
-            className="flex-shrink-1 float-right ml-2 close-button"
+            className="flex-shrink-1 float-right ml-2"
             onClick={() => {
               this.props.onClose();
             }}

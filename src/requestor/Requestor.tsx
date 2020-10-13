@@ -323,7 +323,6 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     console.log("opening history modal");
     const letterId = this.state.letters[key].letterId;
     this.setState({
-      historyIsOpen: true,
       selectedLetterKey: key,
       selectedLetterId: letterId,
     });
@@ -357,6 +356,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           .then((body: ResponseBody) => {
             const data: LetterHistory[] = body.data;
             console.log(response);
+            console.log(data);
             if (data) {
               this.setState({
                 history: data,
@@ -426,7 +426,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               History
             </Button>
             <Button
-              disabled
+              disabled // TODO: add Tooltip
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
@@ -435,6 +435,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             >
               Send
             </Button>
+            {/* {!l.uploadedAt && (
+              <div className="display-text flex-shrink-1 float-right">
+                Pending
+              </div>
+            )} */}
           </div>
         </Accordion.Toggle>
         <Accordion.Collapse as={Card.Body} eventKey={k.toString()}>
@@ -454,9 +459,21 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               {l.writer.name}
             </Button>
           </div>*/}
-          <p className="acc-body display-text float-right">
-            Request Date / Upload Date
-          </p>
+          <div className="acc-body display-text d-flex">
+            <div className="flex-fill">
+              Requested: {l.requestedAt?.toString()}
+            </div>
+            {l.uploadedAt && (
+              <div className=" flex-shrink-1 float-right">
+                Uploaded: {l.uploadedAt?.toString()}
+              </div>
+            )}
+            {!l.uploadedAt && (
+              <div className=" flex-shrink-1 float-right">
+                Not Uploaded
+              </div>
+            )}
+          </div>
           {/* <Button
               variant="outline-light"
               className="flex-shrink-1 float-right ml-2"

@@ -140,7 +140,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
         </Table> */}
 
         <Button
-          className="mt-3"
+          className="mt-3 float-right"
           onClick={(e: any) => {
             this.props.onClose();
           }}

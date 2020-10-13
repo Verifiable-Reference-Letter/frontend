@@ -4,6 +4,6 @@ export default interface Letter {
     contents: string;
     letterRequestor: User;
     letterWriter: User;
-    requestedAt: Date | null;
+    requestedAt: Date
     uploadedAt: Date | null;
 }

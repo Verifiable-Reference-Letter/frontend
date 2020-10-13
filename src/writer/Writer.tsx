@@ -224,10 +224,9 @@ class Writer extends React.Component<WriterProps, WriterState> {
   async openViewModal(key: number) {
     console.log("opening view modal");
     const letterId = this.state.letters[key].letterId;
-    const fetchUrl = `/api/v1/letters/${letterId}/content`;
+    const fetchUrl = `/api/v1/letters/${letterId}/contents`;
     console.log(letterId);
     let encryptedLetter = this.cacheService.get(letterId);
-    // console.log(encryptedLetter);
 
     if (encryptedLetter === null) {
       this.retrieveLetterContentsFromServer(fetchUrl, key);
@@ -316,7 +315,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
         <div className="full-width">
-          <span className="text-float-left">({l.letterId})&nbsp;</span>
+          {/* <span className="text-float-left">({l.letterId})&nbsp;</span> */}
           <span className="text-float-left">For: {l.letterRequestor?.name}</span>
           <Button
             className="left-float-right-button"
@@ -351,7 +350,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              Letter for {requestor?.name} ({selectedLetterId})
+              For: {requestor?.name} ({selectedLetterId})
             </Modal.Title>
           </Modal.Header>
 
