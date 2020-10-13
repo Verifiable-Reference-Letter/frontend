@@ -112,7 +112,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
       <div>
         <div>{historyList}</div>
         <Button
-          className="mt-3 float-right"
+          className="mt-3"
           onClick={(e: any) => {
             this.props.onClose();
           }}

@@ -9,35 +9,35 @@ import {
   Modal,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
-
 // import LetterDetails from "../../common/LetterDetails.interface";
 // import FileData from "../../common/FileData.interface";
 import UserProfile from "../../common/UserProfile.interface";
-import Profile from "../../components/Profile";
+import Profile from "../Profile";
 import RequestBody from "../../common/RequestBody.interface";
 import ResponseBody from "../../common/ResponseBody.interface";
 import User from "../../common/User.interface";
-import "./Request.css";
+import "./Select.css";
 import UserAuth from "../../common/UserAuth.interface";
 
-interface RequestProps {
+interface SelectProps {
   user: UserAuth;
   users: User[];
-  onSubmit: (requestedRecipients: User[]) => void;
+  previouslySelectedRecipients: User[];
+  onSubmit: (selectedRecipients: User[]) => void;
   onClose: () => void;
 }
-interface RequestState {
-  requestedRecipients: User[];
+interface SelectState {
+  selectedRecipients: User[];
   profileIsOpen: boolean;
   selectedPublicAddress: string;
   selectedUserProfile?: UserProfile;
 }
 
-class Request extends React.Component<RequestProps, RequestState> {
-  constructor(props: RequestProps) {
+class Select extends React.Component<SelectProps, SelectState> {
+  constructor(props: SelectProps) {
     super(props);
     this.state = {
-      requestedRecipients: [],
+      selectedRecipients: this.props.previouslySelectedRecipients,
       profileIsOpen: false,
       selectedPublicAddress: "",
     };
@@ -96,19 +96,19 @@ class Request extends React.Component<RequestProps, RequestState> {
 
   onSelectSubmit() {
     console.log("select submit");
-    this.props.onSubmit(this.state.requestedRecipients);
+    this.props.onSubmit(this.state.selectedRecipients);
   }
 
   render() {
     const { users } = this.props;
     const {
       profileIsOpen,
-      requestedRecipients,
+      selectedRecipients,
     } = this.state;
 
     let recipientList;
-    if (requestedRecipients.length % 2 === 0) {
-      recipientList = requestedRecipients.map((r, k) => (
+    if (selectedRecipients.length % 2 === 0) {
+      recipientList = selectedRecipients.map((r, k) => (
         <Card.Header className="d-flex justify-content-between recipient-entry">
           <div className="flex-fill recipient-list-body">{r.name}</div>
           <Button
@@ -121,7 +121,7 @@ class Request extends React.Component<RequestProps, RequestState> {
         </Card.Header>
       ));
     } else {
-      recipientList = requestedRecipients.map((r, k) => (
+      recipientList = selectedRecipients.map((r, k) => (
         <Card.Header className="d-flex justify-content-between recipient-entry">
           <div className="flex-fill recipient-list-body">{r.name}</div>
           <Button
@@ -149,11 +149,11 @@ class Request extends React.Component<RequestProps, RequestState> {
                 options={users}
                 placeholder="Select Recipients"
                 paginate={true}
-                selected={this.state.requestedRecipients}
+                selected={this.state.selectedRecipients}
                 onChange={(selected) => {
                   console.log(selected);
                   this.setState({
-                    requestedRecipients: selected,
+                    selectedRecipients: selected,
                   });
                 }}
                 renderMenuItemChildren={
@@ -163,21 +163,21 @@ class Request extends React.Component<RequestProps, RequestState> {
             </div>
           </InputGroup>
         </Fragment>
-        {requestedRecipients.length !== 0 &&
-          requestedRecipients.length % 2 === 1 && (
+        {selectedRecipients.length !== 0 &&
+          selectedRecipients.length % 2 === 1 && (
             <div className="mt-4 recipient-display">
               {recipientList}
               <div className="d-flex justify-content-between recipient-placeholder"></div>
             </div>
           )}
 
-        {requestedRecipients.length !== 0 &&
-          requestedRecipients.length % 2 === 0 && (
+        {selectedRecipients.length !== 0 &&
+          selectedRecipients.length % 2 === 0 && (
             <div className="mt-4 recipient-display">{recipientList}</div>
           )}
 
         <div className="d-flex mt-4 border-radius">
-          {requestedRecipients.length !== 0 && (
+          {selectedRecipients.length !== 0 && (
             <Button
               variant="primary"
               className="flex-shrink-1"
@@ -186,7 +186,7 @@ class Request extends React.Component<RequestProps, RequestState> {
               Select
             </Button>
           )}
-          {requestedRecipients.length === 0 && (
+          {selectedRecipients.length === 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id="tooltip-disabled" placement="right">
@@ -211,10 +211,10 @@ class Request extends React.Component<RequestProps, RequestState> {
             variant="primary"
             className="flex-shrink-1 ml-2"
             onClick={() => {
-              this.setState({ requestedRecipients: [] });
+              this.setState({ selectedRecipients: this.props.previouslySelectedRecipients });
             }}
           >
-            Clear
+            Reset
           </Button>
           <div className="flex-fill"></div>
           <Button
@@ -255,4 +255,4 @@ class Request extends React.Component<RequestProps, RequestState> {
   }
 }
 
-export default Request;
+export default Select;

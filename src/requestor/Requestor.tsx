@@ -22,7 +22,7 @@ import ResponseBody from "../common/ResponseBody.interface";
 import FileView from "../components/FileView";
 import FileHistory from "../components/FileHistory";
 import Profile from "../components/Profile";
-import Request from "../components/Request";
+import Select from "../components/Select";
 import "./Requestor.css";
 
 interface RequestorProps {
@@ -34,12 +34,12 @@ interface RequestorState {
   letters: LetterDetails[];
   history: LetterHistory[];
   letterKey: number;
-  requestIsOpen: boolean;
+  selectIsOpen: boolean;
   profileIsOpen: boolean;
   historyIsOpen: boolean;
   selectedUserProfile?: UserProfile;
   requestedWriter: User[];
-  requestedRecipients: User[];
+  previouslySelectedRecipients: User[];
   selectedLetterKey: number;
   selectedLetterId: string;
 }
@@ -131,95 +131,6 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       .catch((e: Error) => {
         console.log(e);
       });
-
-    // this.setState({
-    //   users: [
-    //     { name: "Mary Poppins", publicAddress: "0x314159265358979323" },
-    //     { name: "Elton John", publicAddress: "0x101100101001101110100" },
-    //     { name: "Curious George", publicAddress: "0x142857142857142857" },
-    //     { name: "Jerry Mouse", publicAddress: "0xqwertyuiopasdfghjkl" },
-    //     { name: "Tom Cat", publicAddress: "0xqazwsxedcrfvtgbyhnujmi" },
-    //     { name: "Jane Eyre", publicAddress: "0x1q2w3e4r5t6y7u8i9o0p" },
-    //     { name: "The Grinch", publicAddress: "0xuioghj567xcvtyu89" },
-    //     {
-    //       name: "Eponine Thenardier",
-    //       publicAddress: "0xtrfdxzmlkpoiujhnbytgfvc",
-    //     },
-    //     { name: "Little Prince", publicAddress: "0xm98nb76vc54xz32aq1" },
-    //     { name: "Winston Smith", publicAddress: "0x30dk49fj58ghuty7610" },
-    //     { name: "Michael Cassio", publicAddress: "0xp098uhhbvfr43wazxd" },
-    //     { name: "Buddy Hobbs", publicAddress: "0x10woskdjrutyghvbcnxm" },
-    //     { name: "Remy Rat", publicAddress: "0xplkio098ujmnhy76tgb" },
-    //     { name: "Ron Swanson", publicAddress: "0xghvbnjuytfcdresx5678olk" },
-    //     { name: "David Tennant", publicAddress: "0xpsodkrmvnxjsiqo20fh48" },
-    //   ],
-    //   letters: [
-    //     {
-    //       letterId: "1",
-    //       writer: {
-    //         name: "Mary Poppins",
-    //         publicAddress: "0x314159265358979323",
-    //       },
-    //       requestor: {
-    //         name: "Simba",
-    //         publicAddress: "0xabcdefghijklmnop",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //     },
-    //     {
-    //       letterId: "3",
-    //       writer: {
-    //         name: "Curious George",
-    //         publicAddress: "0x142857142857142857",
-    //       },
-    //       requestor: {
-    //         name: "Simba",
-    //         publicAddress: "0xabcdefghijklmnop",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //     },
-    //   ],
-    //   history: [
-    //     {
-    //       letterId: "1",
-    //       writer: {
-    //         name: "Mary Poppins",
-    //         publicAddress: "0x314159265358979323",
-    //       },
-    //       requestor: {
-    //         name: "Simba",
-    //         publicAddress: "0xabcdefghijklmnop",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //       recipient: {
-    //         name: "Elton John",
-    //         publicAddress: "0x101100101001101110100",
-    //       },
-    //       sentAt: null,
-    //     },
-    //     {
-    //       letterId: "1",
-    //       writer: {
-    //         name: "Mary Poppins",
-    //         publicAddress: "0x314159265358979323",
-    //       },
-    //       requestor: {
-    //         name: "Simba",
-    //         publicAddress: "0xabcdefghijklmnop",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //       recipient: {
-    //         name: "Curious George",
-    //         publicAddress: "0x142857142857142857",
-    //       },
-    //       sentAt: null,
-    //     },
-    //   ],
-    // });
   }
 
   constructor(props: RequestorProps) {
@@ -229,37 +140,67 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       letters: [],
       history: [],
       letterKey: -1,
-      requestIsOpen: false,
+      selectIsOpen: false,
       profileIsOpen: false,
       historyIsOpen: false,
       requestedWriter: [],
-      requestedRecipients: [],
+      previouslySelectedRecipients: [],
       selectedLetterKey: -1,
       selectedLetterId: "",
     };
   }
 
-  closeRequestModal() {
-    console.log("closing request modal");
-    this.setState({ requestIsOpen: false });
+  closeSelectModal() {
+    console.log("closing select modal");
+    this.setState({ selectIsOpen: false });
   }
 
-  openRequestModal() {
-    console.log("opening request modal");
+  openSelectModal() {
+    console.log("opening select modal");
     this.setState({
-      requestIsOpen: true,
+      previouslySelectedRecipients: [],
+      selectIsOpen: true,
     });
   }
 
-  async onSelectSubmit(requestedRecipients: User[]) {
-    console.log("on select submit");
+  async onRequestSubmit(requestedRecipients: User[]) {
+    console.log("on request submit");
     console.log(requestedRecipients);
 
-    // TODO: CALL TO BACKEND
-
+    // TODO: fetch backend to create new request
     this.setState({
-      requestIsOpen: false,
+      selectIsOpen: false,
     });
+  }
+
+  async onSendSubmit(requestedRecipients: User[]) {
+    console.log("on send submit");
+
+    // TODO: fetch backend to update recipients list (more complex sql)
+    this.setState({
+      selectIsOpen: false,
+    });
+  }
+
+  async onSendClick(letterId: string) {
+    console.log("on send click");
+    // fetch backend to get recipients list (who the letter has not been sent to)
+    const fetchUrl = `/api/letters/${letterId}/`;
+    const previousSelectedRecipients = await this.retrieveRecipientsFromServer();
+    this.setState({
+      previouslySelectedRecipients: previousSelectedRecipients,
+      requestedWriter: [],
+      selectIsOpen: true,
+    });
+  }
+
+  async retrieveRecipientsFromServer(): Promise<User[]> {
+    return [
+      {
+        name: "Peanut Butter",
+        publicAddress: "0xweojsdkfojo1291029i31092kofjdsd",
+      },
+    ];
   }
 
   closeProfileModal() {
@@ -388,7 +329,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     const {
       letters,
       history,
-      requestIsOpen,
+      selectIsOpen,
       profileIsOpen,
       historyIsOpen,
       requestedWriter,
@@ -415,7 +356,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           </div>
           <div className="button-blur">
             <Button
-              // disabled
+              disabled={l.uploadedAt === null}
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
@@ -426,14 +367,15 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               History
             </Button>
             <Button
-              disabled // TODO: add Tooltip
+              // TODO: add Tooltip
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
                 e.stopPropagation();
+                this.onSendClick(l.letterId);
               }}
             >
-              Send
+              {l.uploadedAt ? "Send" : "Edit"}
             </Button>
             {/* {!l.uploadedAt && (
               <div className="display-text flex-shrink-1 float-right">
@@ -469,9 +411,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               </div>
             )}
             {!l.uploadedAt && (
-              <div className=" flex-shrink-1 float-right">
-                Not Uploaded
-              </div>
+              <div className=" flex-shrink-1 float-right">Not Uploaded</div>
             )}
           </div>
           {/* <Button
@@ -524,7 +464,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             <Button
               variant="outline-light"
               className="flex-shrink-1"
-              onClick={() => this.openRequestModal()}
+              onClick={() => this.openSelectModal()}
             >
               Request
             </Button>
@@ -543,7 +483,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                   className="flex-shrink-1"
                   disabled
                   style={{ pointerEvents: "none" }}
-                  onClick={() => this.openRequestModal()}
+                  onClick={() => this.openSelectModal()}
                 >
                   Request
                 </Button>
@@ -586,9 +526,9 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     return (
       <div className="requestor">
         <Modal
-          id="request-modal"
-          show={requestIsOpen}
-          onHide={this.closeRequestModal.bind(this)}
+          id="select-modal"
+          show={selectIsOpen}
+          onHide={this.closeSelectModal.bind(this)}
           backdrop="static"
           animation={false}
           className="modal"
@@ -598,19 +538,26 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           <Modal.Header closeButton>
             <Modal.Title>
               <span>
-                {requestedWriter[0]?.name}
+                From: {requestedWriter[0]?.name}
                 {/* ({requestedWriter[0]?.publicAddress}) */}
               </span>
             </Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
-            <Request
+            <Select
               user={this.props.user}
-              onClose={this.closeRequestModal.bind(this)}
-              onSubmit={this.onSelectSubmit.bind(this)}
+              previouslySelectedRecipients={
+                this.state.previouslySelectedRecipients
+              }
+              onClose={this.closeSelectModal.bind(this)}
+              onSubmit={
+                this.state.requestedWriter.length !== 0
+                  ? this.onRequestSubmit.bind(this)
+                  : this.onSendSubmit.bind(this)
+              }
               users={this.state.users}
-            ></Request>
+            ></Select>
           </Modal.Body>
         </Modal>
 
@@ -625,7 +572,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           size="sm"
         >
           <Modal.Header closeButton>
-            <Modal.Title>({this.state.selectedUserProfile?.name})</Modal.Title>
+            <Modal.Title>{this.state.selectedUserProfile?.name}</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
@@ -649,7 +596,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           size="sm"
         >
           <Modal.Header closeButton>
-            <Modal.Title>From {this.getWriter()?.name}</Modal.Title>
+            <Modal.Title>From: {this.getWriter()?.name}</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
