@@ -33,6 +33,7 @@ interface RequestorProps {
 interface RequestorState {
   users: User[];
   letters: LetterDetails[];
+  numRecipients: Number[];
   history: LetterHistory[];
   letterKey: number;
   loadingLetters: boolean;
@@ -116,12 +117,13 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         response
           .json()
           .then((body: ResponseBody) => {
-            const data: LetterDetails[] = body.data;
+            const data: { letters: LetterDetails[], numRecipients: Number[]} = body.data;
             console.log(response);
             console.log(body.data);
             if (data) {
               this.setState({
-                letters: data,
+                letters: data.letters,
+                numRecipients: data.numRecipients,
                 loadingLetters: false,
               });
             } else {
@@ -142,6 +144,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     this.state = {
       users: [],
       letters: [],
+      numRecipients: [],
       history: [],
       letterKey: -1,
       loadingLetters: true,
@@ -334,6 +337,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     const user = this.props.user;
     const {
       letters,
+      numRecipients,
       history,
       loadingLetters,
       requestNew,
@@ -365,12 +369,14 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           </div>
           <div className="button-blur">
             <Button
-              disabled={l.uploadedAt === null}
+              disabled={numRecipients[k] === 0}
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
                 e.stopPropagation();
-                this.openHistoryModal(k);
+                if (numRecipients[k] !== 0) {
+                  this.openHistoryModal(k);
+                }
               }}
             >
               History
@@ -465,7 +471,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                 });
               }}
               renderMenuItemChildren={
-                (option) => `${option.name} (${option.publicAddress})` // TODO: add padding with service
+                (option) => `${option.name} (${option.publicAddress.slice(0, 6)} . . . )` // TODO: add padding with service
               }
             />
           </div>

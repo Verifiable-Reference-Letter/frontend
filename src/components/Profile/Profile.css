@@ -1,3 +1,9 @@
-.image-size {
+.profile-image {
+  object-fit: scale-down;
+  object-position: center;
   max-height: 400px;
+}
+
+.image-card {
+  max-height: 400px
 }

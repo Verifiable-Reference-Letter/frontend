@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Row, Container, Modal, Spinner } from "react-bootstrap";
+import { Button, Accordion, Card, Modal, Spinner } from "react-bootstrap";
 
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
@@ -22,6 +22,7 @@ interface WriterProps {
 
 interface WriterState {
   letters: LetterDetails[];
+  numRecipients: Number[];
   history: LetterHistory[];
   loadingLetters: boolean;
   uploadIsOpen: boolean;
@@ -61,11 +62,13 @@ class Writer extends React.Component<WriterProps, WriterState> {
         response
           .json()
           .then((body: ResponseBody) => {
-            const data: LetterDetails[] = body.data;
+            const data: { letters: LetterDetails[], numRecipients: Number[]} = body.data;
+
             console.log(response);
             if (data) {
               this.setState({
-                letters: data,
+                letters: data.letters,
+                numRecipients: data.numRecipients,
                 loadingLetters: false,
               });
             } else {
@@ -85,6 +88,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     super(props);
     this.state = {
       letters: [],
+      numRecipients: [],
       history: [],
       loadingLetters: true,
       viewIsOpen: false,
@@ -259,6 +263,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     const { name } = this.props.user;
     const {
       letters,
+      numRecipients,
       loadingLetters,
       uploadIsOpen,
       viewIsOpen,
@@ -267,32 +272,145 @@ class Writer extends React.Component<WriterProps, WriterState> {
     let requestor = this.getRequestor();
 
     const lettersList = letters.map((l, k) => (
-      <Row key={k}>
-        <div className="full-width">
-          {/* <span className="text-float-left">({l.letterId})&nbsp;</span> */}
-          <span className="text-float-left">
-            For: {l.letterRequestor?.name}
-          </span>
-          <Button
-            className="left-float-right-button"
-            onClick={() => {
-              this.openViewModal(k);
-            }}
-          >
-            View
-          </Button>
+      <Card className="full-width opacity-0">
+        <Accordion.Toggle
+          as={Card.Header}
+          className="d-flex"
+          id={k.toString}
+          eventKey={k.toString()}
+        >
+          <div className="flex-fill button-blur">
+            <span className="mr-3">For:</span>
+            <Button
+              variant="outline-light"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                // this.openProfileModal(l.letterRequestor.publicAddress);
+              }}
+            >
+              {l.letterRequestor?.name}
+            </Button>
+          </div>
 
-          <Button
-            className="left-float-right-button"
-            onClick={() => {
-              this.openUploadModal(k);
-            }}
-          >
-            Upload
-          </Button>
-        </div>
-      </Row>
+          <div className="button-blur">
+            <Button
+              disabled={numRecipients[k] === 0}
+              variant="outline-light"
+              className="flex-shrink-1 float-right ml-3"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                if (numRecipients[k] !== 0) {
+                  //this.openHistoryModal(k);
+                }
+              }}
+            >
+              History
+            </Button>
+            <Button
+              disabled={numRecipients[k] === 0}
+              variant="outline-light"
+              className="flex-shrink-1 float-right ml-3"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                if (numRecipients[k] !== 0) {
+                  this.openViewModal(k);
+                }
+              }}
+            >
+              View
+            </Button>
+            <Button
+              // TODO: add Tooltip
+              disabled={numRecipients[k] !== 0}
+              variant="outline-light"
+              className="flex-shrink-1 float-right ml-3"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                if (numRecipients[k] === 0) {
+                  this.openUploadModal(k);
+                }
+              }}
+            >
+              Upload
+            </Button>
+            {/* {!l.uploadedAt && (
+              <div className="display-text flex-shrink-1 float-right">
+                Pending
+              </div>
+            )} */}
+          </div>
+        </Accordion.Toggle>
+        <Accordion.Collapse as={Card.Body} eventKey={k.toString()}>
+          {/* <Card.Body className="">({l.letterId}) {l.writer.name} ({l.writer.publicAddress})</Card.Body> */}
+          {/*<div className="acc-body button-blur">
+            <a>
+              From: 
+            </a>
+            <Button
+              variant="outline-light"
+              className="ml-3"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                this.openProfileModal(l.writer.publicAddress);
+              }}
+            >
+              {l.writer.name}
+            </Button>
+          </div>*/}
+          <div className="acc-body display-text d-flex text-white-50">
+            <div className="flex-fill">
+              Requested: {l.requestedAt?.toString()}
+            </div>
+            {l.uploadedAt && (
+              <div className=" flex-shrink-1 float-right">
+                Uploaded: {l.uploadedAt?.toString()}
+              </div>
+            )}
+            {!l.uploadedAt && (
+              <div className=" flex-shrink-1 float-right">Not Uploaded</div>
+            )}
+          </div>
+          {/* <Button
+              variant="outline-light"
+              className="flex-shrink-1 float-right ml-2"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                this.openProfileModal(l.writer.publicAddress);
+              }}
+            >
+              View: {l.writer.name}
+            </Button> */}
+        </Accordion.Collapse>
+      </Card>
     ));
+
+    // const lettersList = letters.map((l, k) => (
+    //   <Row key={k}>
+    //     <div className="full-width">
+    //       {/* <span className="text-float-left">({l.letterId})&nbsp;</span> */}
+    //       <span className="text-float-left">
+    //         For: {l.letterRequestor?.name}
+    //       </span>
+    //       <Button
+    //         className="left-float-right-button"
+    //         onClick={() => {
+    //           this.openViewModal(k);
+    //         }}
+    //       >
+    //         View
+    //       </Button>
+
+    //       <Button
+    //         className="left-float-right-button"
+    //         onClick={() => {
+    //           this.openUploadModal(k);
+    //         }}
+    //       >
+    //         Upload
+    //       </Button>
+    //     </div>
+    //   </Row>
+    // ));
 
     return (
       <div id="writer" className="writer">
@@ -347,35 +465,32 @@ class Writer extends React.Component<WriterProps, WriterState> {
             ></FileView>
           </Modal.Body>
         </Modal>
-        <div className="writer-header">
+        <div className="writer-header mb-3">
           <h1> Writer Page </h1>
-          <p>
-            <em>{name}</em>
-          </p>
-          <hr></hr>
+          {/* <hr></hr> */}
         </div>
 
         <div className="letters">
           {!loadingLetters && (
-            <div>
+            <div className="mb-4">
               <h3> Letters </h3>
-              <Container fluid>{lettersList}</Container>
+              <Accordion>{lettersList}</Accordion>
             </div>
           )}
           {loadingLetters && (
-            <div className="d-flex justify-content-center mb-3">
+            <div className="d-flex justify-content-center mb-4">
               <Spinner
                 className="float-right"
                 animation="border"
                 variant="secondary"
               />
+              {/* <hr></hr> */}
             </div>
           )}
-          <hr></hr>
         </div>
 
         <div className="writer-footer">
-          <p> Product of Team Gas</p>
+          <span> Product of Team Gas</span>
         </div>
       </div>
     );

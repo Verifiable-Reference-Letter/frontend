@@ -138,7 +138,7 @@ class Select extends React.Component<SelectProps, SelectState> {
                   });
                 }}
                 renderMenuItemChildren={
-                  (option) => `${option.name} (${option.publicAddress})` // TODO: add padding with service
+                  (option) => `${option.name} (${option.publicAddress.slice(0, 6)} . . . )` // TODO: add padding with service
                 }
               />
             </div>
@@ -220,7 +220,7 @@ class Select extends React.Component<SelectProps, SelectState> {
           // size="sm"
         >
           <Modal.Header closeButton>
-            <Modal.Title>({this.state.selectedUserProfile?.name})</Modal.Title>
+            <Modal.Title>{this.state.selectedUserProfile?.name}</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
