@@ -1,8 +1,5 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Container from "react-bootstrap/Container";
-import Modal from "react-bootstrap/Modal";
+import {Button, Row, Container, Modal, Spinner} from "react-bootstrap";
 
 import UserAuth from "../common/UserAuth.interface";
 import LetterHistory from "../common/LetterHistory.interface";
@@ -22,6 +19,7 @@ interface RecipientProps {
 }
 interface RecipientState {
   letters: LetterHistory[];
+  loadingLetters: boolean;
   viewIsOpen: boolean;
   selectedLetterKey: number;
   selectedLetterId: string;
@@ -62,6 +60,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             if (data) {
               this.setState({
                 letters: data,
+                loadingLetters: false,
               });
             } else {
               console.log("problem with response data for requestor");
@@ -74,52 +73,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       .catch((e: Error) => {
         console.log(e);
       });
-    // this.setState({
-    //   letters: [
-    //     {
-    //       letterId: "1",
-    //       writer: {
-    //         name: "Mary Poppins",
-    //         publicAddress: "0x314159265358979323",
-    //       },
-    //       requestor: {
-    //         name: "Simba",
-    //         publicAddress: "0xabcdefghijklmnop",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //       recipient: {
-    //         name: "Curious George",
-    //         publicAddress: "0x142857142857142857",
-    //       },
-    //       sentAt: null,
-    //     },
-    //     {
-    //       letterId: "2",
-    //       writer: {
-    //         name: "Mary Poppins",
-    //         publicAddress: "0x314159265358979323",
-    //       },
-    //       requestor: {
-    //         name: "Curious George",
-    //         publicAddress: "0x142857142857142857",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //       recipient: {
-    //         name: "Curious George",
-    //         publicAddress: "0x142857142857142857",
-    //       },
-    //       sentAt: null,
-    //     },
-    //   ],
-    // });
   }
 
   constructor(props: RecipientProps) {
     super(props);
     this.state = {
       letters: [],
+      loadingLetters: true,
       viewIsOpen: false,
       selectedLetterKey: -1,
       selectedLetterId: "",
@@ -211,12 +171,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
 
   render() {
     const { name } = this.props.user;
-    const { letters, viewIsOpen, selectedLetterId } = this.state;
+    const { letters, loadingLetters, viewIsOpen, selectedLetterId } = this.state;
 
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
         <div className="full-width">
-          <span className="text-float-left">({l.letterId})&nbsp;</span>
+          {/* <span className="text-float-left">({l.letterId})&nbsp;</span> */}
+          <span className="text-float-left ml-3">From: {l.letterWriter?.name}</span>
           <span className="text-float-left">For: {l.letterRequestor?.name}</span>
           <Button
             className="left-float-right-button"
@@ -244,7 +205,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              Letter for {this.getRequestor()?.name} by {this.getWriter?.name} (
+              For: {this.getRequestor()?.name} From: {this.getWriter?.name} (
               {selectedLetterId})
             </Modal.Title>
           </Modal.Header>
@@ -268,8 +229,21 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         </div>
 
         <div className="letters">
+
+          {loadingLetters && (
+            <div className="d-flex justify-content-center mb-3">
+              <Spinner
+                className="float-right"
+                animation="border"
+                variant="secondary"
+              />
+            </div>
+          )}
+          {!loadingLetters && (<div>
           <h3> Letters </h3>
           <Container fluid>{lettersList}</Container>
+          </div>)}
+
           <hr></hr>
         </div>
 

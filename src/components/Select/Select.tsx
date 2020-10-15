@@ -101,39 +101,20 @@ class Select extends React.Component<SelectProps, SelectState> {
 
   render() {
     const { users } = this.props;
-    const {
-      profileIsOpen,
-      selectedRecipients,
-    } = this.state;
+    const { profileIsOpen, selectedRecipients } = this.state;
 
-    let recipientList;
-    if (selectedRecipients.length % 2 === 0) {
-      recipientList = selectedRecipients.map((r, k) => (
-        <Card.Header className="d-flex justify-content-between recipient-entry">
-          <div className="flex-fill recipient-list-body">{r.name}</div>
-          <Button
-            variant="primary"
-            className="flex-shrink-1 float-right"
-            onClick={() => this.openProfileModal(r.publicAddress)}
-          >
-            View
-          </Button>
-        </Card.Header>
-      ));
-    } else {
-      recipientList = selectedRecipients.map((r, k) => (
-        <Card.Header className="d-flex justify-content-between recipient-entry">
-          <div className="flex-fill recipient-list-body">{r.name}</div>
-          <Button
-            variant="primary"
-            className="flex-shrink-1 float-right"
-            onClick={() => this.openProfileModal(r.publicAddress)}
-          >
-            View
-          </Button>
-        </Card.Header>
-      ));
-    }
+    let recipientList = selectedRecipients.map((r, k) => (
+      <Card.Header className="d-flex justify-content-between recipient-entry">
+        <div className="flex-fill recipient-list-body">{r.name}</div>
+        <Button
+          variant="primary"
+          className="flex-shrink-1 float-right"
+          onClick={() => this.openProfileModal(r.publicAddress)}
+        >
+          View
+        </Button>
+      </Card.Header>
+    ));
 
     return (
       <div>
@@ -163,18 +144,17 @@ class Select extends React.Component<SelectProps, SelectState> {
             </div>
           </InputGroup>
         </Fragment>
-        {selectedRecipients.length !== 0 &&
+        {/* {selectedRecipients.length !== 0 &&
           selectedRecipients.length % 2 === 1 && (
             <div className="mt-4 recipient-display">
               {recipientList}
               <div className="d-flex justify-content-between recipient-placeholder"></div>
             </div>
-          )}
+          )} */}
 
-        {selectedRecipients.length !== 0 &&
-          selectedRecipients.length % 2 === 0 && (
-            <div className="mt-4 recipient-display">{recipientList}</div>
-          )}
+        {selectedRecipients.length !== 0 && (
+          <div className="mt-4 recipient-display">{recipientList}</div>
+        )}
 
         <div className="d-flex mt-4 border-radius">
           {selectedRecipients.length !== 0 && (
@@ -211,7 +191,9 @@ class Select extends React.Component<SelectProps, SelectState> {
             variant="primary"
             className="flex-shrink-1 ml-2"
             onClick={() => {
-              this.setState({ selectedRecipients: this.props.previouslySelectedRecipients });
+              this.setState({
+                selectedRecipients: this.props.previouslySelectedRecipients,
+              });
             }}
           >
             Reset
@@ -235,7 +217,7 @@ class Select extends React.Component<SelectProps, SelectState> {
           animation={false}
           className="modal"
           scrollable={false}
-          size="sm"
+          // size="sm"
         >
           <Modal.Header closeButton>
             <Modal.Title>({this.state.selectedUserProfile?.name})</Modal.Title>

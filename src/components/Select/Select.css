@@ -8,10 +8,20 @@
 }
 
 .recipient-display {
-  columns: 2 auto;
+  /* columns: 2 auto; */
+  overflow: auto;
+  max-height: 250px;
 }
 
 .recipient-placeholder {
   height: 49px;
   margin-bottom: 10px;
 }
+
+/* #select-modal .modal-content {
+  margin-left: -50%;
+}
+
+#profile-modal .modal-content {
+  margin-left: 50%;
+} */

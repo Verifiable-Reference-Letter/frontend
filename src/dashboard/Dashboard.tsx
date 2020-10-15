@@ -24,15 +24,15 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         <div className="dashboard-header">
           <h1> Dashboard </h1>
         </div>
-        <hr></hr>
+        {/* <hr></hr> */}
         <Card.Header>
           Notifications
         </Card.Header>
-        <hr></hr>
+        {/* <hr></hr> */}
         <Card.Header>
           Pending
         </Card.Header>
-        <hr></hr>
+        {/* <hr></hr> */}
         <div className="dashboard-footer">
           <p> Product of Team Gas</p>
         </div>

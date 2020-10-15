@@ -54,7 +54,7 @@ class Nav extends React.Component<NavProps, NavState> {
           )}
           {this.props.connectedTo && (
             <Navbar.Text className="navText">
-              Connected to Metamask: <p>{this.props.connectedTo ? this.props.user.publicAddress : "--"}</p>
+              Connected to Metamask: <span>{this.props.connectedTo ? this.props.user.publicAddress : "--"}</span>
             </Navbar.Text>
           )}
         </Navbar.Collapse>

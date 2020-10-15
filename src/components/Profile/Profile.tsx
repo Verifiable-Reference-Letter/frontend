@@ -28,13 +28,15 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
     const { user } = this.props;
     return (
       <div>
+        <div className="d-flex justify-content-center">
         <Image
           fluid
-          className="mb-3"
+          className="mb-3 image-size"
           src="https://engineering.lehigh.edu/sites/engineering.lehigh.edu/files/styles/faculty_photo/public/korth.jpg?itok=GfxQ6zFl"
         />
+        </div>
 
-        <div>Name: {user.name}</div>
+        <div className="mt-4">Name: {user.name}</div>
         <div className="text-break">ID: {user.publicAddress}</div>
 
         {/* <div>

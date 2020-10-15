@@ -7,6 +7,7 @@ import {
   Accordion,
   OverlayTrigger,
   Tooltip,
+  Spinner,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { Fragment } from "react";
@@ -34,6 +35,8 @@ interface RequestorState {
   letters: LetterDetails[];
   history: LetterHistory[];
   letterKey: number;
+  loadingLetters: boolean;
+  requestNew: boolean;
   selectIsOpen: boolean;
   profileIsOpen: boolean;
   historyIsOpen: boolean;
@@ -107,7 +110,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       }),
     };
 
-    // get user profile from server
+    // get letters from server
     fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, letterInit)
       .then((response) => {
         response
@@ -119,6 +122,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             if (data) {
               this.setState({
                 letters: data,
+                loadingLetters: false,
               });
             } else {
               console.log("problem with response data for requestor");
@@ -140,6 +144,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       letters: [],
       history: [],
       letterKey: -1,
+      loadingLetters: true,
+      requestNew: true,
       selectIsOpen: false,
       profileIsOpen: false,
       historyIsOpen: false,
@@ -182,14 +188,14 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     });
   }
 
-  async onSendClick(letterId: string) {
+  async onSendClick(letterId: string, letterWriter: User) {
     console.log("on send click");
     // fetch backend to get recipients list (who the letter has not been sent to)
     const fetchUrl = `/api/letters/${letterId}/`;
     const previousSelectedRecipients = await this.retrieveRecipientsFromServer();
     this.setState({
       previouslySelectedRecipients: previousSelectedRecipients,
-      requestedWriter: [],
+      requestedWriter: [letterWriter],
       selectIsOpen: true,
     });
   }
@@ -329,6 +335,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     const {
       letters,
       history,
+      loadingLetters,
+      requestNew,
       selectIsOpen,
       profileIsOpen,
       historyIsOpen,
@@ -340,6 +348,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         <Accordion.Toggle
           as={Card.Header}
           className="d-flex"
+          id={k.toString}
           eventKey={k.toString()}
         >
           <div className="flex-fill button-blur">
@@ -372,7 +381,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
                 e.stopPropagation();
-                this.onSendClick(l.letterId);
+                this.onSendClick(l.letterId, l.letterWriter);
               }}
             >
               {l.uploadedAt ? "Send" : "Edit"}
@@ -401,7 +410,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               {l.writer.name}
             </Button>
           </div>*/}
-          <div className="acc-body display-text d-flex">
+          <div className="acc-body display-text d-flex text-white-50">
             <div className="flex-fill">
               Requested: {l.requestedAt?.toString()}
             </div>
@@ -460,7 +469,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               }
             />
           </div>
-          {requestedWriter.length !== 0 && (
+          {requestNew && requestedWriter.length !== 0 && (
             <Button
               variant="outline-light"
               className="flex-shrink-1"
@@ -469,7 +478,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               Request
             </Button>
           )}
-          {requestedWriter.length === 0 && (
+          {requestNew && requestedWriter.length === 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id="tooltip-disabled" placement="left">
@@ -494,35 +503,6 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       </Fragment>
     );
 
-    // const requestRecipients = (
-    //   <Fragment>
-    //     <InputGroup className="d-flex justify-content-between border-radius button-blur mb-0">
-    //       <div className="flex-fill multiple-typeahead">
-    //         <Typeahead
-    //           id="request-recipients"
-    //           // minLength={2}
-    //           multiple
-    //           labelKey="name"
-    //           filterBy={["name", "publicAddress"]}
-    //           options={options}
-    //           placeholder="Select a User"
-    //           paginate={true}
-    //           selected={this.state.requestedRecipients}
-    //           onChange={(selected) => {
-    //             console.log("selected", selected);
-    //             this.setState({
-    //               requestedRecipients: selected,
-    //             });
-    //           }}
-    //           renderMenuItemChildren={
-    //             (option) => `${option.name} (${option.publicAddress})` // TODO: add padding with service
-    //           }
-    //         />
-    //       </div>
-    //     </InputGroup>
-    //   </Fragment>
-    // );
-
     return (
       <div className="requestor">
         <Modal
@@ -533,14 +513,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           animation={false}
           className="modal"
           scrollable={false}
-          size="lg"
+          // size="sm"
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              <span>
-                From: {requestedWriter[0]?.name}
-                {/* ({requestedWriter[0]?.publicAddress}) */}
-              </span>
+              <span>From: {requestedWriter[0]?.name}</span>
             </Modal.Title>
           </Modal.Header>
 
@@ -552,7 +529,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               }
               onClose={this.closeSelectModal.bind(this)}
               onSubmit={
-                this.state.requestedWriter.length !== 0
+                requestNew
                   ? this.onRequestSubmit.bind(this)
                   : this.onSendSubmit.bind(this)
               }
@@ -569,7 +546,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           animation={false}
           className="modal"
           scrollable={false}
-          size="sm"
+          // size="sm"
+
         >
           <Modal.Header closeButton>
             <Modal.Title>{this.state.selectedUserProfile?.name}</Modal.Title>
@@ -609,26 +587,44 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         </Modal>
 
         <div className="requestor-header">
-          <h1> Requestor Page </h1>
-          <p>
-            <em>{user.name}</em>
-          </p>
+          {/* <h1> Requestor Page </h1> */}
+          <h1 className="mb-3">
+            Requests
+          </h1>
         </div>
-        <hr></hr>
+        {/* <hr></hr> */}
 
-        <div>
-          <h3> Request </h3>
-          <Card.Header>{requestWriter}</Card.Header>
-          {/* <Card.Header>{requestRecipients}</Card.Header> */}
+        <div className="requestor-request">
+          {!loadingLetters && (
+            <div className="mb-3">
+              {/* <h3> Request </h3> */}
+              <Card.Header>{requestWriter}</Card.Header>
+              {/* <hr></hr> */}
+            </div>
+          )}
         </div>
-        <hr></hr>
+
         <div className="letters">
-          <h3> Letters </h3>
-          <Accordion>{lettersList}</Accordion>
+          {loadingLetters && (
+            <div className="d-flex justify-content-center mb-4">
+              <Spinner
+                className="float-right"
+                animation="border"
+                variant="secondary"
+              />
+            </div>
+          )}
+
+          {!loadingLetters && (
+            <div className="mb-4">
+              <h3> Letters </h3>
+              <Accordion>{lettersList}</Accordion>
+            </div>
+          )}
         </div>
-        <hr></hr>
+        {/* <hr></hr> */}
         <div className="requestor-footer">
-          <p> Product of Team Gas</p>
+          <span> Product of Team Gas</span>
         </div>
       </div>
     );

@@ -89,6 +89,8 @@ h6 {
 }
 
 .multiple-typeahead .rbt-input-wrapper {
+  overflow: auto;
+  max-height: 125px;
   display: flex;
   flex-wrap: wrap;
 }

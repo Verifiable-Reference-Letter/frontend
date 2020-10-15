@@ -1,8 +1,5 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Modal from "react-bootstrap/Modal";
-import Container from "react-bootstrap/Container";
+import { Button, Row, Container, Modal, Spinner } from "react-bootstrap";
 
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
@@ -26,6 +23,7 @@ interface WriterProps {
 interface WriterState {
   letters: LetterDetails[];
   history: LetterHistory[];
+  loadingLetters: boolean;
   uploadIsOpen: boolean;
   viewIsOpen: boolean;
   selectedLetterKey: number;
@@ -68,6 +66,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
             if (data) {
               this.setState({
                 letters: data,
+                loadingLetters: false,
               });
             } else {
               console.log("problem with response data for writer");
@@ -80,58 +79,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
       .catch((e: Error) => {
         console.log(e);
       });
-
-    console.log("componentWillMount");
-    // this.setState({
-    //   letters: [
-    //     {
-    //       letterId: "1",
-    //       writer: {
-    //         name: "Mary Poppins",
-    //         publicAddress: "0x314159265358979323",
-    //       },
-    //       requestor: {
-    //         name: "Simba",
-    //         publicAddress: "0xabcdefghijklmnop",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //     },
-    //     {
-    //       letterId: "2",
-    //       writer: {
-    //         name: "Mary Poppins",
-    //         publicAddress: "0x314159265358979323",
-    //       },
-    //       requestor: {
-    //         name: "Curious George",
-    //         publicAddress: "0x142857142857142857",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //     },
-    //   ],
-    //   history: [
-    //     {
-    //       letterId: "1",
-    //       writer: {
-    //         name: "Mary Poppins",
-    //         publicAddress: "0x314159265358979323",
-    //       },
-    //       requestor: {
-    //         name: "Simba",
-    //         publicAddress: "0xabcdefghijklmnop",
-    //       },
-    //       requestedAt: null,
-    //       uploadedAt: null,
-    //       recipient: {
-    //         name: "Elton John",
-    //         publicAddress: "0x101100101001101110100",
-    //       },
-    //       sentAt: null,
-    //     },
-    //   ],
-    // });
   }
 
   constructor(props: WriterProps) {
@@ -139,6 +86,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.state = {
       letters: [],
       history: [],
+      loadingLetters: true,
       viewIsOpen: false,
       uploadIsOpen: false,
       selectedLetterKey: -1,
@@ -309,14 +257,22 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
   render() {
     const { name } = this.props.user;
-    const { letters, uploadIsOpen, viewIsOpen, selectedLetterId } = this.state;
+    const {
+      letters,
+      loadingLetters,
+      uploadIsOpen,
+      viewIsOpen,
+      selectedLetterId,
+    } = this.state;
     let requestor = this.getRequestor();
 
     const lettersList = letters.map((l, k) => (
       <Row key={k}>
         <div className="full-width">
           {/* <span className="text-float-left">({l.letterId})&nbsp;</span> */}
-          <span className="text-float-left">For: {l.letterRequestor?.name}</span>
+          <span className="text-float-left">
+            For: {l.letterRequestor?.name}
+          </span>
           <Button
             className="left-float-right-button"
             onClick={() => {
@@ -400,8 +356,21 @@ class Writer extends React.Component<WriterProps, WriterState> {
         </div>
 
         <div className="letters">
-          <h3> Letters </h3>
-          <Container fluid>{lettersList}</Container>
+          {!loadingLetters && (
+            <div>
+              <h3> Letters </h3>
+              <Container fluid>{lettersList}</Container>
+            </div>
+          )}
+          {loadingLetters && (
+            <div className="d-flex justify-content-center mb-3">
+              <Spinner
+                className="float-right"
+                animation="border"
+                variant="secondary"
+              />
+            </div>
+          )}
           <hr></hr>
         </div>
 
