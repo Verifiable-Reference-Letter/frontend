@@ -342,7 +342,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
         </Accordion.Toggle>
         <Accordion.Collapse as={Card.Body} eventKey={k.toString()}>
           {/* <Card.Body className="">({l.letterId}) {l.writer.name} ({l.writer.publicAddress})</Card.Body> */}
-          {/*<div className="acc-body button-blur">
+          {/*<div className="body-text button-blur">
             <a>
               From: 
             </a>
@@ -357,7 +357,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
               {l.writer.name}
             </Button>
           </div>*/}
-          <div className="acc-body display-text d-flex text-white-50">
+          <div className="body-text display-text d-flex text-white-50">
             <div className="flex-fill">
               Requested: {l.requestedAt?.toString()}
             </div>

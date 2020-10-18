@@ -277,8 +277,9 @@ class Login extends React.Component<LoginProps, LoginState> {
 
   render() {
     const loginDisplay = (
-      <div>
+      <div className="button-blur">
         <Button
+          variant="outline-light"
           className="mr-3"
           onClick={() => {
             this.toggleMode();
@@ -287,7 +288,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           Sign Up
         </Button>
         <Button
-          className=""
+          variant="outline-light"
           onClick={() => {
             this.onLoginClick();
           }}
@@ -311,8 +312,9 @@ class Login extends React.Component<LoginProps, LoginState> {
             onChange={this.handleInputChange}
           />
         </InputGroup>
-        <div className="d-flex">
+        <div className="d-flex button-blur">
           <Button
+            variant="outline-light"
             className="float-right flex-fill"
             onClick={() => {
               this.onSignupClick();
@@ -321,6 +323,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             Sign Up
           </Button>
           <Button
+            variant="outline-light"
             className="float-right flex-fill ml-3"
             onClick={() => {
               this.toggleMode();

@@ -7,6 +7,8 @@ import {
   OverlayTrigger,
   Tooltip,
   Modal,
+  Col,
+  Row,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 // import LetterDetails from "../../common/LetterDetails.interface";
@@ -29,27 +31,39 @@ interface SelectProps {
 interface SelectState {
   selectedRecipients: User[];
   profileIsOpen: boolean;
-  selectedPublicAddress: string;
   selectedUserProfile?: UserProfile;
 }
 
 class Select extends React.Component<SelectProps, SelectState> {
+  private userProfiles: Map<string, UserProfile>;
   constructor(props: SelectProps) {
     super(props);
     this.state = {
       selectedRecipients: this.props.previouslySelectedRecipients,
       profileIsOpen: false,
-      selectedPublicAddress: "",
     };
+
+    this.userProfiles = new Map<string, UserProfile>();
   }
 
-  openProfileModal(selectedPublicAddress: string) {
-    console.log("opening view modal");
-    const fetchUrl = `/api/v1/users/${selectedPublicAddress}/profile`;
-    this.retrieveProfileFromServer(fetchUrl);
+  async closeProfileModal() {
+    console.log("closing profile modal");
+    this.setState({ profileIsOpen: false });
   }
 
-  retrieveProfileFromServer(fetchUrl: string) {
+  async openProfileModal(publicAddress: string) {
+    console.log("opening profile modal");
+    const userProfile = this.userProfiles.get(publicAddress);
+    console.log(userProfile);
+    if (userProfile === undefined) {
+      const fetchUrl = `/api/v1/users/${publicAddress}/profile`;
+      this.retrieveProfileFromServer(fetchUrl);
+    } else {
+      this.setState({ selectedUserProfile: userProfile, profileIsOpen: true });
+    }
+  }
+
+  async retrieveProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
       method: "POST",
       headers: {
@@ -66,32 +80,26 @@ class Select extends React.Component<SelectProps, SelectState> {
     };
 
     // get user profile from server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
-      .then((response) => {
-        response
-          .json()
-          .then((body: ResponseBody) => {
-            const data: UserProfile[] = body.data;
-            console.log(response);
-            if (data && data.length !== 0) {
-              this.setState({
-                selectedUserProfile: data[0],
-                profileIsOpen: true,
-              });
-            }
-          })
-          .catch((e: Error) => {
-            console.log(e);
-          });
-      })
-      .catch((e: Error) => {
-        console.log(e);
-      });
-  }
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      let body = await response.json();
 
-  closeProfileModal() {
-    console.log("closing view modal");
-    this.setState({ profileIsOpen: false });
+      const data: UserProfile[] = body.data;
+      console.log(response);
+      console.log(data);
+      if (data && data.length !== 0) {
+        this.userProfiles.set(data[0].publicAddress, data[0]);
+        this.setState({
+          profileIsOpen: true,
+          selectedUserProfile: data[0],
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   onSelectSubmit() {
@@ -103,65 +111,117 @@ class Select extends React.Component<SelectProps, SelectState> {
     const { users } = this.props;
     const { profileIsOpen, selectedRecipients } = this.state;
 
-    let recipientList = selectedRecipients.map((r, k) => (
-      <Card.Header className="d-flex justify-content-between recipient-entry">
-        <div className="flex-fill recipient-list-body">{r.name}</div>
-        <Button
-          variant="primary"
-          className="flex-shrink-1 float-right"
-          onClick={() => this.openProfileModal(r.publicAddress)}
-        >
-          View
-        </Button>
-      </Card.Header>
-    ));
+    const selectRecipients = (
+      <Fragment>
+        <InputGroup className="border-radius mb-0">
+          <div className="multiple-typeahead recipient-typeahead">
+            <Typeahead
+              id="select-recipients-typeahead"
+              // minLength={2}
+              multiple
+              labelKey="name"
+              filterBy={["name", "publicAddress"]}
+              options={users}
+              placeholder="Select Recipients"
+              paginate={true}
+              selected={selectedRecipients}
+              onChange={(selected) => {
+                console.log(selected);
+                this.setState({
+                  selectedRecipients: selected,
+                });
+              }}
+              renderMenuItemChildren={
+                (option) =>
+                  `${option.name} (${option.publicAddress.slice(0, 6)} . . . )` // TODO: add padding with service
+              }
+            />
+          </div>
+        </InputGroup>
+      </Fragment>
+    );
+
+    let recipientsList = [];
+    for (let i = 0; i < selectedRecipients.length; i += 3) {
+      recipientsList.push(
+        <Row>
+          <Col>
+            <div className="d-flex justify-content-between recipient-entry">
+              <div
+                className="flex-fill body-text"
+                onClick={() =>
+                  this.openProfileModal(selectedRecipients[i].publicAddress)
+                }
+              >
+                {selectedRecipients[i].name}
+              </div>
+            </div>
+          </Col>
+          {i + 1 < selectedRecipients.length && (
+            <Col>
+              <div className="d-flex justify-content-between recipient-entry">
+                <div
+                  className="flex-fill body-text"
+                  onClick={() =>
+                    this.openProfileModal(
+                      selectedRecipients[i + 1].publicAddress
+                    )
+                  }
+                >
+                  {selectedRecipients[i + 1].name}
+                </div>
+              </div>
+            </Col>
+          )}
+
+          {i + 1 >= selectedRecipients.length && (
+            <Col>
+              <Card.Header className="d-flex justify-content-between recipient-placeholder"></Card.Header>
+            </Col>
+          )}
+
+          {i + 2 < selectedRecipients.length && (
+            <Col>
+              <div className="d-flex justify-content-between recipient-entry">
+                <div
+                  className="flex-fill body-text"
+                  onClick={() =>
+                    this.openProfileModal(
+                      selectedRecipients[i + 2].publicAddress
+                    )
+                  }
+                >
+                  {selectedRecipients[i + 2].name}
+                </div>
+              </div>
+            </Col>
+          )}
+
+          {i + 2 >= selectedRecipients.length && (
+            <Col>
+              <Card.Header className="d-flex justify-content-between recipient-placeholder"></Card.Header>
+            </Col>
+          )}
+        </Row>
+      );
+    }
 
     return (
       <div>
-        <Fragment>
-          <InputGroup className="border-radius mb-0">
-            <div className="multiple-typeahead recipient-typeahead">
-              <Typeahead
-                id="select-recipients"
-                // minLength={2}
-                multiple
-                labelKey="name"
-                filterBy={["name", "publicAddress"]}
-                options={users}
-                placeholder="Select Recipients"
-                paginate={true}
-                selected={this.state.selectedRecipients}
-                onChange={(selected) => {
-                  console.log(selected);
-                  this.setState({
-                    selectedRecipients: selected,
-                  });
-                }}
-                renderMenuItemChildren={
-                  (option) => `${option.name} (${option.publicAddress.slice(0, 6)} . . . )` // TODO: add padding with service
-                }
-              />
-            </div>
-          </InputGroup>
-        </Fragment>
-        {/* {selectedRecipients.length !== 0 &&
-          selectedRecipients.length % 2 === 1 && (
-            <div className="mt-4 recipient-display">
-              {recipientList}
-              <div className="d-flex justify-content-between recipient-placeholder"></div>
-            </div>
-          )} */}
-
+        <div className="mb-3">{selectRecipients}</div>
         {selectedRecipients.length !== 0 && (
-          <div className="mt-4 recipient-display">{recipientList}</div>
+          <Col className="recipient-display mb-3">{recipientsList}</Col>
         )}
 
-        <div className="d-flex mt-4 border-radius">
+        <div className="d-flex border-radius button-blur">
+          <div className="flex-fill"></div>
           {selectedRecipients.length !== 0 && (
             <Button
-              variant="primary"
-              className="flex-shrink-1"
-              onClick={() => this.onSelectSubmit()}
+              variant="outline-light"
+              className="flex-shrink-1 float-right"
+              onClick={() => {
+                this.props.onSubmit(selectedRecipients);
+              }}
             >
               Select
             </Button>
@@ -176,11 +236,13 @@ class Select extends React.Component<SelectProps, SelectState> {
             >
               <span className="d-inline-block">
                 <Button
-                  variant="primary"
-                  className="flex-shrink-1"
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right"
                   disabled
                   style={{ pointerEvents: "none" }}
-                  onClick={() => this.onSelectSubmit()}
+                  onClick={() => {
+                    this.props.onSubmit(selectedRecipients);
+                  }}
                 >
                   Select
                 </Button>
@@ -188,8 +250,8 @@ class Select extends React.Component<SelectProps, SelectState> {
             </OverlayTrigger>
           )}
           <Button
-            variant="primary"
-            className="flex-shrink-1 ml-2"
+            variant="outline-light"
+            className="flex-shrink-1 ml-3"
             onClick={() => {
               this.setState({
                 selectedRecipients: this.props.previouslySelectedRecipients,
@@ -198,10 +260,10 @@ class Select extends React.Component<SelectProps, SelectState> {
           >
             Reset
           </Button>
-          <div className="flex-fill"></div>
+
           <Button
-            variant="primary"
-            className="flex-shrink-1 float-right ml-2"
+            variant="outline-light"
+            className="flex-shrink-1 float-right ml-3"
             onClick={() => {
               this.props.onClose();
             }}
@@ -209,6 +271,7 @@ class Select extends React.Component<SelectProps, SelectState> {
             Close
           </Button>
         </div>
+
         <Modal
           id="profile-modal"
           show={profileIsOpen}

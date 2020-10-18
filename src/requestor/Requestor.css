@@ -5,6 +5,10 @@
   text-align: center;
 }
 
+.requestor-select-writer {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
 h1,
 h2,
 h3,
@@ -21,7 +25,6 @@ h6 {
 .left-float-right-button {
   margin-left: 10px;
   float: right;
-  /* margin-bottom: 10px; */
 }
 
 .full-width {
@@ -39,7 +42,7 @@ h6 {
 }
 
 .opacity-0 {
-  background-color: rgba(51, 170, 51, 0) !important;
+  background-color: rgba(0, 0, 0, 0) !important;
   border: none;
 }
 
@@ -52,12 +55,11 @@ h6 {
   border-bottom: 0px solid rgba(0, 0, 0, 0) !important;
 }
 
-.acc-body {
+.body-text {
   padding: 8px 12.5px;
 }
 
 .button-blur button {
-  /* border: 5px; */
   border-color: white;
 }
 
@@ -73,7 +75,6 @@ h6 {
 
 .rbt-input-multi.form-control.rbt-input {
   height: auto;
-  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .single-typeahead .rbt-input-wrapper {
@@ -84,27 +85,20 @@ h6 {
 .single-typeahead .rbt-token.rbt-token-removeable {
   padding-left: 7.5px;
   margin-bottom: 5px;
-  background-color: rgba(32, 158, 145, 0.3);
-  border-radius: 3px;
-}
-
-.multiple-typeahead .rbt-input-wrapper {
-  overflow: auto;
-  max-height: 125px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.multiple-typeahead .rbt-token.rbt-token-removeable {
-  padding-left: 7.5px;
-  margin-right: 5px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  background-color: rgba(32, 158, 145, 0.3);
+  background-color: rgba(32, 158, 145, 0.2);
   border-radius: 3px;
 }
 
 button.close.rbt-close.rbt-token-remove-button {
   margin-left: 5px;
   margin-right: 5px;
+}
+
+.dropdown-menu {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.requestor-letters {
+  margin-bottom: 10px;
+  margin-top: 20px;
 }

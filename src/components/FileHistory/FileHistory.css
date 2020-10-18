@@ -1,3 +1,39 @@
 .recipient-body {
   margin-top: 8px;
 }
+
+.history-placeholder {
+  height: 32px;
+  margin-bottom: 10px;
+}
+
+.history-collapse-button {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.history-collapse-button:hover {
+  background-color: RGBA(0, 0, 0, 0.2);
+}
+
+.history-collapse-button:active {
+  background-color: rgba(32, 158, 145, 0.2);
+}
+
+.history-entry {
+  background-color: RGBA(0, 0, 0, 0.1);
+  height: 32px;
+}
+
+.history-entry:hover {
+  background-color: RGBA(0, 0, 0, 0.2);
+}
+
+.history-entry:active {
+  background-color: rgba(32, 158, 145, 0.2);
+}
+
+.history-display {
+  max-height: 126px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

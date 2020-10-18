@@ -8,6 +8,9 @@ import {
   OverlayTrigger,
   Tooltip,
   Spinner,
+  Row,
+  Col,
+  Container,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { Fragment } from "react";
@@ -24,7 +27,9 @@ import FileView from "../components/FileView";
 import FileHistory from "../components/FileHistory";
 import Profile from "../components/Profile";
 import Select from "../components/Select";
+import LetterDisplay from "../LetterDisplay";
 import "./Requestor.css";
+import CacheService from "../services/CacheService";
 
 interface RequestorProps {
   user: UserAuth;
@@ -34,26 +39,33 @@ interface RequestorState {
   users: User[];
   letters: LetterDetails[];
   numRecipients: Number[];
-  history: LetterHistory[];
-  letterKey: number;
   loadingLetters: boolean;
-  requestNew: boolean;
+  loadingSelect: boolean;
   selectIsOpen: boolean;
-  profileIsOpen: boolean;
-  historyIsOpen: boolean;
-  selectedUserProfile?: UserProfile;
-  requestedWriter: User[];
-  previouslySelectedRecipients: User[];
-  selectedLetterKey: number;
-  selectedLetterId: string;
+  selectedWriter: User[];
+  selectedRecipients: User[];
 }
 
 class Requestor extends React.Component<RequestorProps, RequestorState> {
-  private viewModal = React.createRef<FileView>();
+  private writerTypeahead = React.createRef<Typeahead<User>>();
+
+  constructor(props: RequestorProps) {
+    super(props);
+    this.state = {
+      users: [],
+      letters: [],
+      numRecipients: [],
+      loadingLetters: true,
+      loadingSelect: false,
+      selectIsOpen: false,
+      selectedWriter: [],
+      selectedRecipients: [],
+    };
+  }
 
   componentWillMount() {
     // api call to get users and letters
-
+    // TODO: move users fetch to parent component
     const userFetchUrl = `/api/v1/users`;
     const userInit: RequestInit = {
       method: "POST",
@@ -117,7 +129,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         response
           .json()
           .then((body: ResponseBody) => {
-            const data: { letters: LetterDetails[], numRecipients: Number[]} = body.data;
+            const data: { letters: LetterDetails[]; numRecipients: Number[] } =
+              body.data;
             console.log(response);
             console.log(body.data);
             if (data) {
@@ -139,352 +152,86 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       });
   }
 
-  constructor(props: RequestorProps) {
-    super(props);
-    this.state = {
-      users: [],
-      letters: [],
-      numRecipients: [],
-      history: [],
-      letterKey: -1,
-      loadingLetters: true,
-      requestNew: true,
-      selectIsOpen: false,
-      profileIsOpen: false,
-      historyIsOpen: false,
-      requestedWriter: [],
-      previouslySelectedRecipients: [],
-      selectedLetterKey: -1,
-      selectedLetterId: "",
-    };
-  }
-
-  closeSelectModal() {
+  async closeSelectModal() {
     console.log("closing select modal");
-    this.setState({ selectIsOpen: false });
+    this.setState({ selectIsOpen: false, selectedRecipients: [] });
   }
 
-  openSelectModal() {
+  async openSelectModal() {
     console.log("opening select modal");
     this.setState({
-      previouslySelectedRecipients: [],
       selectIsOpen: true,
     });
   }
 
-  async onRequestSubmit(requestedRecipients: User[]) {
-    console.log("on request submit");
-    console.log(requestedRecipients);
+  async onSelectSubmit() {
+    console.log("on select submit");
 
-    // TODO: fetch backend to create new request
+    // TODO: fetch backend to create new request with indicated list of recipients
+
     this.setState({
       selectIsOpen: false,
     });
-  }
-
-  async onSendSubmit(requestedRecipients: User[]) {
-    console.log("on send submit");
-
-    // TODO: fetch backend to update recipients list (more complex sql)
-    this.setState({
-      selectIsOpen: false,
-    });
-  }
-
-  async onSendClick(letterId: string, letterWriter: User) {
-    console.log("on send click");
-    // fetch backend to get recipients list (who the letter has not been sent to)
-    const fetchUrl = `/api/letters/${letterId}/`;
-    const previousSelectedRecipients = await this.retrieveRecipientsFromServer();
-    this.setState({
-      previouslySelectedRecipients: previousSelectedRecipients,
-      requestedWriter: [letterWriter],
-      selectIsOpen: true,
-    });
-  }
-
-  async retrieveRecipientsFromServer(): Promise<User[]> {
-    return [
-      {
-        name: "Peanut Butter",
-        publicAddress: "0xweojsdkfojo1291029i31092kofjdsd",
-      },
-    ];
-  }
-
-  closeProfileModal() {
-    console.log("closing profile modal");
-    this.setState({ profileIsOpen: false });
-  }
-
-  openProfileModal(publicAddress: string) {
-    console.log("opening profile modal");
-    const fetchUrl = `/api/v1/users/${publicAddress}/profile`;
-    this.retrieveProfileFromServer(fetchUrl);
-  }
-
-  retrieveProfileFromServer(fetchUrl: string) {
-    const init: RequestInit = {
-      method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        auth: {
-          jwtToken: this.props.user.jwtToken,
-          publicAddress: this.props.user.publicAddress,
-        },
-        data: {},
-      }),
-    };
-
-    // get user profile from server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
-      .then((response) => {
-        response
-          .json()
-          .then((body: ResponseBody) => {
-            const data: UserProfile[] = body.data;
-            console.log(response);
-            console.log(data);
-            if (data && data.length !== 0) {
-              this.setState({
-                selectedUserProfile: data[0],
-                profileIsOpen: true,
-              });
-            }
-          })
-          .catch((e: Error) => {
-            console.log(e);
-          });
-      })
-      .catch((e: Error) => {
-        console.log(e);
-      });
-  }
-
-  closeHistoryModal() {
-    console.log("closing history modal");
-    this.setState({ historyIsOpen: false });
-  }
-
-  openHistoryModal(key: number) {
-    console.log("opening history modal");
-    const letterId = this.state.letters[key].letterId;
-    this.setState({
-      selectedLetterKey: key,
-      selectedLetterId: letterId,
-    });
-    // const fetchUrl = `/api/v1/users/${this.props.user.publicAddress}/letters/${letterId}/history`;
-    const fetchUrl = `/api/v1/letters/${letterId}/history`;
-
-    this.retrieveHistoryFromServer(fetchUrl);
-  }
-
-  retrieveHistoryFromServer(fetchUrl: string) {
-    const init: RequestInit = {
-      method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        auth: {
-          jwtToken: this.props.user.jwtToken,
-          publicAddress: this.props.user.publicAddress,
-        },
-        data: {},
-      }),
-    };
-
-    // get user profile from server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
-      .then((response) => {
-        response
-          .json()
-          .then((body: ResponseBody) => {
-            const data: LetterHistory[] = body.data;
-            console.log(response);
-            console.log(data);
-            if (data) {
-              this.setState({
-                history: data,
-                historyIsOpen: true,
-              });
-            } else {
-              console.log("fetch for letterHistory failed");
-            }
-          })
-          .catch((e: Error) => {
-            console.log(e);
-          });
-      })
-      .catch((e: Error) => {
-        console.log(e);
-      });
-  }
-
-  getRequestor() {
-    return this.state.letters[this.state.selectedLetterKey]?.letterRequestor;
-  }
-
-  getWriter() {
-    return this.state.letters[this.state.selectedLetterKey]?.letterWriter;
   }
 
   render() {
     const user = this.props.user;
     const {
+      users,
       letters,
       numRecipients,
-      history,
       loadingLetters,
-      requestNew,
       selectIsOpen,
-      profileIsOpen,
-      historyIsOpen,
-      requestedWriter,
+      selectedWriter,
     } = this.state;
-
-    const lettersList = letters.map((l, k) => (
-      <Card className="full-width opacity-0">
-        <Accordion.Toggle
-          as={Card.Header}
-          className="d-flex"
-          id={k.toString}
-          eventKey={k.toString()}
-        >
-          <div className="flex-fill button-blur">
-            <span className="mr-3">From:</span>
-            <Button
-              variant="outline-light"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.openProfileModal(l.letterWriter.publicAddress);
-              }}
-            >
-              {l.letterWriter?.name}
-            </Button>
-          </div>
-          <div className="button-blur">
-            <Button
-              disabled={numRecipients[k] === 0}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (numRecipients[k] !== 0) {
-                  this.openHistoryModal(k);
-                }
-              }}
-            >
-              History
-            </Button>
-            <Button
-              // TODO: add Tooltip
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.onSendClick(l.letterId, l.letterWriter);
-              }}
-            >
-              {l.uploadedAt ? "Send" : "Edit"}
-            </Button>
-            {/* {!l.uploadedAt && (
-              <div className="display-text flex-shrink-1 float-right">
-                Pending
-              </div>
-            )} */}
-          </div>
-        </Accordion.Toggle>
-        <Accordion.Collapse as={Card.Body} eventKey={k.toString()}>
-          {/* <Card.Body className="">({l.letterId}) {l.writer.name} ({l.writer.publicAddress})</Card.Body> */}
-          {/*<div className="acc-body button-blur">
-            <a>
-              From: 
-            </a>
-            <Button
-              variant="outline-light"
-              className="ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.openProfileModal(l.writer.publicAddress);
-              }}
-            >
-              {l.writer.name}
-            </Button>
-          </div>*/}
-          <div className="acc-body display-text d-flex text-white-50">
-            <div className="flex-fill">
-              Requested: {l.requestedAt?.toString()}
-            </div>
-            {l.uploadedAt && (
-              <div className=" flex-shrink-1 float-right">
-                Uploaded: {l.uploadedAt?.toString()}
-              </div>
-            )}
-            {!l.uploadedAt && (
-              <div className=" flex-shrink-1 float-right">Not Uploaded</div>
-            )}
-          </div>
-          {/* <Button
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-2"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.openProfileModal(l.writer.publicAddress);
-              }}
-            >
-              View: {l.writer.name}
-            </Button> */}
-        </Accordion.Collapse>
-      </Card>
-    ));
 
     // const options = range(0, 1000).map((o) => `Item ${o}`);
     const options = this.state.users;
 
-    const requestWriter = (
+    const selectWriter = (
       <Fragment>
         <InputGroup className="d-flex justify-content-between border-radius button-blur mb-0">
           <div
             className="flex-fill mr-4 single-typeahead"
             onClick={() => {
-              this.setState({ requestedWriter: [] });
+              this.setState({ selectedWriter: [] });
             }}
           >
             <Typeahead
-              id="request-writer"
+              id="select-writer-typeahead"
               // minLength={2}
               labelKey="name"
               filterBy={["name", "publicAddress"]}
               options={options}
-              placeholder="Select a User"
+              placeholder="Select a Writer"
               paginate={true}
-              selected={this.state.requestedWriter}
+              selected={this.state.selectedWriter}
               onChange={(selected) => {
                 console.log("selected", selected);
                 this.setState({
-                  requestedWriter: selected,
+                  selectedWriter: selected,
                 });
               }}
               renderMenuItemChildren={
-                (option) => `${option.name} (${option.publicAddress.slice(0, 6)} . . . )` // TODO: add padding with service
+                (option) =>
+                  `${option.name} (${option.publicAddress.slice(0, 6)} . . . )` // TODO: add padding with service
               }
+              ref={this.writerTypeahead}
             />
           </div>
-          {requestNew && requestedWriter.length !== 0 && (
+
+          {selectedWriter.length !== 0 && (
             <Button
               variant="outline-light"
               className="flex-shrink-1"
-              onClick={() => this.openSelectModal()}
+              onClick={() => {
+                this.openSelectModal();
+              }}
             >
-              Request
+              Select
             </Button>
           )}
-          {requestNew && requestedWriter.length === 0 && (
+          {selectedWriter.length === 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id="tooltip-disabled" placement="left">
@@ -498,9 +245,12 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                   className="flex-shrink-1"
                   disabled
                   style={{ pointerEvents: "none" }}
-                  onClick={() => this.openSelectModal()}
+                  onClick={() => {
+                    this.setState({});
+                    this.openSelectModal();
+                  }}
                 >
-                  Request
+                  Select
                 </Button>
               </span>
             </OverlayTrigger>
@@ -509,129 +259,59 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       </Fragment>
     );
 
+    const lettersList = letters.map((l, k) => (
+      <LetterDisplay
+        user={user}
+        letter={l}
+        numRecipients={numRecipients[k]}
+        letterKey={k}
+        users={users}
+      />
+    ));
+
     return (
-      <div className="requestor">
-        <Modal
-          id="select-modal"
-          show={selectIsOpen}
-          onHide={this.closeSelectModal.bind(this)}
-          backdrop="static"
-          animation={false}
-          className="modal"
-          scrollable={false}
-          // size="sm"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>
-              <span>From: {requestedWriter[0]?.name}</span>
-            </Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <Select
-              user={this.props.user}
-              previouslySelectedRecipients={
-                this.state.previouslySelectedRecipients
-              }
-              onClose={this.closeSelectModal.bind(this)}
-              onSubmit={
-                requestNew
-                  ? this.onRequestSubmit.bind(this)
-                  : this.onSendSubmit.bind(this)
-              }
-              users={this.state.users}
-            ></Select>
-          </Modal.Body>
-        </Modal>
-
-        <Modal
-          id="profile-modal"
-          show={profileIsOpen}
-          onHide={this.closeProfileModal.bind(this)}
-          // backdrop="static"
-          animation={false}
-          className="modal"
-          scrollable={false}
-          // size="sm"
-
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>{this.state.selectedUserProfile?.name}</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            {this.state.selectedUserProfile && (
-              <Profile
-                user={this.state.selectedUserProfile}
-                onClose={this.closeProfileModal.bind(this)}
-              />
-            )}
-          </Modal.Body>
-        </Modal>
-
-        <Modal
-          id="history-modal"
-          show={historyIsOpen}
-          onHide={this.closeHistoryModal.bind(this)}
-          // backdrop="static"
-          animation={false}
-          className="modal"
-          scrollable={false}
-          size="sm"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>From: {this.getWriter()?.name}</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <FileHistory
-              user={user}
-              history={history}
-              onClose={this.closeHistoryModal.bind(this)}
-            ></FileHistory>
-          </Modal.Body>
-        </Modal>
-
-        <div className="requestor-header">
-          {/* <h1> Requestor Page </h1> */}
-          <h1 className="mb-3">
-            Requests
-          </h1>
-        </div>
-        {/* <hr></hr> */}
-
-        <div className="requestor-request">
-          {!loadingLetters && (
-            <div className="mb-3">
-              {/* <h3> Request </h3> */}
-              <Card.Header>{requestWriter}</Card.Header>
-              {/* <hr></hr> */}
+      <div>
+        {!loadingLetters && (
+          <div className="requestor">
+            <div className="requestor-header">
+              <h3 className="mb-3">New Request</h3>
             </div>
-          )}
-        </div>
 
-        <div className="letters">
-          {loadingLetters && (
-            <div className="d-flex justify-content-center mb-4">
-              <Spinner
-                className="float-right"
-                animation="border"
-                variant="secondary"
-              />
+            <div className="requestor-select">
+              <Card.Header className="requestor-select-writer">
+                <div>{selectWriter}</div>
+              </Card.Header>
+              <Card.Header>
+                <>
+                  {selectIsOpen && selectedWriter !== null && (
+                    <Select
+                      user={this.props.user}
+                      previouslySelectedRecipients={[]}
+                      onClose={this.closeSelectModal.bind(this)}
+                      onSubmit={this.onSelectSubmit.bind(this)}
+                      users={this.state.users}
+                    ></Select>
+                  )}
+                </>
+              </Card.Header>
             </div>
-          )}
+            <div className="requestor-letters">
+              <div>
+                <h3> Requests </h3>
+                {lettersList}
+              </div>
+            </div>
+            <div className="requestor-footer">
+              <span> Product of Team Gas</span>
+            </div>
+          </div>
+        )}
 
-          {!loadingLetters && (
-            <div className="mb-4">
-              <h3> Letters </h3>
-              <Accordion>{lettersList}</Accordion>
-            </div>
-          )}
-        </div>
-        {/* <hr></hr> */}
-        <div className="requestor-footer">
-          <span> Product of Team Gas</span>
-        </div>
+        {loadingLetters && (
+          <div className="d-flex justify-content-center absolute-center">
+            <Spinner className="" animation="border" variant="secondary" />
+          </div>
+        )}
       </div>
     );
   }

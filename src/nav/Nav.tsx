@@ -37,7 +37,6 @@ class Nav extends React.Component<NavProps, NavState> {
           }}
           href={brandLink}
         >
-          {" "}
           ETC Reference Letter dApp
         </Navbar.Brand>
         <Navbar.Toggle />

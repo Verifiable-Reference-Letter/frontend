@@ -13,7 +13,7 @@ import LoginPage from "./login/Login";
 import DashboardPage from "./dashboard/Dashboard";
 
 import UserAuth from "./common/UserAuth.interface";
-
+import "./App.css";
 import * as ROUTES from "./routes";
 
 import Web3 from "web3";
@@ -137,8 +137,8 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={this.state.loggedIn}
         />
-        {this.state.loggedIn ? <Redirect to="/dashboard" /> : null}
-        <div>
+        {this.state.loggedIn ? <Redirect to={ROUTES.REQUESTOR} /> : null}
+        <div className="application-body">
           <Route exact path={ROUTES.HOME} render={() => home} />
           <Route exact path={ROUTES.LOGIN} render={() => login} />
           <Route exact path={ROUTES.DASHBOARD} render={() => dashboard} />

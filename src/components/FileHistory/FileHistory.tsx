@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button, Modal } from "react-bootstrap";
+import { Card, Collapse, Col, Row, Button, Modal } from "react-bootstrap";
 import "./FileHistory.css";
 import LetterHistory from "../../common/LetterHistory.interface";
 import UserProfile from "../../common/UserProfile.interface";
@@ -15,37 +15,48 @@ interface FileHistoryProps {
   onClose: () => void;
 }
 interface FileHistoryState {
+  collapseIsOpen: boolean[];
   profileIsOpen: boolean;
-  selectedUserKey: number;
-  selectedUserName: string;
   selectedUserProfile?: UserProfile;
 }
 
 class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
-  componentWillMount() {}
+  private userProfiles: Map<string, UserProfile>;
 
   constructor(props: FileHistoryProps) {
     super(props);
+
+    let collapseIsOpen = [];
+    for (let i = 0; i < this.props.history.length; i++) {
+      collapseIsOpen.push(false);
+    }
+
     this.state = {
+      collapseIsOpen: collapseIsOpen,
       profileIsOpen: false,
-      selectedUserKey: -1,
-      selectedUserName: "",
     };
+
+    this.userProfiles = new Map<string, UserProfile>();
   }
 
-  openProfileModal(key: number) {
-    console.log("opening view modal");
-    const recipient: User = this.getRecipientByKey(key);
-    this.setState({ selectedUserKey: key, selectedUserName: recipient.name });
-    const fetchUrl = `/api/v1/users/${recipient.publicAddress}/profile`;
-    this.retrieveProfileFromServer(fetchUrl);
+  async closeProfileModal() {
+    console.log("closing profile modal");
+    this.setState({ profileIsOpen: false });
   }
 
-  getRecipientByKey(key: number) {
-    return this.props.history[key].letterRecipient;
+  async openProfileModal(publicAddress: string) {
+    console.log("opening profile modal");
+    const userProfile = this.userProfiles.get(publicAddress);
+    console.log(userProfile);
+    if (userProfile === undefined) {
+      const fetchUrl = `/api/v1/users/${publicAddress}/profile`;
+      this.retrieveProfileFromServer(fetchUrl);
+    } else {
+      this.setState({ selectedUserProfile: userProfile, profileIsOpen: true });
+    }
   }
 
-  retrieveProfileFromServer(fetchUrl: string) {
+  async retrieveProfileFromServer(fetchUrl: string) {
     const init: RequestInit = {
       method: "POST",
       headers: {
@@ -62,78 +73,137 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
     };
 
     // get user profile from server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
-      .then((response) => {
-        response
-          .json()
-          .then((body: ResponseBody) => {
-            const data: UserProfile[] = body.data;
-            console.log(response);
-            if (data && data.length !== 0) {
-              this.setState({
-                selectedUserProfile: data[0],
-                profileIsOpen: true,
-              });
-            }
-          })
-          .catch((e: Error) => {
-            console.log(e);
-          });
-      })
-      .catch((e: Error) => {
-        console.log(e);
-      });
-  }
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      let body = await response.json();
 
-  closeProfileModal() {
-    console.log("closing view modal");
-    this.setState({ profileIsOpen: false });
+      const data: UserProfile[] = body.data;
+      console.log(response);
+      console.log(data);
+      if (data && data.length !== 0) {
+        this.userProfiles.set(data[0].publicAddress, data[0]);
+        this.setState({
+          profileIsOpen: true,
+          selectedUserProfile: data[0],
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   render() {
     const { history } = this.props;
     const { profileIsOpen } = this.state;
-    const historyList = history.map((l, k) => (
-      <Card.Header className="d-flex justify-content-between recipient-entry" key={k}>
-          <div className="flex-fill recipient-body">Sent to: {l.letterRecipient.name}</div>
-          <Button
-            variant="primary"
-            className="flex-shrink-1 float-right"
-            onClick={() => {
-              this.openProfileModal(k);
-            }}
-          >
-            View
-          </Button>
-      </Card.Header>
-    ));
+
+    let historyList = [];
+    for (let i = 0; i < history.length; i += 2) {
+      historyList.push(
+        <Row>
+          <Col>
+            <Card className="full-width opacity-0 mt-3">
+              <div className="d-flex justify-content-between">
+                <Card.Header
+                  className="flex-fill history-entry"
+                  onClick={() => {
+                    this.openProfileModal(
+                      history[i].letterRecipient.publicAddress
+                    );
+                  }}
+                >
+                  {history[i].letterRecipient.name}
+                </Card.Header>
+                <Card.Header
+                  className="flex-shrink-1 history-collapse-button"
+                  onClick={() => {
+                    let collapseIsOpen = [...this.state.collapseIsOpen];
+                    collapseIsOpen[i] = !collapseIsOpen[i];
+                    this.setState({ collapseIsOpen: collapseIsOpen });
+                  }}
+                ></Card.Header>
+              </div>
+            </Card>
+            <Collapse in={this.state.collapseIsOpen[i]}>
+              <div className="body-text text-white-50">
+                Sent At: {history[i].sentAt}
+              </div>
+            </Collapse>
+          </Col>
+          {i + 1 < history.length && (
+            <Col>
+              <Card className="full-width opacity-0 mt-3">
+                <div className="d-flex justify-content-between">
+                  <Card.Header
+                    className="flex-fill history-entry"
+                    onClick={() => {
+                      this.openProfileModal(
+                        history[i + 1].letterRecipient.publicAddress
+                      );
+                    }}
+                  >
+                    {history[i + 1].letterRecipient.name}
+                  </Card.Header>
+                  <Card.Header
+                    className="flex-shrink-1 history-collapse-button"
+                    onClick={() => {
+                      let collapseIsOpen = [...this.state.collapseIsOpen];
+                      collapseIsOpen[i + 1] = !collapseIsOpen[i + 1];
+                      this.setState({ collapseIsOpen: collapseIsOpen });
+                    }}
+                  ></Card.Header>
+                </div>
+              </Card>
+              <Collapse in={this.state.collapseIsOpen[i + 1]}>
+                <div className="body-text text-white-50">
+                  Sent At: {history[i + 1].sentAt}
+                </div>
+              </Collapse>
+            </Col>
+          )}
+
+          {i + 1 >= history.length && (
+            <Col>
+              <Card.Header className="d-flex justify-content-between history-placeholder"></Card.Header>
+            </Col>
+          )}
+        </Row>
+      );
+    }
 
     return (
-      <div>
-        <div>{historyList}</div>
-        <Button
-          className="mt-3"
-          onClick={(e: any) => {
-            this.props.onClose();
-          }}
-        >
-          Close
-        </Button>
+      <div className="button-blur">
+        <Col>
+          <Row>
+            <Col className="history-display">{historyList}</Col>
+          </Row>
+          <Row className="justify-content-end">
+            <Button
+              className="mt-3 float-right"
+              variant="outline-light"
+              onClick={(e: any) => {
+                this.props.onClose();
+              }}
+            >
+              Close
+            </Button>
+          </Row>
+        </Col>
 
         <Modal
           id="profile-modal"
           show={profileIsOpen}
           onHide={this.closeProfileModal.bind(this)}
-          backdrop="static"
+          // backdrop="static"
           animation={false}
           className="modal"
           scrollable={false}
-          size="sm"
+          // size="sm"
         >
           <Modal.Header closeButton>
-            <Modal.Title>
-              User Profile: ({this.state.selectedUserName})
-            </Modal.Title>
+            <Modal.Title>{this.state.selectedUserProfile?.name}</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
