@@ -217,7 +217,7 @@ class Select extends React.Component<SelectProps, SelectState> {
           <Col className="recipient-display mb-3">{recipientsList}</Col>
         )}
 
-        <div className="d-flex border-radius button-blur">
+        <div className="d-flex border-radius button-blur mb-2">
           <div className="flex-fill"></div>
           {selectedRecipients.length !== 0 && (
             <Button

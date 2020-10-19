@@ -166,8 +166,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
 
           {i + 1 >= history.length && (
             <Col>
-            <Card className="full-width opacity-0 mt-3">
-            </Card>
+              <Card className="full-width opacity-0 mt-3"></Card>
               <Card.Header className="d-flex justify-content-between history-placeholder"></Card.Header>
             </Col>
           )}
@@ -177,49 +176,62 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
 
     return (
       <div className="button-blur">
-        <Col>
-          <Row className="justify-content-start">
-            <h5>History</h5>
-          </Row>
-          <Row>
-            <Col className="history-display">{historyList}</Col>
-          </Row>
-          <Row className="justify-content-end">
-            <Button
-              className="mt-3 float-right"
-              variant="outline-light"
-              onClick={(e: any) => {
-                this.props.onClose();
-              }}
+        {history.length === 0 && (
+          <Col>
+            <Row>
+            <h5 className="w-100 text-center">No History</h5>
+            </Row>
+          </Col>
+        )}
+        {history.length !== 0 && (
+          <>
+            <Col>
+              <Row>
+                <h5>History</h5>
+              </Row>
+              <Row>
+                <Col className="history-display">{historyList}</Col>
+              </Row>
+              <Row className="justify-content-end mb-2">
+                <Button
+                  className="mt-3 float-right"
+                  variant="outline-light"
+                  onClick={(e: any) => {
+                    this.props.onClose();
+                  }}
+                >
+                  Close
+                </Button>
+              </Row>
+            </Col>
+
+            <Modal
+              id="profile-modal"
+              show={profileIsOpen}
+              onHide={this.closeProfileModal.bind(this)}
+              // backdrop="static"
+              animation={false}
+              className="modal"
+              scrollable={false}
+              // size="sm"
             >
-              Close
-            </Button>
-          </Row>
-        </Col>
+              <Modal.Header closeButton>
+                <Modal.Title>
+                  {this.state.selectedUserProfile?.name}
+                </Modal.Title>
+              </Modal.Header>
 
-        <Modal
-          id="profile-modal"
-          show={profileIsOpen}
-          onHide={this.closeProfileModal.bind(this)}
-          // backdrop="static"
-          animation={false}
-          className="modal"
-          scrollable={false}
-          // size="sm"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>{this.state.selectedUserProfile?.name}</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            {this.state.selectedUserProfile && (
-              <Profile
-                user={this.state.selectedUserProfile}
-                onClose={this.closeProfileModal.bind(this)}
-              />
-            )}
-          </Modal.Body>
-        </Modal>
+              <Modal.Body>
+                {this.state.selectedUserProfile && (
+                  <Profile
+                    user={this.state.selectedUserProfile}
+                    onClose={this.closeProfileModal.bind(this)}
+                  />
+                )}
+              </Modal.Body>
+            </Modal>
+          </>
+        )}
       </div>
     );
   }

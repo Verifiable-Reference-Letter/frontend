@@ -292,9 +292,9 @@ class LetterDisplay extends React.Component<
       if (response.status === 400) {
         console.log(response.status);
         this.setState({
-          historyIsOpen: false,
+          // historyIsOpen: false,
           loadingHistory: false,
-          collapseIsOpen: this.state.selectIsOpen,
+          // collapseIsOpen: this.state.selectIsOpen,
         });
       } else {
         const body = await response.json();
@@ -310,18 +310,18 @@ class LetterDisplay extends React.Component<
         } else {
           console.log("fetch for letterHistory failed");
           this.setState({
-            historyIsOpen: false,
+            // historyIsOpen: false,
             loadingHistory: false,
-            collapseIsOpen: this.state.selectIsOpen,
+            // collapseIsOpen: this.state.selectIsOpen,
           });
         }
       }
     } catch (e) {
       console.log(e);
       this.setState({
-        historyIsOpen: false,
+        // historyIsOpen: false,
         loadingHistory: false,
-        collapseIsOpen: this.state.selectIsOpen,
+        // collapseIsOpen: this.state.selectIsOpen,
       });
     }
   }
