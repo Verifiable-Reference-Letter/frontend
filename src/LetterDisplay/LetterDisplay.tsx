@@ -85,6 +85,7 @@ class LetterDisplay extends React.Component<
     console.log("closing select modal");
     this.setState({
       selectIsOpen: false,
+      loadingSelect: false,
       collapseIsOpen: this.state.historyIsOpen,
     });
   }
@@ -92,15 +93,15 @@ class LetterDisplay extends React.Component<
   async openSelectModal() {
     console.log("on send click");
     // fetch backend to get recipients list (who the letter has not been sent to)
-    const fetchUrl = `/api/letters/${this.props.letter.letterId}/previousSelectedRecipients`;
+    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/unsentRecipients`;
 
-    if (this.state.previouslySelectedRecipients.length == 0) {
+    if (this.state.previouslySelectedRecipients.length === 0) {
       this.setState({
-        loadingSelect: false,
+        loadingSelect: true,
         collapseIsOpen: true,
         selectIsOpen: true,
       });
-      this.retrieveRecipientsFromServer();
+      this.retrieveRecipientsFromServer(fetchUrl);
     } else {
       this.setState({
         selectIsOpen: true,
@@ -109,22 +110,76 @@ class LetterDisplay extends React.Component<
     }
   }
 
-  async retrieveRecipientsFromServer() {
-    const previous = [
-      {
-        name: "Peanut Butter",
-        publicAddress: "0xweojsdkfojo1291029i31092kofjdsd",
+  async retrieveRecipientsFromServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
       },
-      {
-        name: "Jelly Legs",
-        publicAddress: "0xp12h9hg0shdo230rh0wefhwdbgk1b20",
-      },
-    ];
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
 
-    this.setState({
-      previouslySelectedRecipients: previous,
-      loadingSelect: false,
-    });
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      if (response.status === 400) {
+        console.log(response.status);
+        this.setState({
+          loadingSelect: false,
+          selectIsOpen: false,
+          collapseIsOpen: this.state.historyIsOpen,
+        });
+      } else {
+        let body = await response.json();
+
+        const data: User[] = body.data;
+        console.log(response);
+        console.log(data);
+        if (data && data.length !== 0) {
+          this.setState({
+            previouslySelectedRecipients: data,
+            loadingSelect: false,
+          });
+        } else {
+          this.setState({
+            loadingSelect: false,
+            selectIsOpen: false,
+            collapseIsOpen: this.state.historyIsOpen,
+          });
+        }
+      }
+    } catch (e) {
+      console.log(e);
+      this.setState({
+        loadingSelect: false,
+        selectIsOpen: false,
+        collapseIsOpen: this.state.historyIsOpen,
+      });
+    }
+
+    // const previous = [
+    //   {
+    //     name: "Peanut Butter",
+    //     publicAddress: "0xweojsdkfojo1291029i31092kofjdsd",
+    //   },
+    //   {
+    //     name: "Jelly Legs",
+    //     publicAddress: "0xp12h9hg0shdo230rh0wefhwdbgk1b20",
+    //   },
+    // ];
+    // this.setState({
+    //   previouslySelectedRecipients: previous,
+    //   loadingSelect: false,
+    // });
   }
 
   async closeProfileModal() {
@@ -187,6 +242,7 @@ class LetterDisplay extends React.Component<
     console.log("closing history modal");
     this.setState({
       historyIsOpen: false,
+      loadingHistory: false,
       collapseIsOpen: this.state.selectIsOpen,
     });
   }
@@ -233,21 +289,40 @@ class LetterDisplay extends React.Component<
         `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
         init
       );
-      const body = await response.json();
-
-      const data: LetterHistory[] = body.data;
-      console.log(response);
-      console.log(data);
-      if (data) {
+      if (response.status === 400) {
+        console.log(response.status);
         this.setState({
-          history: data,
+          historyIsOpen: false,
           loadingHistory: false,
+          collapseIsOpen: this.state.selectIsOpen,
         });
       } else {
-        console.log("fetch for letterHistory failed");
+        const body = await response.json();
+
+        const data: LetterHistory[] = body.data;
+        console.log(response);
+        console.log(data);
+        if (data) {
+          this.setState({
+            history: data,
+            loadingHistory: false,
+          });
+        } else {
+          console.log("fetch for letterHistory failed");
+          this.setState({
+            historyIsOpen: false,
+            loadingHistory: false,
+            collapseIsOpen: this.state.selectIsOpen,
+          });
+        }
       }
     } catch (e) {
       console.log(e);
+      this.setState({
+        historyIsOpen: false,
+        loadingHistory: false,
+        collapseIsOpen: this.state.selectIsOpen,
+      });
     }
   }
 
@@ -255,6 +330,7 @@ class LetterDisplay extends React.Component<
     const { user, letter, numRecipients, letterKey, users } = this.props;
     const {
       history,
+      loadingSelect,
       loadingHistory,
       selectIsOpen,
       profileIsOpen,
@@ -326,13 +402,23 @@ class LetterDisplay extends React.Component<
         </Card>
         <Collapse in={collapseIsOpen}>
           <div className="collapse-body-select">
-            {selectIsOpen && (
-              <div className="mb-5">
+            {loadingSelect && (
+              <div className="d-flex justify-content-center">
+                <Spinner
+                  className="mb-3"
+                  animation="border"
+                  variant="secondary"
+                />
+              </div>
+            )}
+            {!loadingSelect && selectIsOpen && (
+              <div>
                 <Select
                   user={this.props.user}
                   previouslySelectedRecipients={
                     this.state.previouslySelectedRecipients
                   }
+                  header="Select Recipients"
                   onClose={this.closeSelectModal.bind(this)}
                   onSubmit={this.onSelectSubmit.bind(this)}
                   users={this.props.users}
@@ -341,11 +427,15 @@ class LetterDisplay extends React.Component<
             )}
             {loadingHistory && (
               <div className="d-flex justify-content-center">
-                <Spinner className="" animation="border" variant="secondary" />
+                <Spinner
+                  className="mb-3"
+                  animation="border"
+                  variant="secondary"
+                />
               </div>
             )}
             {!loadingHistory && historyIsOpen && (
-              <div className="mb-5">
+              <div className="">
                 <FileHistory
                   user={user}
                   history={history}
@@ -353,6 +443,7 @@ class LetterDisplay extends React.Component<
                 ></FileHistory>
               </div>
             )}
+            {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}
             {!selectIsOpen && !historyIsOpen && (
               <div className="display-text d-flex text-white-50">
                 <div className="flex-fill">

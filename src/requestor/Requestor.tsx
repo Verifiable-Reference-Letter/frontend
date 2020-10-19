@@ -225,7 +225,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               variant="outline-light"
               className="flex-shrink-1"
               onClick={() => {
-                this.openSelectModal();
+                if (selectIsOpen) {
+                  this.closeSelectModal();
+                } else {
+                  this.openSelectModal();
+                }
               }}
             >
               Select
@@ -246,8 +250,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                   disabled
                   style={{ pointerEvents: "none" }}
                   onClick={() => {
-                    this.setState({});
-                    this.openSelectModal();
+                    if (selectIsOpen) {
+                      this.closeSelectModal();
+                    } else {
+                      this.openSelectModal();
+                    }
                   }}
                 >
                   Select
@@ -281,19 +288,18 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               <Card.Header className="requestor-select-writer">
                 <div>{selectWriter}</div>
               </Card.Header>
-              <Card.Header>
-                <>
-                  {selectIsOpen && selectedWriter !== null && (
-                    <Select
-                      user={this.props.user}
-                      previouslySelectedRecipients={[]}
-                      onClose={this.closeSelectModal.bind(this)}
-                      onSubmit={this.onSelectSubmit.bind(this)}
-                      users={this.state.users}
-                    ></Select>
-                  )}
-                </>
-              </Card.Header>
+              {selectIsOpen && selectedWriter !== null && (
+                <div className="collapse-body-select">
+                  <Select
+                    user={this.props.user}
+                    previouslySelectedRecipients={[]}
+                    header="Select Recipients"
+                    onClose={this.closeSelectModal.bind(this)}
+                    onSubmit={this.onSelectSubmit.bind(this)}
+                    users={this.state.users}
+                  ></Select>
+                </div>
+              )}
             </div>
             <div className="requestor-letters">
               <div>

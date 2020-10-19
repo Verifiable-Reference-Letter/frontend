@@ -102,3 +102,7 @@ button.close.rbt-close.rbt-token-remove-button {
   margin-bottom: 10px;
   margin-top: 20px;
 }
+
+.form-control, .form-control:focus {
+  background-color: rgba(0, 0, 0, .15) !important;
+}

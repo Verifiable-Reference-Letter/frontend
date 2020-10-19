@@ -25,6 +25,7 @@ interface SelectProps {
   user: UserAuth;
   users: User[];
   previouslySelectedRecipients: User[];
+  header: string;
   onSubmit: (selectedRecipients: User[]) => void;
   onClose: () => void;
 }
@@ -108,7 +109,7 @@ class Select extends React.Component<SelectProps, SelectState> {
   }
 
   render() {
-    const { users } = this.props;
+    const { users, header } = this.props;
     const { profileIsOpen, selectedRecipients } = this.state;
 
     const selectRecipients = (
@@ -208,6 +209,9 @@ class Select extends React.Component<SelectProps, SelectState> {
 
     return (
       <div>
+        <Row>
+          <h5>{header}</h5>
+        </Row>
         <div className="mb-3">{selectRecipients}</div>
         {selectedRecipients.length !== 0 && (
           <Col className="recipient-display mb-3">{recipientsList}</Col>

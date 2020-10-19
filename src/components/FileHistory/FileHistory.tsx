@@ -166,6 +166,8 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
 
           {i + 1 >= history.length && (
             <Col>
+            <Card className="full-width opacity-0 mt-3">
+            </Card>
               <Card.Header className="d-flex justify-content-between history-placeholder"></Card.Header>
             </Col>
           )}
@@ -176,6 +178,9 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
     return (
       <div className="button-blur">
         <Col>
+          <Row className="justify-content-start">
+            <h5>History</h5>
+          </Row>
           <Row>
             <Col className="history-display">{historyList}</Col>
           </Row>
