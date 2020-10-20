@@ -123,7 +123,7 @@ class Select extends React.Component<SelectProps, SelectState> {
               labelKey="name"
               filterBy={["name", "publicAddress"]}
               options={users}
-              placeholder="Select Recipients"
+              // placeholder="Select Recipients" // can't change color to white
               paginate={true}
               selected={selectedRecipients}
               onChange={(selected) => {

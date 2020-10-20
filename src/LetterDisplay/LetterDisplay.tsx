@@ -394,13 +394,13 @@ class LetterDisplay extends React.Component<
     return (
       <div>
         <Card className="full-width opacity-0">
-          <Card.Header className="d-flex justify-content-between button-blur letter-entry">
+          <Card.Header className="d-flex justify-content-between button-blur letter-entry" onClick={() => this.setState({collapseIsOpen: !collapseIsOpen})}>
             <div className="flex-fill">
               <span className="mr-3">From:</span>
               <Button
                 variant="outline-light"
                 onClick={(e: any) => {
-                  // e.stopPropagation();
+                  e.stopPropagation();
                   this.openProfileModal(letter.letterWriter.publicAddress);
                 }}
               >
@@ -412,6 +412,7 @@ class LetterDisplay extends React.Component<
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
+                e.stopPropagation();
                 if (selectIsOpen) {
                   this.closeSelectModal();
                 } else {
@@ -419,7 +420,7 @@ class LetterDisplay extends React.Component<
                 }
               }}
             >
-              Send
+              Edit
               {/* {letter.uploadedAt ? "Send" : "Edit"} */}
             </Button>
             <Button
@@ -427,6 +428,7 @@ class LetterDisplay extends React.Component<
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
+                e.stopPropagation();
                 if (historyIsOpen) {
                   this.closeHistoryModal();
                 } else {
@@ -439,7 +441,8 @@ class LetterDisplay extends React.Component<
             <Button
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
-              onClick={() => {
+              onClick={(e: any) => {
+                e.stopPropagation();
                 this.setState({ collapseIsOpen: !collapseIsOpen });
               }}
               aria-controls="example-collapse-text"
@@ -467,7 +470,7 @@ class LetterDisplay extends React.Component<
                   previouslySelectedRecipients={
                     this.state.previouslySelectedRecipients
                   }
-                  header="Select Recipients"
+                  header="Edit Recipients"
                   onClose={this.closeSelectModal.bind(this)}
                   onSubmit={this.openMessageModal.bind(this)}
                   users={this.props.users.filter(

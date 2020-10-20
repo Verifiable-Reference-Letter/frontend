@@ -75,6 +75,19 @@ h6 {
 
 .rbt-input-multi.form-control.rbt-input {
   height: auto;
+  color: white !important;
+}
+
+.multiple-typeahead .rbt-input-wrapper {
+  --gap: 5px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin: calc(-1 * var(--gap)) 0 0 calc(-1 * var(--gap));
+  width: calc(100% + var(--gap));
+}
+
+.multiple-typeahead .rbt-input-wrapper > * {
+  margin: var(--gap) 0 0 var(--gap);
 }
 
 .single-typeahead .rbt-input-wrapper {
@@ -84,7 +97,7 @@ h6 {
 
 .single-typeahead .rbt-token.rbt-token-removeable {
   padding-left: 7.5px;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
   background-color: rgba(32, 158, 145, 0.2);
   border-radius: 3px;
 }
