@@ -76,13 +76,14 @@ h6 {
 .rbt-input-multi.form-control.rbt-input {
   height: auto;
   color: white !important;
+  padding-bottom: 10px;
 }
 
 .multiple-typeahead .rbt-input-wrapper {
   --gap: 5px;
   display: inline-flex;
   flex-wrap: wrap;
-  margin: calc(-1 * var(--gap)) 0 0 calc(-1 * var(--gap));
+  /* margin: calc(-1 * var(--gap)) 0 0 calc(-1 * var(--gap)); */
   width: calc(100% + var(--gap));
 }
 

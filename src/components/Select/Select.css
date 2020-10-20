@@ -23,13 +23,6 @@
   overflow-x: hidden;
 }
 
-.multiple-typeahead .rbt-input-wrapper {
-  overflow: auto;
-  max-height: 125px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
 .multiple-typeahead .rbt-token.rbt-token-removeable {
   padding-left: 7.5px;
   /* margin-right: 5px; */
