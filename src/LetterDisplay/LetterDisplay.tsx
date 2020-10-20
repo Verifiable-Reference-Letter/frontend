@@ -116,7 +116,6 @@ class LetterDisplay extends React.Component<
             previouslySelectedRecipients: data,
           });
         } else {
-
         }
       }
     } catch (e) {
@@ -178,8 +177,8 @@ class LetterDisplay extends React.Component<
         console.log(response.status);
         this.setState({
           loadingSelect: false,
-          selectIsOpen: false,
-          collapseIsOpen: this.state.historyIsOpen,
+          // selectIsOpen: false,
+          // collapseIsOpen: this.state.historyIsOpen,
         });
       } else {
         let body = await response.json();
@@ -187,36 +186,27 @@ class LetterDisplay extends React.Component<
         const data: User[] = body.data;
         console.log(response);
         console.log(data);
-        if (data && data.length !== 0) {
-          this.setState({
-            previouslySelectedRecipients: data,
-            loadingSelect: false,
-          });
-        } else {
-          this.setState({
-            loadingSelect: false,
-            selectIsOpen: false,
-            collapseIsOpen: this.state.historyIsOpen,
-          });
-        }
+        this.setState({
+          previouslySelectedRecipients: data,
+          loadingSelect: false,
+        });
       }
     } catch (e) {
       console.log(e);
       this.setState({
         loadingSelect: false,
-        selectIsOpen: false,
-        collapseIsOpen: this.state.historyIsOpen,
+        // selectIsOpen: false,
+        // collapseIsOpen: this.state.historyIsOpen,
       });
     }
   }
 
   async openMessageModal(selectedRecipients: User[]) {
-    this.setState({selectedRecipients: selectedRecipients});
+    this.setState({ selectedRecipients: selectedRecipients });
     this.openConfirmModal();
   }
 
-  async closeMessageModal() {
-  }
+  async closeMessageModal() {}
 
   async closeProfileModal() {
     console.log("closing profile modal");
@@ -480,7 +470,10 @@ class LetterDisplay extends React.Component<
                   header="Select Recipients"
                   onClose={this.closeSelectModal.bind(this)}
                   onSubmit={this.openMessageModal.bind(this)}
-                  users={this.props.users.filter((user: User) => user.publicAddress !== letter.letterWriter.publicAddress)}
+                  users={this.props.users.filter(
+                    (user: User) =>
+                      user.publicAddress !== letter.letterWriter.publicAddress
+                  )}
                 ></Select>
               </div>
             )}

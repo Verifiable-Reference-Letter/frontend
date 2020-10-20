@@ -28,6 +28,7 @@ import FileHistory from "../components/FileHistory";
 import Profile from "../components/Profile";
 import Select from "../components/Select";
 import LetterDisplay from "../LetterDisplay";
+import Confirm from "../components/Confirm";
 import "./Requestor.css";
 import CacheService from "../services/CacheService";
 
@@ -42,6 +43,8 @@ interface RequestorState {
   loadingLetters: boolean;
   loadingSelect: boolean;
   selectIsOpen: boolean;
+  messageIsOpen: boolean;
+  confirmIsOpen: boolean;
   selectedWriter: User[];
   selectedRecipients: User[];
 }
@@ -58,6 +61,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       loadingLetters: true,
       loadingSelect: false,
       selectIsOpen: false,
+      messageIsOpen: false,
+      confirmIsOpen: false,
       selectedWriter: [],
       selectedRecipients: [],
     };
@@ -154,7 +159,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
   async closeSelectModal() {
     console.log("closing select modal");
-    this.setState({ selectIsOpen: false, selectedRecipients: [] });
+    this.setState({ selectIsOpen: false });
   }
 
   async openSelectModal() {
@@ -162,6 +167,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     if (this.state.selectedWriter.length !== 0) {
       this.setState({
         selectIsOpen: true,
+        selectedRecipients: [],
       });
     }
   }
@@ -169,11 +175,78 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
   async onSelectSubmit() {
     console.log("on select submit");
 
-    // TODO: fetch backend to create new request with indicated list of recipients
+    // TODO: necessary checks before fetching backend to create new request with letter details and indicated list of recipients
+    const fetchUrl = `/api/v1/letters/create`;
+    this.sendNewLetterRequestToServer(fetchUrl);
+  }
 
-    this.setState({
-      selectIsOpen: false,
-    });
+  async sendNewLetterRequestToServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {
+          selectedRecipients: this.state.selectedRecipients,
+          letterWriter: this.state.selectedWriter[0].publicAddress,
+          customMessage: "",
+        },
+      }),
+    };
+
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      if (response.status === 400) {
+        console.log(response.status);
+      } else {
+        let body = await response.json();
+        const data: { letters: LetterDetails[], numRecipients: Number[] } = body.data;
+        console.log(response);
+        console.log(data);
+        if (data) {
+          // let l = this.state.letters;
+          // l.push(data.letter);
+
+          // let n = this.state.numRecipients;
+          // n.push(data.numRecipient);
+
+          this.setState({
+            confirmIsOpen: false,
+            letters: data.letters,
+            numRecipients: data.numRecipients,
+            selectIsOpen: false
+          });
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async openMessageModal(selectedRecipients: User[]) {
+    this.setState({ selectedRecipients: selectedRecipients });
+    this.openConfirmModal();
+  }
+
+  async closeMessageModal() {}
+
+  async openConfirmModal() {
+    console.log("open confirm modal");
+    this.setState({ confirmIsOpen: true });
+  }
+
+  async closeConfirmModal() {
+    console.log("close confirm modal");
+    this.setState({ confirmIsOpen: false });
   }
 
   render() {
@@ -184,6 +257,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       numRecipients,
       loadingLetters,
       selectIsOpen,
+      messageIsOpen,
+      confirmIsOpen,
       selectedWriter,
     } = this.state;
 
@@ -279,7 +354,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     ));
 
     return (
-      <div>
+      <>
         {!loadingLetters && (
           <div className="requestor">
             <div className="requestor-header">
@@ -297,8 +372,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                     previouslySelectedRecipients={[]}
                     header="Select Recipients"
                     onClose={this.closeSelectModal.bind(this)}
-                    onSubmit={this.onSelectSubmit.bind(this)}
-                    users={this.state.users.filter((user: User) => user.publicAddress !== selectedWriter[0].publicAddress)}
+                    onSubmit={this.openMessageModal.bind(this)}
+                    users={this.state.users.filter(
+                      (user: User) =>
+                        user.publicAddress !== selectedWriter[0].publicAddress
+                    )}
                   />
                 </div>
               )}
@@ -320,7 +398,29 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             <Spinner className="" animation="border" variant="secondary" />
           </div>
         )}
-      </div>
+        <Modal
+          id="confirm-modal"
+          show={confirmIsOpen}
+          onHide={this.closeConfirmModal.bind(this)}
+          // backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          // size="sm"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Please Confirm</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <Confirm
+              user={this.props.user}
+              onConfirm={this.onSelectSubmit.bind(this)}
+              onClose={this.closeConfirmModal.bind(this)}
+            />
+          </Modal.Body>
+        </Modal>
+      </>
     );
   }
 }
