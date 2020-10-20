@@ -75,6 +75,7 @@ class LetterDisplay extends React.Component<
 
   async onSelectSubmit() {
     console.log("on select submit");
+    // this.setState({ confirmIsOpen: false });
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/updateRecipients`;
     this.sendUpdatedLetterRecipientsToServer(fetchUrl);
   }
@@ -394,7 +395,10 @@ class LetterDisplay extends React.Component<
     return (
       <div>
         <Card className="full-width opacity-0">
-          <Card.Header className="d-flex justify-content-between button-blur letter-entry" onClick={() => this.setState({collapseIsOpen: !collapseIsOpen})}>
+          <Card.Header
+            className="d-flex justify-content-between button-blur letter-entry"
+            onClick={() => this.setState({ collapseIsOpen: !collapseIsOpen })}
+          >
             <div className="flex-fill">
               <span className="mr-3">From:</span>
               <Button
