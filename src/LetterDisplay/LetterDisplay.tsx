@@ -19,6 +19,7 @@ import User from "../common/User.interface";
 import "./LetterDisplay.css";
 import LetterDetails from "../common/LetterDetails.interface";
 
+import Confirm from "../components/Confirm";
 import FileView from "../components/FileView";
 import FileHistory from "../components/FileHistory";
 import Profile from "../components/Profile";
@@ -39,6 +40,7 @@ interface LetterDisplayState {
   profileIsOpen: boolean;
   historyIsOpen: boolean;
   uploadIsOpen: boolean;
+  confirmIsOpen: boolean;
   collapseIsOpen: boolean;
   previouslySelectedRecipients: User[];
   selectedRecipients: User[];
@@ -62,6 +64,7 @@ class LetterDisplay extends React.Component<
       profileIsOpen: false,
       historyIsOpen: false,
       uploadIsOpen: false,
+      confirmIsOpen: false,
       collapseIsOpen: false,
       previouslySelectedRecipients: [],
       selectedRecipients: [],
@@ -72,13 +75,53 @@ class LetterDisplay extends React.Component<
 
   async onSelectSubmit() {
     console.log("on select submit");
+    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/updateRecipients`;
+    this.sendUpdatedLetterRecipientsToServer(fetchUrl);
+  }
 
-    // TODO: fetch backend to update recipients list (more complex sql)
-    // this.state.selectedRecipients;
-    this.setState({
-      selectIsOpen: false,
-      collapseIsOpen: false,
-    });
+  async sendUpdatedLetterRecipientsToServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: this.state.selectedRecipients,
+      }),
+    };
+
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      if (response.status === 400) {
+        console.log(response.status);
+      } else {
+        let body = await response.json();
+
+        const data: User[] = body.data;
+        console.log(response);
+        console.log(data);
+        if (data && data.length !== 0) {
+          this.setState({
+            selectIsOpen: false,
+            confirmIsOpen: false,
+            collapseIsOpen: this.state.historyIsOpen,
+            previouslySelectedRecipients: data,
+          });
+        } else {
+
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async closeSelectModal() {
@@ -165,26 +208,19 @@ class LetterDisplay extends React.Component<
         collapseIsOpen: this.state.historyIsOpen,
       });
     }
+  }
 
-    // const previous = [
-    //   {
-    //     name: "Peanut Butter",
-    //     publicAddress: "0xweojsdkfojo1291029i31092kofjdsd",
-    //   },
-    //   {
-    //     name: "Jelly Legs",
-    //     publicAddress: "0xp12h9hg0shdo230rh0wefhwdbgk1b20",
-    //   },
-    // ];
-    // this.setState({
-    //   previouslySelectedRecipients: previous,
-    //   loadingSelect: false,
-    // });
+  async openMessageModal(selectedRecipients: User[]) {
+    this.setState({selectedRecipients: selectedRecipients});
+    this.openConfirmModal();
+  }
+
+  async closeMessageModal() {
   }
 
   async closeProfileModal() {
     console.log("closing profile modal");
-    this.setState({ profileIsOpen: false });
+    this.setState({ profileIsOpen: false, selectedUserProfile: undefined });
   }
 
   async openProfileModal(publicAddress: string) {
@@ -192,6 +228,7 @@ class LetterDisplay extends React.Component<
     const userProfile = this.userProfiles.get(publicAddress);
     console.log(userProfile);
     if (userProfile === undefined) {
+      this.setState({ profileIsOpen: true });
       const fetchUrl = `/api/v1/users/${publicAddress}/profile`;
       this.retrieveProfileFromServer(fetchUrl);
     } else {
@@ -215,26 +252,38 @@ class LetterDisplay extends React.Component<
       }),
     };
 
-    // get user profile from server
     try {
       let response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
         init
       );
-      let body = await response.json();
 
-      const data: UserProfile[] = body.data;
-      console.log(response);
-      console.log(data);
-      if (data && data.length !== 0) {
-        this.userProfiles.set(data[0].publicAddress, data[0]);
-        this.setState({
-          profileIsOpen: true,
-          selectedUserProfile: data[0],
-        });
+      if (response.status === 400) {
+        console.log(response.status);
+        // this.setState({
+        //   profileIsOpen: false,
+        // });
+      } else {
+        let body = await response.json();
+        const data: UserProfile[] = body.data;
+        console.log(response);
+        console.log(data);
+        if (data && data.length !== 0) {
+          this.userProfiles.set(data[0].publicAddress, data[0]);
+          this.setState({
+            selectedUserProfile: data[0],
+          });
+        } else {
+          // this.setState({
+          //   profileIsOpen: false,
+          // });
+        }
       }
     } catch (e) {
       console.log(e);
+      // this.setState({
+      //   profileIsOpen: false,
+      // });
     }
   }
 
@@ -283,7 +332,6 @@ class LetterDisplay extends React.Component<
       }),
     };
 
-    // get user profile from server
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
@@ -326,6 +374,16 @@ class LetterDisplay extends React.Component<
     }
   }
 
+  async openConfirmModal() {
+    console.log("open confirm modal");
+    this.setState({ confirmIsOpen: true });
+  }
+
+  async closeConfirmModal() {
+    console.log("close confirm modal");
+    this.setState({ confirmIsOpen: false });
+  }
+
   render() {
     const { user, letter, numRecipients, letterKey, users } = this.props;
     const {
@@ -336,6 +394,7 @@ class LetterDisplay extends React.Component<
       profileIsOpen,
       historyIsOpen,
       uploadIsOpen,
+      confirmIsOpen,
       collapseIsOpen,
       previouslySelectedRecipients,
       selectedRecipients,
@@ -420,8 +479,8 @@ class LetterDisplay extends React.Component<
                   }
                   header="Select Recipients"
                   onClose={this.closeSelectModal.bind(this)}
-                  onSubmit={this.onSelectSubmit.bind(this)}
-                  users={this.props.users}
+                  onSubmit={this.openMessageModal.bind(this)}
+                  users={this.props.users.filter((user: User) => user.publicAddress !== letter.letterWriter.publicAddress)}
                 ></Select>
               </div>
             )}
@@ -483,6 +542,36 @@ class LetterDisplay extends React.Component<
                 onClose={this.closeProfileModal.bind(this)}
               />
             )}
+            {!this.state.selectedUserProfile && (
+              <Spinner
+                className="mb-3"
+                animation="border"
+                variant="secondary"
+              />
+            )}
+          </Modal.Body>
+        </Modal>
+
+        <Modal
+          id="confirm-modal"
+          show={confirmIsOpen}
+          onHide={this.closeConfirmModal.bind(this)}
+          // backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          // size="sm"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Please Confirm</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <Confirm
+              user={this.props.user}
+              onConfirm={this.onSelectSubmit.bind(this)}
+              onClose={this.closeConfirmModal.bind(this)}
+            />
           </Modal.Body>
         </Modal>
       </div>

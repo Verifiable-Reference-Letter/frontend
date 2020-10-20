@@ -159,9 +159,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
   async openSelectModal() {
     console.log("opening select modal");
-    this.setState({
-      selectIsOpen: true,
-    });
+    if (this.state.selectedWriter.length !== 0) {
+      this.setState({
+        selectIsOpen: true,
+      });
+    }
   }
 
   async onSelectSubmit() {
@@ -288,7 +290,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               <Card.Header className="requestor-select-writer">
                 <div>{selectWriter}</div>
               </Card.Header>
-              {selectIsOpen && selectedWriter !== null && (
+              {selectIsOpen && selectedWriter.length === 1 && (
                 <div className="collapse-body-select">
                   <Select
                     user={this.props.user}
@@ -296,8 +298,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                     header="Select Recipients"
                     onClose={this.closeSelectModal.bind(this)}
                     onSubmit={this.onSelectSubmit.bind(this)}
-                    users={this.state.users}
-                  ></Select>
+                    users={this.state.users.filter((user: User) => user.publicAddress !== selectedWriter[0].publicAddress)}
+                  />
                 </div>
               )}
             </div>

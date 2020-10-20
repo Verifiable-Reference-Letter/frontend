@@ -19,11 +19,6 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
     this.state = {};
   }
 
-  /*decryptLetter(letter: string) {
-    console.log("decrypting letter");
-    return new File([""], "filename.pdf", {type: "application/pdf"});
-  }*/
-
   render() {
     const { user } = this.props;
     return (
@@ -42,29 +37,6 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
           />
           </div>
         </div>
-
-        {/* <div>
-        </div>
-        <div className="mb-3">
-          <Table hover className="border border-secondary">
-            <thead>
-              <tr>
-                <th className="border border-secondary .bg-secondary">
-                  User Name
-                </th>
-                <th className="border border-secondary">Public Address</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border border-secondary">{user.name}</td>
-                <td className="border border-secondary">
-                  {user.publicAddress}
-                </td>
-              </tr>
-            </tbody>
-          </Table>
-        </div>*/}
 
         <Button
           className="mt-3 float-right"
