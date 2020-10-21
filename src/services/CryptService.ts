@@ -57,6 +57,11 @@ class CryptService {
     }
   }
 
+  async sign(file: string, publicAddress: string): Promise<string> {
+  	// Logic to sign https://github.com/MetaMask/eth-sig-util/blob/master/index.ts
+  	// eth-sign from here json rpc: https://eth.wiki/json-rpc/API#eth_sign
+  }
+
   async decrypt(file: string, publicAddress: string) : Promise<FileData> {
     console.log(publicAddress);
     console.log(file);
