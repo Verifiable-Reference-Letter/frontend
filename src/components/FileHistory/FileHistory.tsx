@@ -139,19 +139,20 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
                   <Card.Header
                     className="flex-fill history-entry"
                     onClick={() => {
-                      this.openProfileModal(
-                        history[i + 1].letterRecipient.publicAddress
-                      );
+                      let collapseIsOpen = [...this.state.collapseIsOpen];
+                      collapseIsOpen[i + 1] = !collapseIsOpen[i + 1];
+                      this.setState({ collapseIsOpen: collapseIsOpen });
                     }}
                   >
                     {history[i + 1].letterRecipient.name}
                   </Card.Header>
                   <Card.Header
                     className="flex-shrink-1 history-collapse-button"
+
                     onClick={() => {
-                      let collapseIsOpen = [...this.state.collapseIsOpen];
-                      collapseIsOpen[i + 1] = !collapseIsOpen[i + 1];
-                      this.setState({ collapseIsOpen: collapseIsOpen });
+                      this.openProfileModal(
+                        history[i + 1].letterRecipient.publicAddress
+                      );
                     }}
                   ></Card.Header>
                 </div>
