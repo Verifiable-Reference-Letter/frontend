@@ -101,7 +101,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
               <h3> Letters </h3>
             </div>
 
-            <div className="letters">
+            <div className="writer-letters">
               <div>{lettersList}</div>
             </div>
 

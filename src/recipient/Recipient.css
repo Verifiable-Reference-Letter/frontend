@@ -1,8 +1,13 @@
 .recipient {
-  padding: 20px 20% 20px
+  padding: 20px 20% 20px;
 }
 .recipient-header {
   text-align: center;
+}
+
+.recipient-letters {
+  margin-bottom: 10px;
+  margin-top: 20px;
 }
 
 h1,
@@ -18,7 +23,12 @@ h6 {
   text-align: center;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   text-align: center;
 }
 
@@ -29,7 +39,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .full-width {
-  width: 100%
+  width: 100%;
 }
 
 .text-float-right {

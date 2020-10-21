@@ -23,7 +23,7 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
     const { user } = this.props;
     return (
       <div>
-        {user !== undefined && (
+        {user && (
           <div className="d-flex mb-2">
             <Card className="flex-fill">
               <div className="m-2">
@@ -39,7 +39,7 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
             </div>
           </div>
         )}
-        {!user === undefined && (
+        {!user && (
           <div className="d-flex justify-content-center">
             <Spinner
               className="float-right mt-4 mr-3"

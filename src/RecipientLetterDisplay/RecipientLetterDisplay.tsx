@@ -14,7 +14,7 @@ import UserAuth from "../common/UserAuth.interface";
 import LetterHistory from "../common/LetterHistory.interface";
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
-import "./WriterLetterDisplay.css";
+import "./RecipientLetterDisplay.css";
 import LetterDetails from "../common/LetterDetails.interface";
 
 import FileData from "../common/FileData.interface";
@@ -27,12 +27,12 @@ import Confirm from "../components/Confirm/Confirm";
 import FileHistory from "../components/FileHistory";
 import Profile from "../components/Profile";
 
-interface WriterLetterDisplayProps {
+interface RecipientLetterDisplayProps {
   user: UserAuth;
   letter: LetterDetails;
   numRecipients: Number;
 }
-interface WriterLetterDisplayState {
+interface RecipientLetterDisplayState {
   history: LetterHistory[];
   loadingHistory: boolean;
   profileIsOpen: boolean;
@@ -46,9 +46,9 @@ interface WriterLetterDisplayState {
   fileData?: FileData;
 }
 
-class WriterLetterDisplay extends React.Component<
-  WriterLetterDisplayProps,
-  WriterLetterDisplayState
+class RecipientLetterDisplay extends React.Component<
+  RecipientLetterDisplayProps,
+  RecipientLetterDisplayState
 > {
   private uploadModal = React.createRef<FileUpload>();
   private viewModal = React.createRef<FileView>();
@@ -56,7 +56,7 @@ class WriterLetterDisplay extends React.Component<
   private cryptService: CryptService;
   private cacheService: CacheService<string, string>;
 
-  constructor(props: WriterLetterDisplayProps) {
+  constructor(props: RecipientLetterDisplayProps) {
     super(props);
     this.state = {
       history: [],
@@ -72,80 +72,6 @@ class WriterLetterDisplay extends React.Component<
     this.userProfiles = new Map<string, UserProfile>();
     this.cryptService = new CryptService();
     this.cacheService = new CacheService(1);
-  }
-
-  openUploadModal() {
-    console.log("opening upload modal");
-    this.setState({
-      uploadIsOpen: true,
-      collapseIsOpen: true,
-    });
-  }
-
-  onUploadSubmit() {
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/content`;
-    if (this.state.uploadedFile !== undefined) {
-      this.uploadToServer(this.state.uploadedFile, fetchUrl);
-    }
-  }
-
-  closeUploadModal() {
-    console.log("closing upload modal");
-    this.setState({
-      uploadIsOpen: false,
-      collapseIsOpen: this.state.historyIsOpen,
-    });
-  }
-
-  async uploadToServer(file: File, fetchUrl: string) {
-    console.log("uploading to server");
-    console.log(file);
-
-    // encrypt file
-    let encryptedFile = await this.cryptService.encrypt(
-      file,
-      this.props.user.publicAddress
-    );
-    console.log(encryptedFile);
-
-    if (!encryptedFile) {
-      console.log("encryption failed");
-      this.closeUploadModal();
-      return;
-    }
-
-    // cache encrypted file
-    this.cacheService.put(this.props.letter.letterId, encryptedFile);
-    console.log("put encryptedFile into memcache");
-
-    // post encrypted file to server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, {
-      body: JSON.stringify({
-        auth: {
-          publicAddress: this.props.user.publicAddress,
-          jwtToken: this.props.user.jwtToken,
-        },
-        data: { contents: encryptedFile },
-      }),
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-type": "application/json",
-      },
-      method: "POST",
-    })
-      .then((response: any) => {
-        console.log(response.status);
-        if (response.status === 200) {
-          this.closeUploadModal();
-        } else {
-          this.uploadModal.current!.changeDisplayMessage(
-            "Upload Failed. Try Again Later."
-          );
-        }
-      })
-      .catch((e: Error) => {
-        console.log(e);
-      });
   }
 
   async openViewModal() {
@@ -415,6 +341,33 @@ class WriterLetterDisplay extends React.Component<
             onClick={() => this.setState({ collapseIsOpen: !collapseIsOpen })}
           >
             <div className="flex-fill">
+              <span className="mr-3">From:</span>
+              <Button
+                variant="outline-light"
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  this.openProfileModal(letter.letterWriter.publicAddress);
+                }}
+              >
+                {letter.letterWriter?.name}
+              </Button>
+            </div>
+            {/* <Button
+              // TODO: add Tooltip
+              variant="outline-light"
+              className="flex-shrink-1 float-right ml-3"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                if (uploadIsOpen) {
+                  this.closeUploadModal();
+                } else {
+                  this.openUploadModal();
+                }
+              }}
+            >
+              Upload
+            </Button> */}
+              <div className="flex-shrink-1 float-right">
               <span className="mr-3">For:</span>
               <Button
                 variant="outline-light"
@@ -432,21 +385,6 @@ class WriterLetterDisplay extends React.Component<
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
                 e.stopPropagation();
-                if (uploadIsOpen) {
-                  this.closeUploadModal();
-                } else {
-                  this.openUploadModal();
-                }
-              }}
-            >
-              Upload
-            </Button>
-            <Button
-              // TODO: add Tooltip
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
                 if (viewIsOpen) {
                   this.closeViewModal();
                 } else {
@@ -456,7 +394,7 @@ class WriterLetterDisplay extends React.Component<
             >
               View
             </Button>
-            <Button
+            {/* <Button
               disabled={numRecipients === 0}
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
@@ -470,7 +408,7 @@ class WriterLetterDisplay extends React.Component<
               }}
             >
               History
-            </Button>
+            </Button> */}
             <Button
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
@@ -487,7 +425,7 @@ class WriterLetterDisplay extends React.Component<
         </Card>
         <Collapse in={collapseIsOpen}>
           <div className="collapse-body-select">
-            {uploadIsOpen && (
+            {/* {uploadIsOpen && (
               <div>
                 <FileUpload
                   ref={this.uploadModal}
@@ -516,7 +454,7 @@ class WriterLetterDisplay extends React.Component<
                 ></FileHistory>
               </div>
             )}
-            {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}
+            {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}*/}
             {!uploadIsOpen && !historyIsOpen && (
               <div className="display-text d-flex text-white-50">
                 <div className="flex-fill">
@@ -557,7 +495,7 @@ class WriterLetterDisplay extends React.Component<
           </Modal.Body>
         </Modal>
 
-        <Modal
+        {/* <Modal
           id="confirm-modal"
           show={confirmIsOpen}
           onHide={this.closeConfirmModal.bind(this)}
@@ -574,11 +512,11 @@ class WriterLetterDisplay extends React.Component<
           <Modal.Body>
             <Confirm
               user={this.props.user}
-              onConfirm={this.onUploadSubmit.bind(this)}
+              onConfirm={this.closeConfirmModal.bind(this)}
               onClose={this.closeConfirmModal.bind(this)}
             />
           </Modal.Body>
-        </Modal>
+        </Modal> */}
 
         <Modal
           id="view-modal"
@@ -608,4 +546,4 @@ class WriterLetterDisplay extends React.Component<
   }
 }
 
-export default WriterLetterDisplay;
+export default RecipientLetterDisplay;
