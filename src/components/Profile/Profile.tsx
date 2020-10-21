@@ -1,10 +1,10 @@
 import React from "react";
-import { Button, Image, Card } from "react-bootstrap";
-import UserAuth from "../../common/User.interface";
+import { Button, Image, Card, Spinner } from "react-bootstrap";
+import UserProfile from "../../common/UserProfile.interface";
 import "./Profile.css";
 
 interface ProfileProps {
-  user: UserAuth;
+  user?: UserProfile;
   onClose: () => void;
 }
 interface ProfileState {}
@@ -23,20 +23,31 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
     const { user } = this.props;
     return (
       <div>
-        <div className="d-flex mb-2">
-          <Card className="flex-fill">
-            <div className="m-2">
-            <div className="">Name: {user.name}</div>
-            <div className="text-break">ID: {user.publicAddress}</div>
+        {user !== undefined && (
+          <div className="d-flex mb-2">
+            <Card className="flex-fill">
+              <div className="m-2">
+                <div className="">Name: {user.name}</div>
+                <div className="text-break">ID: {user.publicAddress}</div>
+              </div>
+            </Card>
+            <div className="ml-4 flex-shrink-1 float-right image-card">
+              <Image
+                className="profile-image"
+                src="https://engineering.lehigh.edu/sites/engineering.lehigh.edu/files/styles/faculty_photo/public/korth.jpg?itok=GfxQ6zFl"
+              />
             </div>
-          </Card>
-          <div className="ml-4 flex-shrink-1 float-right image-card">
-          <Image
-            className="profile-image"
-            src="https://engineering.lehigh.edu/sites/engineering.lehigh.edu/files/styles/faculty_photo/public/korth.jpg?itok=GfxQ6zFl"
-          />
           </div>
-        </div>
+        )}
+        {!user === undefined && (
+          <div className="d-flex justify-content-center">
+            <Spinner
+              className="float-right mt-4 mr-3"
+              animation="border"
+              variant="secondary"
+            />
+          </div>
+        )}
 
         <Button
           className="mt-3 float-right"

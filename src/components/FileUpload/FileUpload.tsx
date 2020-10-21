@@ -5,6 +5,7 @@ import Spinner from "react-bootstrap/Spinner";
 
 import User from "../../common/UserAuth.interface";
 import "./FileUpload.css";
+import { DropdownDivider } from "react-bootstrap/Dropdown";
 
 interface FileUploadProps {
   user: User;
@@ -104,20 +105,35 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
       <Form onSubmit={this.onFormSubmit.bind(this)}>
         <Form.Group>
           <Form.File id="fileUpload" onChange={this.onChange} />
-          <div>
-            <div className="display-message"> {displayMessage} </div>
+          <div className="d-flex border-radius button-blur mb-2">
+            <div className="text-warning mt-3 flex-fill ">
+              {displayMessage}
+            </div>
+            {/* {buffering && (
+              <div className="d-flex justify-content-end">
+                <Spinner
+                  className="mt-4 mr-3"
+                  animation="border"
+                  variant="secondary"
+                />
+              </div>
+            )} */}
             <Button
-              className="mt-3 float-right"
+              className="mt-3 mr-3 flex-shrink-1 float-right"
+              variant="outline-light"
+              onClick={this.onFormSubmit}
+            >
+              Upload
+            </Button>
+            <Button
+              className="mt-3 flex-shrink-1 float-right"
+              variant="outline-light"
               onClick={(e: any) => {
                 this.props.onClose();
               }}
             >
               Close
             </Button>
-            <Button className="mt-3 mr-3 float-right" onClick={this.onFormSubmit}>
-              Upload
-            </Button>
-           {buffering && <Spinner className="float-right mt-4 mr-3" animation="border" variant="secondary" />}
           </div>
         </Form.Group>
       </Form>

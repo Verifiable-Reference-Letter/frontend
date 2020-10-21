@@ -4,7 +4,6 @@ import {
   Modal,
   InputGroup,
   Card,
-  Accordion,
   OverlayTrigger,
   Tooltip,
   Spinner,
@@ -18,16 +17,9 @@ import { Fragment } from "react";
 import User from "../common/User.interface";
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
-import LetterHistory from "../common/LetterHistory.interface";
-import UserProfile from "../common/UserProfile.interface";
-import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
-
-import FileView from "../components/FileView";
-import FileHistory from "../components/FileHistory";
-import Profile from "../components/Profile";
 import Select from "../components/Select";
-import LetterDisplay from "../LetterDisplay";
+import RequestorLetterDisplay from "../RequestorLetterDisplay/RequestorLetterDisplay";
 import Confirm from "../components/Confirm";
 import "./Requestor.css";
 import CacheService from "../services/CacheService";
@@ -344,11 +336,10 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     );
 
     const lettersList = letters.map((l, k) => (
-      <LetterDisplay
+      <RequestorLetterDisplay
         user={user}
         letter={l}
         numRecipients={numRecipients[k]}
-        letterKey={k}
         users={users}
       />
     ));

@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Spinner } from "react-bootstrap";
 import LetterDetails from "../../common/LetterDetails.interface";
 import UserProfile from "../../common/UserProfile.interface";
 import FileData from "../../common/FileData.interface";
@@ -11,13 +11,10 @@ import UserAuth from "../../common/UserAuth.interface";
 
 interface FileViewProps {
   user: UserAuth;
-  letter: LetterDetails;
   fileData?: FileData;
   onClose: () => void;
 }
 interface FileViewState {
-  // letterUrl: any;
-  // letterType: string;
   profileIsOpen: boolean;
   selectedPublicAddress: string;
   selectedUserProfile?: UserProfile;
@@ -93,51 +90,19 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
               type={fileData.letterType}
               src={fileData.letterUrl}
               width="100%"
-              height="360px"
+              height="500px"
             />
           )}
+          {!fileData && (
+            <div className="d-flex justify-content-center">
+              <Spinner
+                className="mb-3 .absolute-center"
+                animation="border"
+                variant="secondary"
+              />
+            </div>
+          )}
         </div>
-
-        {/* <Table hover className="border border-secondary">
-          <thead>
-            <tr>
-              <th className="border border-secondary .bg-secondary">
-                Letter ID
-              </th>
-              <th className="border border-secondary">Requestor</th>
-              <th className="border border-secondary">Writer</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-secondary">{letter.letterId}</td>
-              <td className="border border-secondary">
-                <div>
-                  {requestor.name} ({requestor.publicAddress})
-                  <Button
-                    className="mt-3 float-right mb-3 mr-2"
-                    onClick={(e: any) => {
-                      this.openProfileModal(requestor.publicAddress);
-                    }}
-                  >
-                    *
-                  </Button>
-                </div>
-              </td>
-              <td className="border border-secondary">
-                {writer.name} ({writer.publicAddress})
-                <Button
-                  className="mt-3 float-right mb-3"
-                  onClick={(e: any) => {
-                    this.openProfileModal(requestor.publicAddress);
-                  }}
-                >
-                  *
-                </Button>
-              </td>
-            </tr>
-          </tbody>
-        </Table> */}
 
         <Button
           className="mt-3 float-right"

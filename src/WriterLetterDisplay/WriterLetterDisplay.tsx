@@ -16,144 +16,175 @@ import LetterHistory from "../common/LetterHistory.interface";
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
 import User from "../common/User.interface";
-import "./LetterDisplay.css";
+import "./WriterLetterDisplay.css";
 import LetterDetails from "../common/LetterDetails.interface";
 
-import Confirm from "../components/Confirm";
-import FileView from "../components/FileView";
+import FileData from "../common/FileData.interface";
+import CryptService from "../services/CryptService";
+import CacheService from "../services/CacheService";
+
+import FileUpload from "../components/FileUpload/FileUpload";
+import FileView from "../components/FileView/FileView";
+import Confirm from "../components/Confirm/Confirm";
 import FileHistory from "../components/FileHistory";
 import Profile from "../components/Profile";
 import Select from "../components/Select";
 
-interface LetterDisplayProps {
+interface WriterLetterDisplayProps {
   user: UserAuth;
   letter: LetterDetails;
   numRecipients: Number;
-  letterKey: number;
-  users: User[];
 }
-interface LetterDisplayState {
+interface WriterLetterDisplayState {
   history: LetterHistory[];
-  loadingSelect: boolean;
   loadingHistory: boolean;
-  selectIsOpen: boolean;
   profileIsOpen: boolean;
   historyIsOpen: boolean;
   uploadIsOpen: boolean;
+  viewIsOpen: boolean;
   confirmIsOpen: boolean;
   collapseIsOpen: boolean;
-  previouslySelectedRecipients: User[];
-  selectedRecipients: User[];
   selectedPublicAddress?: string;
   selectedUserProfile?: UserProfile;
+  uploadedFile?: File;
+  fileData?: FileData;
 }
 
-class LetterDisplay extends React.Component<
-  LetterDisplayProps,
-  LetterDisplayState
+class WriterLetterDisplay extends React.Component<
+  WriterLetterDisplayProps,
+  WriterLetterDisplayState
 > {
+  private uploadModal = React.createRef<FileUpload>();
+  private viewModal = React.createRef<FileView>();
   private userProfiles: Map<string, UserProfile>;
+  private cryptService: CryptService;
+  private cacheService: CacheService<string, string>;
 
-  constructor(props: LetterDisplayProps) {
+  constructor(props: WriterLetterDisplayProps) {
     super(props);
     this.state = {
       history: [],
       loadingHistory: false,
-      loadingSelect: false,
-      selectIsOpen: false,
       profileIsOpen: false,
       historyIsOpen: false,
       uploadIsOpen: false,
+      viewIsOpen: false,
       confirmIsOpen: false,
       collapseIsOpen: false,
-      previouslySelectedRecipients: [],
-      selectedRecipients: [],
     };
 
     this.userProfiles = new Map<string, UserProfile>();
+    this.cryptService = new CryptService();
+    this.cacheService = new CacheService(1);
   }
 
-  async onSelectSubmit() {
-    console.log("on select submit");
-    // this.setState({ confirmIsOpen: false });
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/updateRecipients`;
-    this.sendUpdatedLetterRecipientsToServer(fetchUrl);
+  openUploadModal() {
+    console.log("opening upload modal");
+    this.setState({
+      uploadIsOpen: true,
+      collapseIsOpen: true,
+    });
   }
 
-  async sendUpdatedLetterRecipientsToServer(fetchUrl: string) {
-    const init: RequestInit = {
-      method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        auth: {
-          jwtToken: this.props.user.jwtToken,
-          publicAddress: this.props.user.publicAddress,
-        },
-        data: this.state.selectedRecipients,
-      }),
-    };
-
-    try {
-      let response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
-        init
-      );
-      if (response.status === 400) {
-        console.log(response.status);
-      } else {
-        let body = await response.json();
-
-        const data: User[] = body.data;
-        console.log(response);
-        console.log(data);
-        if (data && data.length !== 0) {
-          this.setState({
-            selectIsOpen: false,
-            confirmIsOpen: false,
-            collapseIsOpen: this.state.historyIsOpen,
-            previouslySelectedRecipients: data,
-          });
-        } else {
-        }
-      }
-    } catch (e) {
-      console.log(e);
+  onUploadSubmit() {
+    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/content`;
+    if (this.state.uploadedFile !== undefined) {
+      this.uploadToServer(this.state.uploadedFile, fetchUrl);
     }
   }
 
-  async closeSelectModal() {
-    console.log("closing select modal");
+  closeUploadModal() {
+    console.log("closing upload modal");
     this.setState({
-      selectIsOpen: false,
-      loadingSelect: false,
+      uploadIsOpen: false,
       collapseIsOpen: this.state.historyIsOpen,
     });
   }
 
-  async openSelectModal() {
-    console.log("on send click");
-    // fetch backend to get recipients list (who the letter has not been sent to)
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/unsentRecipients`;
+  async uploadToServer(file: File, fetchUrl: string) {
+    console.log("uploading to server");
+    console.log(file);
 
-    if (this.state.previouslySelectedRecipients.length === 0) {
-      this.setState({
-        loadingSelect: true,
-        collapseIsOpen: true,
-        selectIsOpen: true,
+    // encrypt file
+    let encryptedFile = await this.cryptService.encrypt(
+      file,
+      this.props.user.publicAddress
+    );
+    console.log(encryptedFile);
+
+    if (!encryptedFile) {
+      console.log("encryption failed");
+      this.closeUploadModal();
+      return;
+    }
+
+    // cache encrypted file
+    this.cacheService.put(this.props.letter.letterId, encryptedFile);
+    console.log("put encryptedFile into memcache");
+
+    // post encrypted file to server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, {
+      body: JSON.stringify({
+        auth: {
+          publicAddress: this.props.user.publicAddress,
+          jwtToken: this.props.user.jwtToken,
+        },
+        data: { contents: encryptedFile },
+      }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-type": "application/json",
+      },
+      method: "POST",
+    })
+      .then((response: any) => {
+        console.log(response.status);
+        if (response.status === 200) {
+          this.closeUploadModal();
+        } else {
+          this.uploadModal.current!.changeDisplayMessage(
+            "Upload Failed. Try Again Later."
+          );
+        }
+      })
+      .catch((e: Error) => {
+        console.log(e);
       });
-      this.retrieveRecipientsFromServer(fetchUrl);
+  }
+
+  async openViewModal() {
+    console.log("opening view modal");
+    this.setState({ viewIsOpen: true });
+    const letterId = this.props.letter.letterId;
+    const fetchUrl = `/api/v1/letters/${letterId}/contents`;
+    console.log(letterId);
+    let encryptedLetter = this.cacheService.get(letterId);
+    if (encryptedLetter === null) {
+      this.retrieveLetterContentsFromServer(fetchUrl);
     } else {
-      this.setState({
-        selectIsOpen: true,
-        collapseIsOpen: true,
-      });
+      try {
+        let fileData = await this.cryptService.decrypt(
+          encryptedLetter,
+          this.props.user.publicAddress
+        );
+
+        console.log(fileData.letterType);
+        this.setState({
+          fileData: fileData,
+        });
+      } catch (error) {
+        console.log("error with decryption");
+      }
     }
   }
 
-  async retrieveRecipientsFromServer(fetchUrl: string) {
+  closeViewModal() {
+    console.log("closing view modal");
+    this.setState({ viewIsOpen: false, fileData: undefined });
+  }
+
+  retrieveLetterContentsFromServer(fetchUrl: string) {
+    console.log("retrieving from server");
     const init: RequestInit = {
       method: "POST",
       headers: {
@@ -168,42 +199,34 @@ class LetterDisplay extends React.Component<
         data: {},
       }),
     };
-
-    try {
-      let response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
-        init
-      );
-      if (response.status === 400) {
-        console.log(response.status);
-        this.setState({
-          loadingSelect: false,
-          // selectIsOpen: false,
-          // collapseIsOpen: this.state.historyIsOpen,
-        });
-      } else {
-        let body = await response.json();
-
-        const data: User[] = body.data;
+    const letterId = this.props.letter.letterId;
+    // get letter from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+      .then((response) => {
+        console.log("logging response");
         console.log(response);
-        console.log(data);
-        this.setState({
-          previouslySelectedRecipients: data,
-          loadingSelect: false,
-        });
-      }
-    } catch (e) {
-      console.log(e);
-      this.setState({
-        loadingSelect: false,
-        // selectIsOpen: false,
-        // collapseIsOpen: this.state.historyIsOpen,
+        return response.json();
+      })
+      .then((encryptedLetter) => {
+        // decrypt letter
+        this.cryptService
+          .decrypt(encryptedLetter, this.props.user.publicAddress)
+          .then((fileData) => {
+            if (fileData) {
+              this.setState({
+                viewIsOpen: true,
+                fileData: fileData,
+              });
+            }
+          });
+      })
+      .catch((e: Error) => {
+        console.log(e);
       });
-    }
   }
 
-  async openMessageModal(selectedRecipients: User[]) {
-    this.setState({ selectedRecipients: selectedRecipients });
+  async openMessageModal(file: File) {
+    this.setState({ uploadedFile: file });
     this.openConfirmModal();
   }
 
@@ -283,7 +306,7 @@ class LetterDisplay extends React.Component<
     this.setState({
       historyIsOpen: false,
       loadingHistory: false,
-      collapseIsOpen: this.state.selectIsOpen,
+      collapseIsOpen: this.state.viewIsOpen,
     });
   }
 
@@ -376,19 +399,16 @@ class LetterDisplay extends React.Component<
   }
 
   render() {
-    const { user, letter, numRecipients, letterKey, users } = this.props;
+    const { user, letter, numRecipients } = this.props;
     const {
       history,
-      loadingSelect,
       loadingHistory,
-      selectIsOpen,
       profileIsOpen,
       historyIsOpen,
       uploadIsOpen,
+      viewIsOpen,
       confirmIsOpen,
       collapseIsOpen,
-      previouslySelectedRecipients,
-      selectedRecipients,
       selectedPublicAddress,
     } = this.state;
 
@@ -417,15 +437,29 @@ class LetterDisplay extends React.Component<
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
                 e.stopPropagation();
-                if (selectIsOpen) {
-                  this.closeSelectModal();
+                if (uploadIsOpen) {
+                  this.closeUploadModal();
                 } else {
-                  this.openSelectModal();
+                  this.openUploadModal();
                 }
               }}
             >
-              Edit
-              {/* {letter.uploadedAt ? "Send" : "Edit"} */}
+              Upload
+            </Button>
+            <Button
+              // TODO: add Tooltip
+              variant="outline-light"
+              className="flex-shrink-1 float-right ml-3"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                if (viewIsOpen) {
+                  this.closeViewModal();
+                } else {
+                  this.openViewModal();
+                }
+              }}
+            >
+              View
             </Button>
             <Button
               disabled={numRecipients === 0}
@@ -458,30 +492,15 @@ class LetterDisplay extends React.Component<
         </Card>
         <Collapse in={collapseIsOpen}>
           <div className="collapse-body-select">
-            {loadingSelect && (
-              <div className="d-flex justify-content-center">
-                <Spinner
-                  className="mb-3"
-                  animation="border"
-                  variant="secondary"
-                />
-              </div>
-            )}
-            {!loadingSelect && selectIsOpen && (
+            {uploadIsOpen && (
               <div>
-                <Select
+                <FileUpload
+                  ref={this.uploadModal}
                   user={this.props.user}
-                  previouslySelectedRecipients={
-                    this.state.previouslySelectedRecipients
-                  }
-                  header="Edit Recipients"
-                  onClose={this.closeSelectModal.bind(this)}
-                  onSubmit={this.openMessageModal.bind(this)}
-                  users={this.props.users.filter(
-                    (user: User) =>
-                      user.publicAddress !== letter.letterWriter.publicAddress
-                  )}
-                ></Select>
+                  restrictPdf={true}
+                  onUpload={this.openMessageModal.bind(this)}
+                  onClose={this.closeUploadModal.bind(this)}
+                ></FileUpload>
               </div>
             )}
             {loadingHistory && (
@@ -503,7 +522,7 @@ class LetterDisplay extends React.Component<
               </div>
             )}
             {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}
-            {!selectIsOpen && !historyIsOpen && (
+            {!uploadIsOpen && !historyIsOpen && (
               <div className="display-text d-flex text-white-50">
                 <div className="flex-fill">
                   Requested: {letter.requestedAt?.toString()}
@@ -536,19 +555,10 @@ class LetterDisplay extends React.Component<
           </Modal.Header>
 
           <Modal.Body>
-            {this.state.selectedUserProfile && (
-              <Profile
-                user={this.state.selectedUserProfile}
-                onClose={this.closeProfileModal.bind(this)}
-              />
-            )}
-            {!this.state.selectedUserProfile && (
-              <Spinner
-                className="mb-3"
-                animation="border"
-                variant="secondary"
-              />
-            )}
+            <Profile
+              user={this.state.selectedUserProfile}
+              onClose={this.closeProfileModal.bind(this)}
+            />
           </Modal.Body>
         </Modal>
 
@@ -569,9 +579,33 @@ class LetterDisplay extends React.Component<
           <Modal.Body>
             <Confirm
               user={this.props.user}
-              onConfirm={this.onSelectSubmit.bind(this)}
+              onConfirm={this.onUploadSubmit.bind(this)}
               onClose={this.closeConfirmModal.bind(this)}
             />
+          </Modal.Body>
+        </Modal>
+
+        <Modal
+          id="view-modal"
+          show={viewIsOpen}
+          onHide={this.closeViewModal.bind(this)}
+          backdrop="static"
+          animation={false}
+          className="modal view-modal"
+          scrollable={false}
+          size="xl"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>For: {letter.letterRequestor?.name}</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FileView
+              fileData={this.state.fileData}
+              ref={this.viewModal}
+              user={this.props.user}
+              onClose={this.closeViewModal.bind(this)}
+            ></FileView>
           </Modal.Body>
         </Modal>
       </div>
@@ -579,4 +613,4 @@ class LetterDisplay extends React.Component<
   }
 }
 
-export default LetterDisplay;
+export default WriterLetterDisplay;

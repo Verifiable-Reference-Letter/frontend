@@ -214,7 +214,6 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             <FileView
               ref={this.viewModal}
               user={this.props.user}
-              letter={letters[this.state.selectedLetterKey]}
               onClose={this.closeViewModal.bind(this)}
             ></FileView>
           </Modal.Body>
