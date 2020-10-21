@@ -1,23 +1,24 @@
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
 
-import Nav from "./components/navbar/Nav";
-import HomePage from "./components/pages/home/Home";
-import WriterPage from "./components/pages/writer/Writer";
-import RequestorPage from "./components/pages/requestor/Requestor";
-import RecipientPage from "./components/pages/recipient/Recipient";
-import LoginPage from "./components/pages/login/Login";
-import DashboardPage from "./components/pages/dashboard/Dashboard";
+import Nav from "./nav/Nav";
+import HomePage from "./home/Home";
+import WriterPage from "./writer/Writer";
+import RequestorPage from "./requestor/Requestor";
+import RecipientPage from "./recipient/Recipient";
+import LoginPage from "./login/Login";
+import DashboardPage from "./dashboard/Dashboard";
 
-import User from "./interfaces/User.interface";
-
-import * as ROUTES from "./common/routes";
+import UserAuth from "./common/UserAuth.interface";
+import "./App.css";
+import * as ROUTES from "./routes";
 
 import Web3 from "web3";
 export let web3: Web3;
+export let ethereum: any;
 
 export const GAS_LIMIT_STANDARD = 6000000;
 export let accounts: string[];
@@ -56,7 +57,7 @@ type MyState = {
   contract: TutorialToken;
   connectedTo: boolean; // metamask
   loggedIn: boolean; // our app
-  user: User;
+  user: UserAuth;
 };
 
 class App extends React.Component<MyProps, MyState> {
@@ -67,7 +68,7 @@ class App extends React.Component<MyProps, MyState> {
       contract: {} as TutorialToken,
       connectedTo: false,
       loggedIn: false,
-      user: { publicAddress: "", name: "", email: "", jwtToken: "" },
+      user: { publicAddress: "", name: "", jwtToken: "" },
     };
     this.onConnect = this.onConnect.bind(this);
     this.onLogin = this.onLogin.bind(this);
@@ -95,16 +96,25 @@ class App extends React.Component<MyProps, MyState> {
     web3 = new Web3(web3Provider);
     accounts = await ethereum.request({ method: "eth_accounts" });
     // contract = await deployTutorialToken(); // temporary disable
+    console.log(accounts);
+    // ethereum
+    //       .request({
+    //         method: "eth_getEncryptionPublicKey",
+    //         params: [accounts[0]], // you must have access to the specified account
+    //       })
+    //       .then((publicKey: string) => {
+    //         console.log(publicKey);
+    //       });
 
     this.setState({
       contract,
       connectedTo: true,
-      user: { publicAddress: accounts[0], name: "", email: "", jwtToken: "" },
-      loggedIn: true, // testing purposes only
+      user: { publicAddress: accounts[0], name: "", jwtToken: "" },
+      // loggedIn: true, // testing purposes only
     });
   }
 
-  onLogin(u: User) {
+  onLogin(u: UserAuth) {
     console.log("login complete");
     this.setState({ user: u, loggedIn: true });
   }
@@ -127,8 +137,8 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={this.state.loggedIn}
         />
-        {this.state.loggedIn ? <Redirect to="/dashboard" /> : null}
-        <div>
+        {this.state.loggedIn ? <Redirect to={ROUTES.REQUESTOR} /> : null}
+        <div className="application-body">
           <Route exact path={ROUTES.HOME} render={() => home} />
           <Route exact path={ROUTES.LOGIN} render={() => login} />
           <Route exact path={ROUTES.DASHBOARD} render={() => dashboard} />

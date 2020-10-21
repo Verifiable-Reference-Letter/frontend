@@ -1,0 +1,122 @@
+.requestor {
+  padding: 20px 20% 20px;
+}
+.requestor-header {
+  text-align: center;
+}
+
+.requestor-select-writer {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-align: center;
+}
+
+.requestor-footer {
+  text-align: center;
+}
+
+.left-float-right-button {
+  margin-left: 10px;
+  float: right;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-float-right {
+  float: right;
+  margin-top: 7.5px;
+}
+
+.text-float-left {
+  float: left;
+  margin-top: 7.5px;
+}
+
+.opacity-0 {
+  background-color: rgba(0, 0, 0, 0) !important;
+  border: none;
+}
+
+.display-text {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.card-header {
+  border-bottom: 0px solid rgba(0, 0, 0, 0) !important;
+}
+
+.body-text {
+  padding: 8px 12.5px;
+}
+
+.button-blur button {
+  border-color: white;
+}
+
+.button-blur .btn:focus {
+  color: white !important;
+  background-color: rgba(51, 170, 51, 0) !important;
+}
+
+.button-blur .btn:hover {
+  color: white !important;
+  background-color: rgba(51, 170, 51, 0) !important;
+}
+
+.rbt-input-multi.form-control.rbt-input {
+  height: auto;
+  color: white !important;
+  padding-bottom: 10px;
+}
+
+.multiple-typeahead .rbt-input-wrapper {
+  --gap: 5px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  /* margin: calc(-1 * var(--gap)) 0 0 calc(-1 * var(--gap)); */
+  width: calc(100% + var(--gap));
+}
+
+.multiple-typeahead .rbt-input-wrapper > * {
+  margin: var(--gap) 0 0 var(--gap);
+}
+
+.single-typeahead .rbt-input-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.single-typeahead .rbt-token.rbt-token-removeable {
+  padding-left: 7.5px;
+  /* margin-bottom: 5px; */
+  background-color: rgba(32, 158, 145, 0.2);
+  border-radius: 3px;
+}
+
+button.close.rbt-close.rbt-token-remove-button {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.dropdown-menu {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.requestor-letters {
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+
+.form-control, .form-control:focus {
+  background-color: rgba(0, 0, 0, .15) !important;
+}

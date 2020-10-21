@@ -1,0 +1,58 @@
+.writer {
+  padding: 20px 20% 20px;
+}
+.writer-header {
+  text-align: center;
+}
+
+.writer-letters {
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-align: center;
+}
+
+.writer-footer {
+  text-align: center;
+}
+
+.left-float-right-button {
+  margin-left: 10px;
+  float: right;
+  margin-bottom: 10px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-float-right {
+  float: right;
+  margin-top: 7px;
+}
+
+.text-float-left {
+  float: left;
+  margin-top: 7px;
+}
+
+.modal-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+}
+
+.absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+}
