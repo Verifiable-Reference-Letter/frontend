@@ -44,7 +44,7 @@ class CryptService {
               "utf8"
             )
           );
-          // console.log(encryptedMessage);
+          console.log(encryptedMessage.length);
           fileDataString = encryptedMessage;
           return Promise.resolve(fileDataString);
         })
@@ -107,7 +107,7 @@ class CryptService {
         params: [file, publicAddress],
       })
       .then((decryptedMessage: string) => {
-        // console.log(decryptedMessage);
+        console.log(decryptedMessage.length);
         fileData = JSON.parse(decryptedMessage);
         console.log("parsed");
         return Promise.resolve(fileData);

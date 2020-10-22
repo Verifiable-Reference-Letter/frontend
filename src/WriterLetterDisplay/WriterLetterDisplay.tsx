@@ -83,21 +83,22 @@ class WriterLetterDisplay extends React.Component<
   }
 
   onUploadSubmit() {
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/content`;
+    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/update`;
     if (this.state.uploadedFile !== undefined) {
-      this.uploadToServer(this.state.uploadedFile, fetchUrl);
+      this.uploadContentsToServer(this.state.uploadedFile, fetchUrl);
     }
   }
 
   closeUploadModal() {
     console.log("closing upload modal");
     this.setState({
+      confirmIsOpen: false,
       uploadIsOpen: false,
       collapseIsOpen: this.state.historyIsOpen,
     });
   }
 
-  async uploadToServer(file: File, fetchUrl: string) {
+  async uploadContentsToServer(file: File, fetchUrl: string) {
     console.log("uploading to server");
     console.log(file);
 
@@ -125,8 +126,8 @@ class WriterLetterDisplay extends React.Component<
     }
 
     // cache encrypted file
-    this.cacheService.put(this.props.letter.letterId, encryptedFile);
-    console.log("put encryptedFile into memcache");
+    // this.cacheService.put(this.props.letter.letterId, encryptedFile);
+    // console.log("put encryptedFile into memcache");
 
     // post encrypted file to server
     fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, {
@@ -135,7 +136,7 @@ class WriterLetterDisplay extends React.Component<
           publicAddress: this.props.user.publicAddress,
           jwtToken: this.props.user.jwtToken,
         },
-        data: { contents: encryptedFile },
+        data: encryptedFile,
       }),
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -162,7 +163,7 @@ class WriterLetterDisplay extends React.Component<
     console.log("opening view modal");
     this.setState({ viewIsOpen: true });
     const letterId = this.props.letter.letterId;
-    const fetchUrl = `/api/v1/letters/${letterId}/contents`;
+    const fetchUrl = `/api/v1/letters/${letterId}/contents/writer`;
     console.log(letterId);
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
@@ -213,18 +214,25 @@ class WriterLetterDisplay extends React.Component<
         console.log(response);
         return response.json();
       })
-      .then((encryptedLetter) => {
+      .then((body) => {
         // decrypt letter
-        this.cryptService
-          .decrypt(encryptedLetter, this.props.user.publicAddress)
-          .then((fileData) => {
-            if (fileData) {
-              this.setState({
-                viewIsOpen: true,
-                fileData: fileData,
-              });
-            }
+        const encryptedLetter: string = body.data;
+        if (encryptedLetter) {
+          this.cryptService
+            .decrypt(encryptedLetter, this.props.user.publicAddress)
+            .then((fileData) => {
+              if (fileData) {
+                this.setState({
+                  viewIsOpen: true,
+                  fileData: fileData,
+                });
+              }
+            });
+        } else {
+          this.setState({
+            viewIsOpen: false,
           });
+        }
       })
       .catch((e: Error) => {
         console.log(e);
@@ -438,6 +446,7 @@ class WriterLetterDisplay extends React.Component<
             </div>
             <Button
               // TODO: add Tooltip
+              disabled={numRecipients > 0}
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
@@ -453,6 +462,7 @@ class WriterLetterDisplay extends React.Component<
             </Button>
             <Button
               // TODO: add Tooltip
+              disabled={letter.uploadedAt === null}
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
