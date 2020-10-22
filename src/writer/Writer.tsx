@@ -32,6 +32,10 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
   componentWillMount() {
     // api call to get letters
+    this.loadLetterList();
+  }
+
+  async loadLetterList() {
     const letterFetchUrl = `/api/v1/letters/written`;
     const init: RequestInit = {
       method: "POST",
@@ -47,7 +51,6 @@ class Writer extends React.Component<WriterProps, WriterState> {
         data: {},
       }),
     };
-
     // get letters from server
     fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, init)
       .then((response) => {
@@ -79,17 +82,14 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
   render() {
     const { user } = this.props;
-    const {
-      letters,
-      numRecipients,
-      loadingLetters,
-    } = this.state;
+    const { letters, numRecipients, loadingLetters } = this.state;
 
     const lettersList = letters.map((l, k) => (
       <WriterLetterDisplay
         user={user}
         letter={l}
         numRecipients={numRecipients[k]}
+        onReload={this.loadLetterList.bind(this)}
       />
     ));
 

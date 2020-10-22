@@ -31,6 +31,7 @@ interface WriterLetterDisplayProps {
   user: UserAuth;
   letter: LetterDetails;
   numRecipients: Number;
+  onReload(): Promise<void>;
 }
 interface WriterLetterDisplayState {
   history: LetterHistory[];
@@ -138,6 +139,7 @@ class WriterLetterDisplay extends React.Component<
         console.log(response.status);
         if (response.status === 200) {
           this.closeUploadModal();
+          this.props.onReload();
         } else {
           this.uploadModal.current!.changeDisplayMessage(
             "Upload Failed. Try Again Later."
