@@ -39,7 +39,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
   onFormSubmit() {
     const file = this.state.file;
     console.log(file);
-    if (file && file.size === 0) {
+    if (!file || file.size === 0) {
       console.log("no file uploaded");
       this.setState({ displayMessage: "No File Uploaded." });
     } else if (this.props.restrictPdf && file.type !== "application/pdf") {
