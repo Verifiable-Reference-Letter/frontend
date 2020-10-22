@@ -227,7 +227,7 @@ class Select extends React.Component<SelectProps, SelectState> {
                 this.props.onSubmit(selectedRecipients);
               }}
             >
-              Select
+              Submit
             </Button>
           )}
           {selectedRecipients.length === 0 && (
@@ -248,7 +248,7 @@ class Select extends React.Component<SelectProps, SelectState> {
                     this.props.onSubmit(selectedRecipients);
                   }}
                 >
-                  Select
+                  Submit
                 </Button>
               </span>
             </OverlayTrigger>
@@ -264,7 +264,7 @@ class Select extends React.Component<SelectProps, SelectState> {
           >
             Reset
           </Button>
-
+          {/* 
           <Button
             variant="outline-light"
             className="flex-shrink-1 float-right ml-3"
@@ -273,7 +273,7 @@ class Select extends React.Component<SelectProps, SelectState> {
             }}
           >
             Close
-          </Button>
+          </Button> */}
         </div>
 
         <Modal

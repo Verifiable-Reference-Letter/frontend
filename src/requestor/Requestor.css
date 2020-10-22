@@ -1,8 +1,15 @@
 .requestor {
-  padding: 20px 20% 20px;
+  padding: 10px 20% 10px;
 }
 .requestor-header {
   text-align: center;
+  width: 100%;
+}
+
+.requestor-select {
+  width: 100%;
+  margin-bottom: 15px;
+  margin-right: 6.4px;
 }
 
 .requestor-select-writer {
@@ -11,14 +18,29 @@
 
 .requestor-letters {
   margin-bottom: 10px;
-  margin-top: 20px;
+  width: 100%;
 }
 
-/* .requestor-letterslist {
-  max-height: 392px;
+.requestor-dual {
+  padding: 10px 3em 10px;
+}
+
+.requestor-footer {
+  text-align: center;
+  width: 100%;
+}
+
+.requestor .requestor-letterslist {
+  max-height: 441px;
   overflow-y: scroll;
   overflow-x: hidden;
-} */
+}
+
+.requestor-dual .requestor-letterslist {
+  max-height: 539px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 
 h1,
 h2,
@@ -26,10 +48,6 @@ h3,
 h4,
 h5,
 h6 {
-  text-align: center;
-}
-
-.requestor-footer {
   text-align: center;
 }
 

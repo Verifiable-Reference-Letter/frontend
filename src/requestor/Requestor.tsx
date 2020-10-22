@@ -33,6 +33,7 @@ interface RequestorState {
   letters: LetterDetails[];
   numRecipients: Number[];
   loadingLetters: boolean;
+  dualMode: boolean;
   loadingSelect: boolean;
   selectIsOpen: boolean;
   messageIsOpen: boolean;
@@ -51,6 +52,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       letters: [],
       numRecipients: [],
       loadingLetters: true,
+      dualMode: false,
       loadingSelect: false,
       selectIsOpen: false,
       messageIsOpen: false,
@@ -151,7 +153,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
   async closeSelectModal() {
     console.log("closing select modal");
-    this.setState({ selectIsOpen: false });
+    this.setState({ selectIsOpen: false, selectedWriter: [], dualMode: false });
   }
 
   async openSelectModal() {
@@ -159,6 +161,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     if (this.state.selectedWriter.length !== 0) {
       this.setState({
         selectIsOpen: true,
+        dualMode: true,
         selectedRecipients: [],
       });
     }
@@ -217,6 +220,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             letters: data.letters,
             numRecipients: data.numRecipients,
             selectIsOpen: false,
+            dualMode: false,
+            selectedWriter: [],
           });
         }
       }
@@ -249,6 +254,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       letters,
       numRecipients,
       loadingLetters,
+      dualMode,
       selectIsOpen,
       messageIsOpen,
       confirmIsOpen,
@@ -262,7 +268,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       <Fragment>
         <InputGroup className="d-flex justify-content-between border-radius button-blur mb-0">
           <div
-            className="flex-fill mr-4 single-typeahead"
+            className="flex-fill single-typeahead"
             onClick={() => {
               this.setState({ selectedWriter: [] });
             }}
@@ -280,6 +286,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                 console.log("selected", selected);
                 this.setState({
                   selectedWriter: selected,
+                  selectIsOpen: true,
+                  dualMode: true,
                 });
               }}
               renderMenuItemChildren={
@@ -290,7 +298,22 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             />
           </div>
 
-          {selectedWriter.length !== 0 && (
+          {dualMode && (
+            <Button
+              variant="outline-light"
+              className="ml-4 flex-shrink-1"
+              onClick={() => {
+                if (selectIsOpen) {
+                  this.closeSelectModal();
+                } else {
+                  this.openSelectModal();
+                }
+              }}
+            >
+              {selectIsOpen ? "Close" : "Select"}
+            </Button>
+          )}
+          {/* {selectedWriter.length !== 0 && (
             <Button
               variant="outline-light"
               className="flex-shrink-1"
@@ -302,10 +325,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                 }
               }}
             >
-              Select
+              {selectIsOpen ? "Close" : "Select"}
             </Button>
-          )}
-          {selectedWriter.length === 0 && (
+          )} */}
+
+          {/* {selectedWriter.length === 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id="tooltip-disabled" placement="left">
@@ -327,11 +351,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
                     }
                   }}
                 >
-                  Select
+                  {selectIsOpen ? "Close" : "Select"}
                 </Button>
               </span>
             </OverlayTrigger>
-          )}
+          )} */}
         </InputGroup>
       </Fragment>
     );
@@ -344,43 +368,67 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         users={users}
       />
     ));
+    const requestorSelect = (
+      <div className="requestor-select">
+        <div className="requestor-header">
+          <h3 className="mb-3">New Request</h3>
+        </div>
+        <Card.Header className="requestor-select-writer">
+          <div>{selectWriter}</div>
+        </Card.Header>
+        {selectIsOpen && selectedWriter.length === 1 && (
+          <div className="collapse-body-select">
+            <Select
+              user={this.props.user}
+              previouslySelectedRecipients={[]}
+              header="Select Recipients"
+              onClose={this.closeSelectModal.bind(this)}
+              onSubmit={this.openMessageModal.bind(this)}
+              users={this.state.users.filter(
+                (user: User) =>
+                  user.publicAddress !== selectedWriter[0].publicAddress
+              )}
+            />
+          </div>
+        )}
+      </div>
+    );
+
+    const requestorLetter = (
+      <div className="requestor-letters">
+        <h3> Requests </h3>
+        <div className="requestor-letterslist">{lettersList}</div>
+      </div>
+    );
+
+    const requestorFooter = (
+      <div className="requestor-footer">
+        <span> Product of Team Gas</span>
+      </div>
+    );
 
     return (
       <>
-        {!loadingLetters && (
-          <div className="requestor">
-            <div className="requestor-header">
-              <h3 className="mb-3">New Request</h3>
-            </div>
+        {!loadingLetters && !dualMode && (
+          <Col className="requestor">
+            <Row>{requestorSelect}</Row>
+            <Row>{requestorLetter}</Row>
+            {/* <Row>{requestorFooter}</Row> */}
+          </Col>
+        )}
 
-            <div className="requestor-select">
-              <Card.Header className="requestor-select-writer">
-                <div>{selectWriter}</div>
-              </Card.Header>
-              {selectIsOpen && selectedWriter.length === 1 && (
-                <div className="collapse-body-select">
-                  <Select
-                    user={this.props.user}
-                    previouslySelectedRecipients={[]}
-                    header="Select Recipients"
-                    onClose={this.closeSelectModal.bind(this)}
-                    onSubmit={this.openMessageModal.bind(this)}
-                    users={this.state.users.filter(
-                      (user: User) =>
-                        user.publicAddress !== selectedWriter[0].publicAddress
-                    )}
-                  />
-                </div>
-              )}
-            </div>
-            <div className="requestor-letters">
-              <h3> Requests </h3>
-              <div className="requestor-letterslist">{lettersList}</div>
-            </div>
-            <div className="requestor-footer">
-              <span> Product of Team Gas</span>
-            </div>
-          </div>
+        {!loadingLetters && dualMode && (
+          <Col>
+            <Row className="requestor-dual">
+              <Col className="ml-5 mr-5">
+                <Row>{requestorSelect}</Row>
+              </Col>
+              <Col className="mr-5 ml-5">
+                <Row>{requestorLetter}</Row>
+              </Col>
+            </Row>
+            {/* <Row>{requestorFooter}</Row> */}
+          </Col>
         )}
 
         {loadingLetters && (
@@ -388,6 +436,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             <Spinner className="" animation="border" variant="secondary" />
           </div>
         )}
+
         <Modal
           id="confirm-modal"
           show={confirmIsOpen}

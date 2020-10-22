@@ -123,7 +123,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
               variant="outline-light"
               onClick={this.onFormSubmit}
             >
-              Upload
+              Submit
             </Button>
             <Button
               className="mt-3 flex-shrink-1 float-right"
