@@ -201,7 +201,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         console.log(response.status);
       } else {
         let body = await response.json();
-        const data: { letters: LetterDetails[], numRecipients: Number[] } = body.data;
+        const data: { letters: LetterDetails[]; numRecipients: Number[] } =
+          body.data;
         console.log(response);
         console.log(data);
         if (data) {
@@ -215,7 +216,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             confirmIsOpen: false,
             letters: data.letters,
             numRecipients: data.numRecipients,
-            selectIsOpen: false
+            selectIsOpen: false,
           });
         }
       }
@@ -373,10 +374,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               )}
             </div>
             <div className="requestor-letters">
-              <div>
-                <h3> Requests </h3>
-                {lettersList}
-              </div>
+              <h3> Requests </h3>
+              <div className="requestor-letterslist">{lettersList}</div>
             </div>
             <div className="requestor-footer">
               <span> Product of Team Gas</span>

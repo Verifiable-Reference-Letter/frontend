@@ -78,7 +78,7 @@ class RecipientLetterDisplay extends React.Component<
     console.log("opening view modal");
     this.setState({ viewIsOpen: true });
     const letterId = this.props.letter.letterId;
-    const fetchUrl = `/api/v1/letters/${letterId}/contents`;
+    const fetchUrl = `/api/v1/letters/${letterId}/contents/recipient`;
     console.log(letterId);
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
