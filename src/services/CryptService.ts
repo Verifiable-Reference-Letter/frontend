@@ -76,6 +76,12 @@ class CryptService {
 	              return reject(err);
 	            }
 	            console.log("message signed");
+	            // web3.eth.personal.ecRecover(message, signature).then((account: string) => { 
+	            // 	//console.log("Successfully signed letter")
+	            // 	if (account != publicAddress) {
+	            // 		console.log("Successfully signed letter")
+	            // 	}
+	            // });
 	            return resolve(signature);
 	          }
 	        )
@@ -84,7 +90,6 @@ class CryptService {
 	          console.log();
 	        });
 	    });
-
 
   	} catch (error) {
   		console.log("error in file reader and/or digital signature");
