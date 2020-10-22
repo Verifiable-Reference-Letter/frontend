@@ -101,6 +101,16 @@ class WriterLetterDisplay extends React.Component<
     console.log("uploading to server");
     console.log(file);
 
+    // This should be what I change 
+    //  1. Encryt w/recipients public key
+    //  2. Sign
+    //  3. Send to server
+    let encrypt = await this.cryptService.sign(
+      file,
+      this.props.user.publicAddress
+    );
+    console.log("Encrypt: " + encrypt);
+
     // encrypt file
     let encryptedFile = await this.cryptService.encrypt(
       file,

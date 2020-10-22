@@ -1,6 +1,7 @@
 import * as EthUtil from "ethereumjs-util";
 import * as SigUtil from "eth-sig-util";
 import FileData from "../common/FileData.interface";
+import { web3 } from "../App";
 
 class CryptService {
   private publicKey: string = "";
@@ -57,9 +58,44 @@ class CryptService {
     }
   }
 
-  async sign(file: string, publicAddress: string): Promise<string> {
+  async sign(file: File, publicAddress: string): Promise<string> {
   	// Logic to sign https://github.com/MetaMask/eth-sig-util/blob/master/index.ts
   	// eth-sign from here json rpc: https://eth.wiki/json-rpc/API#eth_sign
+  	try {
+  		const fileData = await this.createFileData(file); // rejects on failure
+  		let signedFile: string | null = null;
+  		let message = JSON.stringify(fileData)
+
+  		return new Promise((resolve, reject) => {
+      // web3.eth.sign doesn't seem to work (never finishes)
+	      web3.eth.personal
+	        .sign(
+	          message,
+	          // web3.utils.utf8ToHex(`${message}`),
+	          publicAddress,
+	          "",
+	          (err, signature) => {
+	            //console.log(web3.eth.accounts.recover(web3.utils.keccak256(nonce), signature));
+	            //web3.eth.personal.ecRecover(message, signature).then((v) => console.log(v));
+	            if (err) {
+	              console.log("error when signing");
+	              return reject(err);
+	            }
+	            console.log("message signed");
+	            return resolve(signature);
+	          }
+	        )
+	        .then(console.log)
+	        .catch((err: Error) => {
+	          console.log();
+	        });
+	    });
+
+
+  	} catch (error) {
+  		console.log("error in file reader and/or digital signature");
+      	return Promise.reject("error in file reader and/or digital signature");
+  	}
   }
 
   async decrypt(file: string, publicAddress: string) : Promise<FileData> {
