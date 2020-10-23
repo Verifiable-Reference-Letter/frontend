@@ -39,7 +39,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
   onFormSubmit() {
     const file = this.state.file;
     console.log(file);
-    if (file && file.size === 0) {
+    if (!file || file.size === 0) {
       console.log("no file uploaded");
       this.setState({ displayMessage: "No File Uploaded." });
     } else if (this.props.restrictPdf && file.type !== "application/pdf") {
@@ -123,7 +123,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
               variant="outline-light"
               onClick={this.onFormSubmit}
             >
-              Upload
+              Submit
             </Button>
             <Button
               className="mt-3 flex-shrink-1 float-right"

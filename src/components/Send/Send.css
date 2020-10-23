@@ -1,0 +1,26 @@
+.send-check-square {
+  margin: 7px 7px 7px 12px;
+}
+
+.send-check-square-placeholder {
+  height: 32px;
+  width: 35px;
+  opacity: 0;
+}
+
+.send-placeholder {
+  height: 32px;
+}
+
+.send-entry {
+  background-color: RGBA(0, 0, 0, 0.1);
+  height: 32px;
+}
+
+.send-entry:hover {
+  background-color: RGBA(0, 0, 0, 0.2);
+}
+
+.send-entry:active {
+  background-color: rgba(32, 158, 145, 0.2);
+}

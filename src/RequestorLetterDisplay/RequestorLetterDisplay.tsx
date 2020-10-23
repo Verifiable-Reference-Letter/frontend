@@ -143,7 +143,7 @@ class RequestorLetterDisplay extends React.Component<
         collapseIsOpen: true,
         selectIsOpen: true,
       });
-      this.retrieveRecipientsFromServer(fetchUrl);
+      this.retrieveUnsentRecipientsFromServer(fetchUrl);
     } else {
       this.setState({
         selectIsOpen: true,
@@ -152,7 +152,7 @@ class RequestorLetterDisplay extends React.Component<
     }
   }
 
-  async retrieveRecipientsFromServer(fetchUrl: string) {
+  async retrieveUnsentRecipientsFromServer(fetchUrl: string) {
     const init: RequestInit = {
       method: "POST",
       headers: {
