@@ -50,14 +50,21 @@ class Send extends React.Component<SendProps, SendState> {
     this.cryptService = new CryptService();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
   	let hash = this.cryptService.hashFile(JSON.stringify(this.props.letter))
+  	// Get letter contents
+  	const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents`;
+  	let contents = await this.getLetterContents(fetchUrl)
+  	console.dir(contents)
   	this.setState({ letterHash: hash })
   }
 
   async encryptAndUpload(key: number, userKey: UserKey) {
   	let hash = this.state.letterHash
   	console.log("Letter hash is: " + hash)
+  	// Sign hash
+  	// get letter contents
+  	// 
     //const encryptedLetterForm: { encryptedLetter: string, signedHash: string, hash: string } = await this.cryptService.encryptMethod(userKey.publicKey);
     // TODO: check successful encrypt, make fetch call to backend with signed hashed, hash, and encrypted letters
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
@@ -68,6 +75,39 @@ class Send extends React.Component<SendProps, SendState> {
       encrypted[key] = true;
       this.setState({ encrypted: encrypted });
     }
+  }
+
+  async getLetterContents(fetchUrl: string) {
+  	const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        }
+      }),
+    };
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      if (response.status === 400) {
+        console.log(response.status);
+        return "";
+      } else {
+        // let body = await response.json();
+        return response;
+      }
+    } catch (e) {
+      console.log(e);
+      return "";
+    }
+
   }
 
   async uploadEncryptedLetterForm(
