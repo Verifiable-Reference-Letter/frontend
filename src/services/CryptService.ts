@@ -76,6 +76,7 @@ class CryptService {
 	              return reject(err);
 	            }
 	            console.log("message signed");
+              // Did this to test signature
 	            // web3.eth.personal.ecRecover(message, signature).then((account: string) => { 
 	            // 	//console.log("Successfully signed letter")
 	            // 	if (account != publicAddress) {

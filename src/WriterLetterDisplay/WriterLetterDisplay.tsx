@@ -106,11 +106,11 @@ class WriterLetterDisplay extends React.Component<
     //  1. Encryt w/recipients public key
     //  2. Sign
     //  3. Send to server
-    let encrypt = await this.cryptService.sign(
+    let signLetter = await this.cryptService.sign(
       file,
       this.props.user.publicAddress
     );
-    console.log("Encrypt: " + encrypt);
+    console.log("Encrypt: " + signLetter);
 
     // encrypt file
     let encryptedFile = await this.cryptService.encrypt(
