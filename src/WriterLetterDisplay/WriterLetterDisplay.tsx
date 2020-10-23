@@ -11,6 +11,8 @@ import {
 } from "react-bootstrap";
 import UserProfile from "../common/UserProfile.interface";
 import UserAuth from "../common/UserAuth.interface";
+import UserKey from "../common/UserKey.interface";
+import User from "../common/User.interface";
 import LetterHistory from "../common/LetterHistory.interface";
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
@@ -24,6 +26,7 @@ import CacheService from "../services/CacheService";
 import FileUpload from "../components/FileUpload/FileUpload";
 import FileView from "../components/FileView/FileView";
 import Confirm from "../components/Confirm/Confirm";
+import Send from "../components/Send/Send";
 import FileHistory from "../components/FileHistory";
 import Profile from "../components/Profile";
 
@@ -31,20 +34,25 @@ interface WriterLetterDisplayProps {
   user: UserAuth;
   letter: LetterDetails;
   numRecipients: Number;
+  numUnsentRecipients: Number;
   onReload(): Promise<void>;
 }
 interface WriterLetterDisplayState {
   history: LetterHistory[];
   loadingHistory: boolean;
+  loadingSend: boolean;
   profileIsOpen: boolean;
   historyIsOpen: boolean;
+  messageIsOpen: boolean;
   uploadIsOpen: boolean;
+  sendIsOpen: boolean;
   viewIsOpen: boolean;
   confirmIsOpen: boolean;
   collapseIsOpen: boolean;
   selectedUserProfile?: UserProfile;
   uploadedFile?: File;
   fileData?: FileData;
+  unsentRecipientKeys: UserKey[];
 }
 
 class WriterLetterDisplay extends React.Component<
@@ -61,10 +69,14 @@ class WriterLetterDisplay extends React.Component<
     super(props);
     this.state = {
       history: [],
+      unsentRecipientKeys: [],
       loadingHistory: false,
+      loadingSend: false,
       profileIsOpen: false,
       historyIsOpen: false,
+      messageIsOpen: false,
       uploadIsOpen: false,
+      sendIsOpen: false,
       viewIsOpen: false,
       confirmIsOpen: false,
       collapseIsOpen: false,
@@ -75,7 +87,7 @@ class WriterLetterDisplay extends React.Component<
     this.cacheService = new CacheService(1);
   }
 
-  openUploadModal() {
+  async openUploadModal() {
     console.log("opening upload modal");
     this.setState({
       uploadIsOpen: true,
@@ -83,14 +95,14 @@ class WriterLetterDisplay extends React.Component<
     });
   }
 
-  onUploadSubmit() {
+  async onUploadSubmit() {
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/update`;
     if (this.state.uploadedFile !== undefined) {
-      this.uploadContentsToServer(this.state.uploadedFile, fetchUrl);
+      await this.uploadContentsToServer(this.state.uploadedFile, fetchUrl);
     }
   }
 
-  closeUploadModal() {
+  async closeUploadModal() {
     console.log("closing upload modal");
     this.setState({
       confirmIsOpen: false,
@@ -149,6 +161,75 @@ class WriterLetterDisplay extends React.Component<
       .catch((e: Error) => {
         console.log(e);
       });
+  }
+
+  async openSendModal() {
+    this.setState({ sendIsOpen: true });
+    if (
+      this.props.numUnsentRecipients > 0 &&
+      this.props.letter.uploadedAt !== null
+    ) {
+      const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/unsentRecipientKeys`;
+      this.retrieveUnsentRecipientKeysFromServer(fetchUrl);
+    }
+  }
+
+  async closeSendModal() {
+    this.setState({ sendIsOpen: false });
+  }
+
+  async onSendSubmit() {
+    // closed send and repopulate letter list; can be optimized
+    this.closeSendModal();
+    this.props.onReload();
+  }
+
+  async retrieveUnsentRecipientKeysFromServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      if (response.status === 400) {
+        console.log(response.status);
+        // this.setState({
+        // loadingSelect: false,
+        // selectIsOpen: false,
+        // collapseIsOpen: this.state.historyIsOpen,
+        // });
+      } else {
+        let body = await response.json();
+
+        const data: { userKeys: UserKey[]; users: User[] } = body.data;
+        console.log(response);
+        this.setState({
+          unsentRecipientKeys: data.userKeys,
+          loadingSend: false,
+        });
+      }
+    } catch (e) {
+      console.log(e);
+      // this.setState({
+      // loadingSelect: false,
+      // selectIsOpen: false,
+      // collapseIsOpen: this.state.historyIsOpen,
+      // });
+    }
   }
 
   async openViewModal() {
@@ -232,11 +313,13 @@ class WriterLetterDisplay extends React.Component<
   }
 
   async openMessageModal(file: File) {
-    this.setState({ uploadedFile: file });
+    this.setState({ uploadedFile: file, messageIsOpen: true });
     this.openConfirmModal();
   }
 
-  async closeMessageModal() {}
+  async closeMessageModal() {
+    this.setState({ messageIsOpen: false });
+  }
 
   async closeProfileModal() {
     console.log("closing profile modal");
@@ -405,16 +488,20 @@ class WriterLetterDisplay extends React.Component<
   }
 
   render() {
-    const { user, letter, numRecipients } = this.props;
+    const { user, letter, numRecipients, numUnsentRecipients } = this.props;
     const {
       history,
       loadingHistory,
+      loadingSend,
       profileIsOpen,
       historyIsOpen,
+      messageIsOpen,
       uploadIsOpen,
+      sendIsOpen,
       viewIsOpen,
       confirmIsOpen,
       collapseIsOpen,
+      unsentRecipientKeys,
     } = this.state;
 
     return (
@@ -436,6 +523,24 @@ class WriterLetterDisplay extends React.Component<
                 {letter.letterRequestor?.name}
               </Button>
             </div>
+
+            {numUnsentRecipients > 0 && letter.uploadedAt !== null && (
+              <Button
+                // TODO: add Tooltip
+                variant="outline-light"
+                className="flex-shrink-1 float-right ml-3"
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  if (sendIsOpen) {
+                    this.closeSendModal();
+                  } else {
+                    this.openSendModal();
+                  }
+                }}
+              >
+                Send
+              </Button>
+            )}
             <Button
               // TODO: add Tooltip
               disabled={numRecipients > 0}
@@ -469,6 +574,7 @@ class WriterLetterDisplay extends React.Component<
               View
             </Button>
             <Button
+              // TODO: add Tooltip
               disabled={numRecipients === 0}
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
@@ -484,6 +590,7 @@ class WriterLetterDisplay extends React.Component<
               History
             </Button>
             <Button
+              // TODO: add Tooltip
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
@@ -499,6 +606,7 @@ class WriterLetterDisplay extends React.Component<
         </Card>
         <Collapse in={collapseIsOpen}>
           <div className="collapse-body-select">
+            {sendIsOpen && <div>Send Letter Component</div>}
             {uploadIsOpen && (
               <div>
                 <FileUpload
@@ -588,6 +696,30 @@ class WriterLetterDisplay extends React.Component<
               user={this.props.user}
               onConfirm={this.onUploadSubmit.bind(this)}
               onClose={this.closeConfirmModal.bind(this)}
+            />
+          </Modal.Body>
+        </Modal>
+
+        <Modal
+          id="send-modal"
+          show={sendIsOpen}
+          onHide={this.closeSendModal.bind(this)}
+          // backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          // size="sm"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>List of Recipients</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <Send
+              user={this.props.user}
+              letter={this.props.letter}
+              unsentRecipientKeys={this.state.unsentRecipientKeys}
+              onClose={this.onSendSubmit.bind(this)}
             />
           </Modal.Body>
         </Modal>

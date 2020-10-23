@@ -17,6 +17,7 @@ interface WriterProps {
 interface WriterState {
   letters: LetterDetails[];
   numRecipients: Number[];
+  numUnsentRecipients: Number[];
   loadingLetters: boolean;
 }
 
@@ -26,6 +27,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
     this.state = {
       letters: [],
       numRecipients: [],
+      numUnsentRecipients: [],
       loadingLetters: true,
     };
   }
@@ -57,7 +59,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
         response
           .json()
           .then((body: ResponseBody) => {
-            const data: { letters: LetterDetails[]; numRecipients: Number[] } =
+            const data: { letters: LetterDetails[], numRecipients: Number[], numUnsentRecipients: Number[] } =
               body.data;
 
             console.log(response);
@@ -65,6 +67,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
               this.setState({
                 letters: data.letters,
                 numRecipients: data.numRecipients,
+                numUnsentRecipients: data.numUnsentRecipients,
                 loadingLetters: false,
               });
             } else {
@@ -82,13 +85,14 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
   render() {
     const { user } = this.props;
-    const { letters, numRecipients, loadingLetters } = this.state;
+    const { letters, numRecipients, numUnsentRecipients, loadingLetters } = this.state;
 
     const lettersList = letters.map((l, k) => (
       <WriterLetterDisplay
         user={user}
         letter={l}
         numRecipients={numRecipients[k]}
+        numUnsentRecipients={numUnsentRecipients[k]}
         onReload={this.loadLetterList.bind(this)}
       />
     ));

@@ -298,7 +298,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             />
           </div>
 
-          {dualMode && (
+          {/* {dualMode && (
             <Button
               variant="outline-light"
               className="ml-4 flex-shrink-1"
@@ -312,7 +312,8 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             >
               {selectIsOpen ? "Close" : "Select"}
             </Button>
-          )}
+          )} */}
+
           {/* {selectedWriter.length !== 0 && (
             <Button
               variant="outline-light"

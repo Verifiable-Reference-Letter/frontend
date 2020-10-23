@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Row, Col, Spinner } from "react-bootstrap";
-import UserAuth from "../../common/User.interface";
+import UserAuth from "../../common/UserAuth.interface";
 import "./Confirm.css";
 
 interface ConfirmProps {
