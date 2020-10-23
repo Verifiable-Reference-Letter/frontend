@@ -59,17 +59,17 @@ class CryptService {
   }
 
   async encryptSend(file: File) {
-
+  	// Encrypt the file and send
   }
 
-  async hashFile(letterDetails: string): Promise<string> {
+  hashFile(letterDetails: string): string {
   	try{
 	  	let hash = EthUtil.bufferToHex(EthUtil.keccak256(Buffer.from(letterDetails,"utf8")))
 	  	console.log("Hash is: " + hash)
 	  	return hash
   	} catch (error) {
   		console.log("error in file reader and/or fileHash");
-      	return Promise.reject("error in file reader and/or fileHash");
+      	return "error in file reader and/or fileHash"
   	}
   }
 
