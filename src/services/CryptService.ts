@@ -58,6 +58,21 @@ class CryptService {
     }
   }
 
+  async encryptSend(file: File) {
+
+  }
+
+  async hashFile(letterDetails: string): Promise<string> {
+  	try{
+	  	let hash = EthUtil.bufferToHex(EthUtil.keccak256(Buffer.from(letterDetails,"utf8")))
+	  	console.log("Hash is: " + hash)
+	  	return hash
+  	} catch (error) {
+  		console.log("error in file reader and/or fileHash");
+      	return Promise.reject("error in file reader and/or fileHash");
+  	}
+  }
+
   async sign(file: File, publicAddress: string): Promise<string> {
   	try {
   		const fileData = await this.createFileData(file); // rejects on failure

@@ -49,7 +49,8 @@ class Send extends React.Component<SendProps, SendState> {
   }
 
   async encryptAndUpload(key: number, userKey: UserKey) {
-    // const encryptedLetterForm: { encryptedLetter: string, signedHash: string, hash: string } = await this.cryptService.encryptMethod(userKey.publicKey);
+  	const fileHash = await this.cryptService.hashFile(JSON.stringify(this.props.letter))
+    //const encryptedLetterForm: { encryptedLetter: string, signedHash: string, hash: string } = await this.cryptService.encryptMethod(userKey.publicKey);
     // TODO: check successful encrypt, make fetch call to backend with signed hashed, hash, and encrypted letters
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
     // const success = await this.uploadEncryptedLetterForm(fetchUrl, encryptedLetterForm);
