@@ -23,7 +23,7 @@ interface RecipientUserDisplayProps {
   user: UserAuth;
   requestor: User;
   selected: boolean;
-  onView: (publicAddress: string) => void;
+  onView: (user: User) => void;
 }
 interface RecipientUserDisplayState {
   profileIsOpen: boolean;
@@ -36,7 +36,7 @@ class RecipientUserDisplay extends React.Component<
   RecipientUserDisplayProps,
   RecipientUserDisplayState
 > {
-  private viewModal = React.createRef<FileView>();
+  // private viewModal = React.createRef<FileView>();
   private userProfiles: Map<string, UserProfile>;
 
   constructor(props: RecipientUserDisplayProps) {
@@ -152,7 +152,7 @@ class RecipientUserDisplay extends React.Component<
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
                 e.stopPropagation();
-                this.props.onView(requestor.publicAddress);
+                this.props.onView(requestor);
               }}
             >
               {/* {selected ? "Close" : "Letters"} */}

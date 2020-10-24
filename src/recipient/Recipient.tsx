@@ -25,7 +25,7 @@ interface RecipientState {
   loadingRequestors: boolean;
   loadingLetters: boolean;
   dualMode: boolean;
-  selectedPublicAddress?: string;
+  selectedUser?: User;
 }
 
 class Recipient extends React.Component<RecipientProps, RecipientState> {
@@ -87,13 +87,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       });
   }
 
-  async toggleLetterModal(publicAddress: string) {
-    const selectedPublicAddress = this.state.selectedPublicAddress;
-    if (selectedPublicAddress && selectedPublicAddress === publicAddress) {
-      this.setState({ selectedPublicAddress: undefined, dualMode: false });
+  async toggleLetterModal(user: User) {
+    const selectedUser = this.state.selectedUser;
+    if (selectedUser && selectedUser.publicAddress === user.publicAddress) {
+      this.setState({ selectedUser: undefined, dualMode: false });
     } else {
-      this.setState({ selectedPublicAddress: publicAddress, dualMode: true, loadingLetters: true });
-      this.loadLettersList(publicAddress);
+      this.setState({ selectedUser: user, dualMode: true, loadingLetters: true });
+      this.loadLettersList(user.publicAddress);
     }
   }
 
@@ -158,14 +158,14 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       loadingRequestors,
       loadingLetters,
       dualMode,
-      selectedPublicAddress,
+      selectedUser,
     } = this.state;
 
     const requestorList = requestors.map((r, k) => (
       <RecipientUserDisplay
         user={user}
         requestor={r}
-        selected={r.publicAddress === selectedPublicAddress}
+        selected={r.publicAddress === selectedUser?.publicAddress}
         onView={this.toggleLetterModal.bind(this)}
       />
     ));
@@ -193,7 +193,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     const recipientLetters = (
       <div className="recipient-letters">
         <div className="recipient-header mb-3">
-          <h3> Letters </h3>
+          <h3> {selectedUser?.name} </h3>
         </div>
 
         <div className="recipient-letterdisplay">
