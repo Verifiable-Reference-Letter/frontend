@@ -158,12 +158,14 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
       loadingRequestors,
       loadingLetters,
       dualMode,
+      selectedPublicAddress,
     } = this.state;
 
     const requestorList = requestors.map((r, k) => (
       <RecipientUserDisplay
         user={user}
         requestor={r}
+        selected={r.publicAddress === selectedPublicAddress}
         onView={this.toggleLetterModal.bind(this)}
       />
     ));

@@ -22,6 +22,7 @@ import User from "../common/User.interface";
 interface RecipientUserDisplayProps {
   user: UserAuth;
   requestor: User;
+  selected: boolean;
   onView: (publicAddress: string) => void;
 }
 interface RecipientUserDisplayState {
@@ -123,7 +124,7 @@ class RecipientUserDisplay extends React.Component<
   }
 
   render() {
-    const { user, requestor } = this.props;
+    const { user, requestor, selected } = this.props;
     const { profileIsOpen, viewIsOpen, collapseIsOpen } = this.state;
 
     return (
@@ -154,6 +155,7 @@ class RecipientUserDisplay extends React.Component<
                 this.props.onView(requestor.publicAddress);
               }}
             >
+              {/* {selected ? "Close" : "Letters"} */}
               Letters
             </Button>
             <Button
