@@ -175,7 +175,7 @@ class RecipientUserDisplay extends React.Component<
         <Collapse in={collapseIsOpen}>
           <div className="collapse-body-select">
             <div className="display-text d-flex text-white-50">
-              <div className="flex-fill">Application Information</div>
+              <div className="flex-fill">Applicant Information</div>
             </div>
           </div>
         </Collapse>
