@@ -28,7 +28,7 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
             <Card className="flex-fill">
               <div className="m-2">
                 <div className="">Name: {user.name}</div>
-                <div className="text-break">ID: {user.publicAddress}</div>
+                {/* <div className="text-break">ID: {user.publicAddress}</div> */}
               </div>
             </Card>
             <div className="ml-4 flex-shrink-1 float-right image-card">

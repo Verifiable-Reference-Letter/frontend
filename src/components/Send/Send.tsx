@@ -187,7 +187,7 @@ class Send extends React.Component<SendProps, SendState> {
               <Col>{recipientList}</Col>
             </Row>
           )}
-          {!unsentRecipientKeys && (
+          {(!unsentRecipientKeys || unsentRecipientKeys.length === 0) && (
             <Row className="d-flex justify-content-center">
               <Spinner
                 className="float-right mt-4 mr-3"
