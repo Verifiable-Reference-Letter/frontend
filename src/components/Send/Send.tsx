@@ -26,7 +26,7 @@ interface SendProps {
 interface SendState {
   sent: boolean;
   encrypted: boolean[];
-  letterHash: string;
+  encryptedLetter: any;
 }
 
 class Send extends React.Component<SendProps, SendState> {
@@ -45,31 +45,41 @@ class Send extends React.Component<SendProps, SendState> {
     this.state = {
       sent: false,
       encrypted: e,
-      letterHash: ""
+      encryptedLetter: ""
     };
     this.cryptService = new CryptService();
   }
 
   async componentDidMount() {
-  	//let hash = this.cryptService.hashFile(JSON.stringify(this.props.letter))
-  	// Get letter contents
-  	const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents`;
-  	//let contents = await this.getLetterContents(fetchUrl)
-  	//console.dir(contents)
-  	//this.setState({ letterHash: hash })
+  	let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
+    let url = await this.getLetterContents(this.props.letter.letterId, fetchUrl);
+    //this.setState({ encryptedLetter: url });
+
+    //this.setState({ encryptedLetter: url });
+    //let encryptedLetter = await this.cryptService.encryptSend(url);
+    //console.log("State url: " + this.state.encryptedLetter)
+  }
+
+  async getLetter() {
+    let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
+    this.getLetterContents(this.props.letter.letterId, fetchUrl)
+    //this.setState({ encryptedLetter: url });
+    //let encryptedLetter = await this.cryptService.encryptSend(url);
   }
 
   async encryptAndUpload(key: number, letter: Letter, userKey: UserKey) {
-  	let hash = this.state.letterHash
-  	console.log("Letter hash is: " + hash)
-    let fetchUrl = `/api/v1/letters/${letter.letterId}/contents/writer`;
-    let url = this.getLetterContents(letter.letterId, fetchUrl)
+    // Not using hash for now
+  	//let hash = this.state.letterHash
+  	//console.log("Letter hash is: " + hash)
+    console.log("State url: " + this.state.encryptedLetter)
+    //let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
+    //let url = this.getLetterContents(letter.letterId, fetchUrl)
   	// Sign hash
   	// get letter contents
   	// 
     //const encryptedLetterForm: { encryptedLetter: string, signedHash: string, hash: string } = await this.cryptService.encryptMethod(userKey.publicKey);
     // TODO: check successful encrypt, make fetch call to backend with signed hashed, hash, and encrypted letters
-    fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
+    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
     // const success = await this.uploadEncryptedLetterForm(fetchUrl, encryptedLetterForm);
     const success = true;
     if (success) {
@@ -104,14 +114,17 @@ class Send extends React.Component<SendProps, SendState> {
       .then((body) => {
         const encryptedLetter: string = body.data;
         if (encryptedLetter) {
+          //return encryptedLetter;
           this.cryptService
             .decrypt(encryptedLetter, this.props.user.publicAddress)
             .then((fileData) => {
               if (fileData) {
+                this.setState({ encryptedLetter: fileData.letterUrl });
                 return fileData.letterUrl;
               }
             });
         } else {
+          return ""
           console.log("Letter retrieval in send failed")
         }
       })
@@ -166,6 +179,7 @@ class Send extends React.Component<SendProps, SendState> {
     const { user, letter, unsentRecipientKeys } = this.props;
     const { sent, encrypted } = this.state;
 
+    //this.getLetter();
     let recipientList = [];
     if (unsentRecipientKeys) {
       for (let i = 0; i < unsentRecipientKeys.length; i += 2) {
