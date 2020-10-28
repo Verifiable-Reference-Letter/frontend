@@ -71,17 +71,15 @@ class Send extends React.Component<SendProps, SendState> {
     // 1) Encrypt letter w/ pubkey
     // Mines hard coded till I get real letter request
     let encryptedLetter = await this.cryptService.encryptSend(this.state.encryptedLetter, "0x779FF1B02d16765e9324ED137914f2e77e2a0D97");
-    // Test with my public key
-    let userAddress = this.props.user.publicAddress
-    let signedLetter = await this.cryptService.signLetter(encryptedLetter, userAddress)
-    
     console.log("Encrypted letter: " + encryptedLetter)
-    // 2) Sign letter
+
+    let signedLetter = await this.cryptService.signLetter(encryptedLetter, this.props.user.publicAddress)
+    console.log("Signed letter: " + signedLetter)
+
    
 
 
-    //const encryptedLetterForm: { encryptedLetter: string, signedHash: string, hash: string } = await this.cryptService.encryptMethod(userKey.publicKey);
-    // TODO: check successful encrypt, make fetch call to backend with signed hashed, hash, and encrypted letters
+    const encryptedLetterForm: { encryptedLetter: string, signedLetter: string} = {encryptedLetter, signedLetter}
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
     // const success = await this.uploadEncryptedLetterForm(fetchUrl, encryptedLetterForm);
     const success = true;
@@ -141,8 +139,7 @@ class Send extends React.Component<SendProps, SendState> {
     fetchUrl: string,
     encryptedLetterForm: {
       encryptedLetter: string;
-      signedHash: string;
-      hash: string;
+      signedLetter: string;
     }
   ) {
     const init: RequestInit = {
