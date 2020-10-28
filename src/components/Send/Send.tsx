@@ -64,12 +64,18 @@ class Send extends React.Component<SendProps, SendState> {
     // Not using hash for now
   	//let hash = this.state.letterHash
   	//console.log("Letter hash is: " + hash)
-
+    console.log("Pub address is: " + userKey.publicAddress)
     console.log("State url: " + this.state.encryptedLetter)
     //let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
 
     // 1) Encrypt letter w/ pubkey
-    let encryptedLetter = await this.cryptService.encryptSend(this.state.encryptedLetter, userKey.publicKey);
+    // Mines hard coded till I get real letter request
+    let encryptedLetter = await this.cryptService.encryptSend(this.state.encryptedLetter, "0x779FF1B02d16765e9324ED137914f2e77e2a0D97");
+    // Test with my public key
+    let userAddress = this.props.user.publicAddress
+    let signedLetter = await this.cryptService.signLetter(encryptedLetter, userAddress)
+    
+    console.log("Encrypted letter: " + encryptedLetter)
     // 2) Sign letter
    
 

@@ -58,8 +58,52 @@ class CryptService {
     }
   }
 
-  async encryptSend(url: string, pubKey: string) {
-  	// Encrypt the file and send
+  async encryptSend(url: string, address: string): Promise<string> {
+    // const encryptedLetter = EthUtil.bufferToHex(
+    //   Buffer.from(
+    //     JSON.stringify(
+    //       SigUtil.encrypt(
+    //         pubKey,
+    //         { data: url },
+    //         "x25519-xsalsa20-poly1305"
+    //       )
+    //     ),
+    //     "utf8"
+    //   )
+    // );
+    return this.ethereum
+        .request({
+          method: "eth_getEncryptionPublicKey",
+          params: [address], // you must have access to the specified account
+        })
+        .then((publicKey: string) => {
+          console.log(publicKey);
+          this.publicKey = publicKey;
+  
+          const encryptedMessage = EthUtil.bufferToHex(
+            Buffer.from(
+              JSON.stringify(
+                SigUtil.encrypt(
+                  this.publicKey,
+                  { data: url },
+                  "x25519-xsalsa20-poly1305"
+                )
+              ),
+              "utf8"
+            )
+          );
+          console.log(encryptedMessage.length);
+          return Promise.resolve(encryptedMessage);
+        })
+        .catch((e: Error) => {
+          console.log(e);
+          return Promise.resolve(e);
+        });
+  }
+
+  pubToAddress(pubKey: string): string {
+    let address = EthUtil.bufferToHex(EthUtil.pubToAddress(Buffer.from(pubKey,"utf8"), true))
+    return address;
   }
 
   hashFile(letterDetails: string): string {
@@ -71,6 +115,29 @@ class CryptService {
   		console.log("error in file reader and/or fileHash");
       	return "error in file reader and/or fileHash"
   	}
+  }
+
+  async signLetter(letter: string, publicAddress: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        web3.eth.personal
+          .sign(
+            letter,
+            publicAddress,
+            "",
+            (err, signedLetter) => {
+              if (err) {
+                console.log("error when signing");
+                return reject(err);
+              }
+              console.log("message signed");
+              return resolve(signedLetter);
+            }
+          )
+          .then(console.log)
+          .catch((err: Error) => {
+            console.log();
+          });
+      });
   }
 
   async sign(file: File, publicAddress: string): Promise<string> {
