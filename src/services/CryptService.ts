@@ -58,7 +58,7 @@ class CryptService {
     }
   }
 
-  async encryptSend(file: File) {
+  async encryptSend(url: string, pubKey: string) {
   	// Encrypt the file and send
   }
 

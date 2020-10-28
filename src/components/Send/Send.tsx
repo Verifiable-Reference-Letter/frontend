@@ -60,23 +60,20 @@ class Send extends React.Component<SendProps, SendState> {
     //console.log("State url: " + this.state.encryptedLetter)
   }
 
-  async getLetter() {
-    let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
-    this.getLetterContents(this.props.letter.letterId, fetchUrl)
-    //this.setState({ encryptedLetter: url });
-    //let encryptedLetter = await this.cryptService.encryptSend(url);
-  }
-
-  async encryptAndUpload(key: number, letter: Letter, userKey: UserKey) {
+  async encryptAndUpload(key: number, userKey: UserKey) {
     // Not using hash for now
   	//let hash = this.state.letterHash
   	//console.log("Letter hash is: " + hash)
+
     console.log("State url: " + this.state.encryptedLetter)
     //let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
-    //let url = this.getLetterContents(letter.letterId, fetchUrl)
-  	// Sign hash
-  	// get letter contents
-  	// 
+
+    // 1) Encrypt letter w/ pubkey
+    let encryptedLetter = await this.cryptService.encryptSend(this.state.encryptedLetter, userKey.publicKey);
+    // 2) Sign letter
+   
+
+
     //const encryptedLetterForm: { encryptedLetter: string, signedHash: string, hash: string } = await this.cryptService.encryptMethod(userKey.publicKey);
     // TODO: check successful encrypt, make fetch call to backend with signed hashed, hash, and encrypted letters
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
@@ -179,7 +176,6 @@ class Send extends React.Component<SendProps, SendState> {
     const { user, letter, unsentRecipientKeys } = this.props;
     const { sent, encrypted } = this.state;
 
-    //this.getLetter();
     let recipientList = [];
     if (unsentRecipientKeys) {
       for (let i = 0; i < unsentRecipientKeys.length; i += 2) {
@@ -192,7 +188,7 @@ class Send extends React.Component<SendProps, SendState> {
                     className="flex-fill send-entry"
                     onClick={() => {
                       if (!encrypted[i]) {
-                        this.encryptAndUpload(i, letter, unsentRecipientKeys[i]);
+                        this.encryptAndUpload(i, unsentRecipientKeys[i]);
                       }
                     }}
                   >
@@ -220,7 +216,7 @@ class Send extends React.Component<SendProps, SendState> {
                       className="flex-fill send-entry"
                       onClick={() => {
                         if (!encrypted[i + 1]) {
-                          this.encryptAndUpload(i + 1, letter, unsentRecipientKeys[i + 1]);
+                          this.encryptAndUpload(i + 1, unsentRecipientKeys[i + 1]);
                         }
                       }}
                     >
