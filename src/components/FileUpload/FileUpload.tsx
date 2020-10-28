@@ -104,7 +104,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     return (
       <Form onSubmit={this.onFormSubmit.bind(this)}>
         <Form.Group>
-          <Form.File id="fileUpload" className="file-upload-form" onChange={this.onChange} />
+          <Form.File id="fileUpload" className="file-upload-form" onChange={this.onChange} label="memes"/>
           <div className="d-flex border-radius button-blur mb-2">
             <div className="text-warning mt-3 flex-fill ">
               {displayMessage}
