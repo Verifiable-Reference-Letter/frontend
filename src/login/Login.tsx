@@ -2,6 +2,8 @@ import React from "react";
 import { Button, InputGroup, FormControl } from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
+import CryptService from "../services/CryptService";
+
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
 
@@ -18,6 +20,9 @@ interface LoginState {
 }
 
 class Login extends React.Component<LoginProps, LoginState> {
+
+  private cryptService: CryptService;
+
   constructor(props: LoginProps) {
     super(props);
     this.state = {
@@ -25,6 +30,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       // displayMessage: "",
       loginMode: true,
     };
+    this.cryptService = new CryptService();
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.onLoginClick = this.onLoginClick.bind(this);
@@ -60,7 +66,6 @@ class Login extends React.Component<LoginProps, LoginState> {
       .then(this.signMessage)
       // send signature to backend
       .then(this.authenticate)
-      //.then(this.doStuffWithToken) // after receiving the token
       .catch((err: Error) => {
         console.log(err);
         // this.setState({ displayMessage: "Error. Please Try Again Later." });
@@ -141,12 +146,18 @@ class Login extends React.Component<LoginProps, LoginState> {
   }) {
     console.log("publicAddress:", publicAddress, "name:", inputName);
     // this.setState({ displayMessage: "Signing You Up . . ." });
+
+    const publicKey = await this.cryptService.getPublicKey(publicAddress);
+    if (!publicKey) Promise.reject();
+
     return await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/auth/users/create`,
       {
         body: JSON.stringify({
           publicAddress: publicAddress,
           name: inputName,
+          email: "placeholder@lehigh.edu",
+          publicKey: publicKey,
         }),
         headers: {
           "Access-Control-Allow-Origin": "*",
