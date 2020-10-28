@@ -143,70 +143,71 @@ class Select extends React.Component<SelectProps, SelectState> {
     );
 
     let recipientsList = [];
-    for (let i = 0; i < selectedRecipients.length; i += 3) {
-      recipientsList.push(
-        <Row>
-          <Col>
-            <div className="d-flex justify-content-between recipient-entry">
-              <div
-                className="flex-fill body-text"
-                onClick={() =>
-                  this.openProfileModal(selectedRecipients[i].publicAddress)
-                }
-              >
-                {selectedRecipients[i].name}
-              </div>
-            </div>
-          </Col>
-          {i + 1 < selectedRecipients.length && (
+    if (selectedRecipients) {
+      for (let i = 0; i < selectedRecipients.length; i += 3) {
+        recipientsList.push(
+          <Row>
             <Col>
               <div className="d-flex justify-content-between recipient-entry">
                 <div
                   className="flex-fill body-text"
                   onClick={() =>
-                    this.openProfileModal(
-                      selectedRecipients[i + 1].publicAddress
-                    )
+                    this.openProfileModal(selectedRecipients[i].publicAddress)
                   }
                 >
-                  {selectedRecipients[i + 1].name}
+                  {selectedRecipients[i].name}
                 </div>
               </div>
             </Col>
-          )}
-
-          {i + 1 >= selectedRecipients.length && (
-            <Col>
-              <Card.Header className="d-flex justify-content-between recipient-placeholder"></Card.Header>
-            </Col>
-          )}
-
-          {i + 2 < selectedRecipients.length && (
-            <Col>
-              <div className="d-flex justify-content-between recipient-entry">
-                <div
-                  className="flex-fill body-text"
-                  onClick={() =>
-                    this.openProfileModal(
-                      selectedRecipients[i + 2].publicAddress
-                    )
-                  }
-                >
-                  {selectedRecipients[i + 2].name}
+            {i + 1 < selectedRecipients.length && (
+              <Col>
+                <div className="d-flex justify-content-between recipient-entry">
+                  <div
+                    className="flex-fill body-text"
+                    onClick={() =>
+                      this.openProfileModal(
+                        selectedRecipients[i + 1].publicAddress
+                      )
+                    }
+                  >
+                    {selectedRecipients[i + 1].name}
+                  </div>
                 </div>
-              </div>
-            </Col>
-          )}
+              </Col>
+            )}
 
-          {i + 2 >= selectedRecipients.length && (
-            <Col>
-              <Card.Header className="d-flex justify-content-between recipient-placeholder"></Card.Header>
-            </Col>
-          )}
-        </Row>
-      );
+            {i + 1 >= selectedRecipients.length && (
+              <Col>
+                <Card.Header className="d-flex justify-content-between recipient-placeholder"></Card.Header>
+              </Col>
+            )}
+
+            {i + 2 < selectedRecipients.length && (
+              <Col>
+                <div className="d-flex justify-content-between recipient-entry">
+                  <div
+                    className="flex-fill body-text"
+                    onClick={() =>
+                      this.openProfileModal(
+                        selectedRecipients[i + 2].publicAddress
+                      )
+                    }
+                  >
+                    {selectedRecipients[i + 2].name}
+                  </div>
+                </div>
+              </Col>
+            )}
+
+            {i + 2 >= selectedRecipients.length && (
+              <Col>
+                <Card.Header className="d-flex justify-content-between recipient-placeholder"></Card.Header>
+              </Col>
+            )}
+          </Row>
+        );
+      }
     }
-
     return (
       <div>
         <Row>
@@ -264,7 +265,7 @@ class Select extends React.Component<SelectProps, SelectState> {
           >
             Reset
           </Button>
-          
+
           <Button
             variant="outline-light"
             className="flex-shrink-1 float-right ml-3"

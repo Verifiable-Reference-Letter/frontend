@@ -1,13 +1,15 @@
 .recipient {
-  padding: 20px 20% 20px;
+  padding: 10px 20% 10px;
 }
 .recipient-header {
   text-align: center;
+  margin-bottom: 15px;
+  width: 100%;
 }
 
 .recipient-letters {
   margin-bottom: 10px;
-  margin-top: 20px;
+  width: 100%;
 }
 
 h1,
@@ -21,6 +23,11 @@ h6 {
 
 .recipient-footer {
   text-align: center;
+  width: 100%;
+}
+
+.recipient-dual {
+  padding: 10px 3em 10px;
 }
 
 h1,

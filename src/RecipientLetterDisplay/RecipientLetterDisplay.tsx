@@ -78,7 +78,7 @@ class RecipientLetterDisplay extends React.Component<
     console.log("opening view modal");
     this.setState({ viewIsOpen: true });
     const letterId = this.props.letter.letterId;
-    const fetchUrl = `/api/v1/letters/${letterId}/contents/recipient`;
+    const fetchUrl = `/api/v1/letters/${letterId}/recipientContents`;
     console.log(letterId);
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
@@ -367,7 +367,7 @@ class RecipientLetterDisplay extends React.Component<
             >
               Upload
             </Button> */}
-              <div className="flex-shrink-1 float-right">
+            {/* <div className="flex-shrink-1 float-right">
               <span className="mr-3">For:</span>
               <Button
                 variant="outline-light"
@@ -378,7 +378,7 @@ class RecipientLetterDisplay extends React.Component<
               >
                 {letter.letterRequestor?.name}
               </Button>
-            </div>
+            </div> */}
             <Button
               // TODO: add Tooltip
               variant="outline-light"
@@ -457,7 +457,8 @@ class RecipientLetterDisplay extends React.Component<
             {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}*/}
             {!uploadIsOpen && !historyIsOpen && (
               <div className="display-text d-flex text-white-50">
-                <div className="flex-fill">
+                <div className="flex-fill">Letter Information</div>
+                {/* <div className="flex-fill">
                   Requested: {letter.requestedAt?.toString()}
                 </div>
                 {letter.uploadedAt && (
@@ -467,7 +468,7 @@ class RecipientLetterDisplay extends React.Component<
                 )}
                 {!letter.uploadedAt && (
                   <div className=" flex-shrink-1 float-right">Not Uploaded</div>
-                )}
+                )} */}
               </div>
             )}
           </div>

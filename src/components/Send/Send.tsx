@@ -51,23 +51,25 @@ class Send extends React.Component<SendProps, SendState> {
   }
 
   async componentDidMount() {
-  	let hash = this.cryptService.hashFile(JSON.stringify(this.props.letter))
+  	//let hash = this.cryptService.hashFile(JSON.stringify(this.props.letter))
   	// Get letter contents
   	const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents`;
-  	let contents = await this.getLetterContents(fetchUrl)
-  	console.dir(contents)
-  	this.setState({ letterHash: hash })
+  	//let contents = await this.getLetterContents(fetchUrl)
+  	//console.dir(contents)
+  	//this.setState({ letterHash: hash })
   }
 
-  async encryptAndUpload(key: number, userKey: UserKey) {
+  async encryptAndUpload(key: number, letter: Letter, userKey: UserKey) {
   	let hash = this.state.letterHash
   	console.log("Letter hash is: " + hash)
+    let fetchUrl = `/api/v1/letters/${letter.letterId}/contents/writer`;
+    let url = this.getLetterContents(letter.letterId, fetchUrl)
   	// Sign hash
   	// get letter contents
   	// 
     //const encryptedLetterForm: { encryptedLetter: string, signedHash: string, hash: string } = await this.cryptService.encryptMethod(userKey.publicKey);
     // TODO: check successful encrypt, make fetch call to backend with signed hashed, hash, and encrypted letters
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
+    fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
     // const success = await this.uploadEncryptedLetterForm(fetchUrl, encryptedLetterForm);
     const success = true;
     if (success) {
@@ -77,8 +79,9 @@ class Send extends React.Component<SendProps, SendState> {
     }
   }
 
-  async getLetterContents(fetchUrl: string) {
-  	const init: RequestInit = {
+  async getLetterContents(id: string, fetchUrl: string) {
+    console.log("Letter Id: " + id)
+    const init: RequestInit = {
       method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -88,25 +91,33 @@ class Send extends React.Component<SendProps, SendState> {
         auth: {
           jwtToken: this.props.user.jwtToken,
           publicAddress: this.props.user.publicAddress,
-        }
+        },
+        data: {},
       }),
     };
-    try {
-      let response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
-        init
-      );
-      if (response.status === 400) {
-        console.log(response.status);
-        return "";
-      } else {
-        // let body = await response.json();
-        return response;
-      }
-    } catch (e) {
-      console.log(e);
-      return "";
-    }
+    const letterId = id;
+    // get letter from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+      .then((response) => {
+        return response.json();
+      })
+      .then((body) => {
+        const encryptedLetter: string = body.data;
+        if (encryptedLetter) {
+          this.cryptService
+            .decrypt(encryptedLetter, this.props.user.publicAddress)
+            .then((fileData) => {
+              if (fileData) {
+                return fileData.letterUrl;
+              }
+            });
+        } else {
+          console.log("Letter retrieval in send failed")
+        }
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
 
   }
 
@@ -167,7 +178,7 @@ class Send extends React.Component<SendProps, SendState> {
                     className="flex-fill send-entry"
                     onClick={() => {
                       if (!encrypted[i]) {
-                        this.encryptAndUpload(i, unsentRecipientKeys[i]);
+                        this.encryptAndUpload(i, letter, unsentRecipientKeys[i]);
                       }
                     }}
                   >
@@ -195,7 +206,7 @@ class Send extends React.Component<SendProps, SendState> {
                       className="flex-fill send-entry"
                       onClick={() => {
                         if (!encrypted[i + 1]) {
-                          this.encryptAndUpload(i + 1, unsentRecipientKeys[i + 1]);
+                          this.encryptAndUpload(i + 1, letter, unsentRecipientKeys[i + 1]);
                         }
                       }}
                     >
@@ -236,7 +247,7 @@ class Send extends React.Component<SendProps, SendState> {
               <Col>{recipientList}</Col>
             </Row>
           )}
-          {!unsentRecipientKeys && (
+          {(!unsentRecipientKeys || unsentRecipientKeys.length === 0) && (
             <Row className="d-flex justify-content-center">
               <Spinner
                 className="float-right mt-4 mr-3"
