@@ -53,31 +53,17 @@ class Send extends React.Component<SendProps, SendState> {
   async componentDidMount() {
   	let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
     let url = await this.getLetterContents(this.props.letter.letterId, fetchUrl);
-    //this.setState({ encryptedLetter: url });
-
-    //this.setState({ encryptedLetter: url });
-    //let encryptedLetter = await this.cryptService.encryptSend(url);
-    //console.log("State url: " + this.state.encryptedLetter)
   }
 
   async encryptAndUpload(key: number, userKey: UserKey) {
-    // Not using hash for now
-  	//let hash = this.state.letterHash
-  	//console.log("Letter hash is: " + hash)
-    console.log("Pub address is: " + userKey.publicAddress)
+    console.log("Pub key is: " + userKey.publicKey)
     console.log("State url: " + this.state.encryptedLetter)
-    //let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
 
-    // 1) Encrypt letter w/ pubkey
-    // Mines hard coded till I get real letter request
-    let encryptedLetter = await this.cryptService.encryptSend(this.state.encryptedLetter, "0x779FF1B02d16765e9324ED137914f2e77e2a0D97");
+    let encryptedLetter = this.cryptService.encryptSend(this.state.encryptedLetter, userKey.publicKey);
     console.log("Encrypted letter: " + encryptedLetter)
 
     let signedLetter = await this.cryptService.signLetter(encryptedLetter, this.props.user.publicAddress)
     console.log("Signed letter: " + signedLetter)
-
-   
-
 
     const encryptedLetterForm: { encryptedLetter: string, signedLetter: string} = {encryptedLetter, signedLetter}
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
@@ -166,6 +152,7 @@ class Send extends React.Component<SendProps, SendState> {
         console.log(response.status);
         return false;
       } else {
+
         // let body = await response.json();
         return true;
       }

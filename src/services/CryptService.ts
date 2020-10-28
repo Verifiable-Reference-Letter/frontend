@@ -58,48 +58,25 @@ class CryptService {
     }
   }
 
-  async encryptSend(url: string, address: string): Promise<string> {
-    // THis is how to really do it, just need a real request
-    // const encryptedLetter = EthUtil.bufferToHex(
-    //   Buffer.from(
-    //     JSON.stringify(
-    //       SigUtil.encrypt(
-    //         pubKey,
-    //         { data: url },
-    //         "x25519-xsalsa20-poly1305"
-    //       )
-    //     ),
-    //     "utf8"
-    //   )
-    // );
-    return this.ethereum
-      .request({
-        method: "eth_getEncryptionPublicKey",
-        params: [address], // you must have access to the specified account
-      })
-      .then((publicKey: string) => {
-        console.log(publicKey);
-        this.publicKey = publicKey;
-
-        const encryptedMessage = EthUtil.bufferToHex(
-          Buffer.from(
-            JSON.stringify(
-              SigUtil.encrypt(
-                this.publicKey,
-                { data: url },
-                "x25519-xsalsa20-poly1305"
-              )
-            ),
-            "utf8"
-          )
-        );
-        console.log(encryptedMessage.length);
-        return Promise.resolve(encryptedMessage);
-      })
-      .catch((e: Error) => {
-        console.log(e);
-        return Promise.resolve(e);
-      });
+  encryptSend(url: string, pubKey: string): string {
+    try {
+      const encryptedLetter = EthUtil.bufferToHex(
+        Buffer.from(
+          JSON.stringify(
+            SigUtil.encrypt(
+              pubKey,
+              { data: url },
+              "x25519-xsalsa20-poly1305"
+            )
+          ),
+          "utf8"
+        )
+      );
+      return encryptedLetter
+    } catch (error) {
+      console.log("error in encrypting letter");
+      return "";
+    }
   }
 
   hashFile(letterDetails: string): string {
