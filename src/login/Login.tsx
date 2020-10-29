@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, InputGroup, FormControl } from "react-bootstrap";
+import { Button, InputGroup, FormControl, Form } from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
 import CryptService from "../services/CryptService";
@@ -14,25 +14,28 @@ interface LoginProps {
   callback: (u: UserAuth) => void;
 }
 interface LoginState {
+  inputEmail: string;
   inputName: string;
   // displayMessage: string;
   loginMode: boolean;
 }
 
 class Login extends React.Component<LoginProps, LoginState> {
-
   private cryptService: CryptService;
 
   constructor(props: LoginProps) {
     super(props);
     this.state = {
+      inputEmail: "",
       inputName: "",
       // displayMessage: "",
       loginMode: true,
     };
     this.cryptService = new CryptService();
 
-    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleInputNameChange = this.handleInputNameChange.bind(this);
+    this.handleInputEmailChange = this.handleInputEmailChange.bind(this);
+
     this.onLoginClick = this.onLoginClick.bind(this);
     this.signMessage = this.signMessage.bind(this);
     this.authenticate = this.authenticate.bind(this);
@@ -276,8 +279,14 @@ class Login extends React.Component<LoginProps, LoginState> {
       });
   }
 
-  handleInputChange(event: any) {
+  handleInputNameChange(event: any) {
+    console.log(event.target.value);
     this.setState({ inputName: event.target.value });
+  }
+
+  handleInputEmailChange(event: any) {
+    console.log(event.target.value);
+    this.setState({ inputEmail: event.target.value });
   }
 
   toggleMode() {
@@ -311,16 +320,28 @@ class Login extends React.Component<LoginProps, LoginState> {
 
     const signupDisplay = (
       <form className="justify-content-between">
-        <InputGroup className="label-top border-radius d-flex">
+        <InputGroup className="label-top border-radius">
+          <Form.Group controlId="formEmail">
+            {/* <Form.Label>Email address</Form.Label> */}
+            <Form.Control
+              type="email"
+              className="w-100 mb-3"
+              placeholder="Email"
+              onChange={this.handleInputEmailChange}
+            />
+            {/* <Form.Text className="text-muted">
+              We'll never share your email with anyone else.
+            </Form.Text> */}
+          </Form.Group>
           {/* <InputGroup.Prepend className="m-2 flex-shrink-1">
               Sign Up
             </InputGroup.Prepend> */}
           <FormControl
             type="text"
-            className="flex-fill"
+            className="w-100"
             placeholder="Name"
             value={this.state.inputName}
-            onChange={this.handleInputChange}
+            onChange={this.handleInputNameChange}
           />
         </InputGroup>
         <div className="d-flex button-blur">

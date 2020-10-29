@@ -220,7 +220,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
 
     return (
       <>
-        {requestors.length === 0 && (
+        {!loadingRequestors && requestors.length === 0 && (
           <div className="recipient-header absolute-center">
             <h3> No Letters Received </h3>
           </div>
