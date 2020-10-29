@@ -369,6 +369,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         users={users}
       />
     ));
+    
     const requestorSelect = (
       <div className="requestor-select">
         <div className="requestor-header">
