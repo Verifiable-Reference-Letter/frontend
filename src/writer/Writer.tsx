@@ -63,7 +63,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
               body.data;
 
             console.log(response);
-            if (data) {
+            if (data && data.letters && data.numRecipients) {
               this.setState({
                 letters: data.letters,
                 numRecipients: data.numRecipients,
@@ -71,7 +71,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
                 loadingLetters: false,
               });
             } else {
-              console.log("problem with response data for writer");
+              this.setState({loadingLetters: false});
             }
           })
           .catch((e: Error) => {

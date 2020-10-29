@@ -132,14 +132,14 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               body.data;
             console.log(response);
             console.log(body.data);
-            if (data) {
+            if (data && data.letters && data.numRecipients) {
               this.setState({
                 letters: data.letters,
                 numRecipients: data.numRecipients,
                 loadingLetters: false,
               });
             } else {
-              console.log("problem with response data for requestor");
+              this.setState({ loadingLetters: false });
             }
           })
           .catch((e: Error) => {
@@ -410,7 +410,14 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
     return (
       <>
-        {!loadingLetters && !dualMode && (
+        {!loadingLetters && letters.length === 0 && (
+          <Col className="requestor">
+            <Row>{requestorSelect}</Row>
+            {/* <Row>{requestorLetter}</Row> */}
+            {/* <Row>{requestorFooter}</Row> */}
+          </Col>
+        )}
+        {!loadingLetters && !dualMode && letters.length !== 0 && (
           <Col className="requestor">
             <Row>{requestorSelect}</Row>
             <Row>{requestorLetter}</Row>
@@ -418,7 +425,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           </Col>
         )}
 
-        {!loadingLetters && dualMode && (
+        {!loadingLetters && dualMode && letters.length !== 0 && (
           <Col>
             <Row className="requestor-dual">
               <Col className="ml-5 mr-5">

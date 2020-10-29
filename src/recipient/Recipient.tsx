@@ -69,13 +69,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             const data: User[] = body.data;
             console.log(data);
             console.log(response);
-            if (data) {
+            if (data.length === 0) {
               this.setState({
                 requestors: data,
                 loadingRequestors: false,
               });
             } else {
-              console.log("problem with response data for recipient");
+              this.setState({loadingRequestors: false});
             }
           })
           .catch((e: Error) => {
