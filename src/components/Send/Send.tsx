@@ -26,7 +26,7 @@ interface SendProps {
 }
 interface SendState {
   loadingContents: boolean;
-  sent: boolean;
+  sending: boolean;
   encrypted: boolean[];
   encryptedLetter?: FileData;
 }
@@ -48,7 +48,7 @@ class Send extends React.Component<SendProps, SendState> {
 
     this.state = {
       loadingContents: true,
-      sent: false,
+      sending: false,
       encrypted: e,
     };
     this.cryptService = new CryptService();
@@ -88,6 +88,9 @@ class Send extends React.Component<SendProps, SendState> {
       letterSignature: signedLetter,
       letterRecipient: userKey.publicAddress,
     };
+
+    this.setState({ sending: true });
+
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientContents/update`;
     const success = await this.uploadEncryptedLetterForm(
       fetchUrl,
@@ -97,7 +100,7 @@ class Send extends React.Component<SendProps, SendState> {
     if (success) {
       let encrypted = [...this.state.encrypted];
       encrypted[key] = true;
-      this.setState({ encrypted: encrypted });
+      this.setState({ encrypted: encrypted, sending: false });
     }
   }
 
@@ -188,7 +191,7 @@ class Send extends React.Component<SendProps, SendState> {
 
   render() {
     const { user, letter, unsentRecipientKeys } = this.props;
-    const { loadingContents, sent, encrypted } = this.state;
+    const { loadingContents, sending, encrypted } = this.state;
 
     let recipientList = [];
     if (unsentRecipientKeys) {
@@ -216,7 +219,7 @@ class Send extends React.Component<SendProps, SendState> {
                       className="send-check-square"
                     />
                   )}
-                  {!encrypted[i] && (
+                  {!encrypted[i] && !sending && (
                     <div className="send-check-square-placeholder"></div>
                   )}
                 </div>
@@ -286,7 +289,7 @@ class Send extends React.Component<SendProps, SendState> {
             )}
             <Row className="d-flex justify-content-end">
               <div className="mt-3 mr-3">
-                {sent && <Spinner animation="border" variant="secondary" />}
+                {sending && <Spinner animation="border" variant="secondary" />}
               </div>
               <Button
                 className="mt-3 flex-shrink-1"

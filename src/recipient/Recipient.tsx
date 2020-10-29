@@ -130,7 +130,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
               const data: LetterHistory[] = body.data;
 
               console.log(response);
-              if (data) {
+              if (data && data.length > 0) {
                 this.cacheService.put(publicAddress, data);
                 this.setState({
                   letters: data,
@@ -138,7 +138,9 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
                   dualMode: true,
                 });
               } else {
-                console.log("problem with response data for recipient");
+                this.setState({
+                  loadingLetters: false,
+                })
               }
             })
             .catch((e: Error) => {
