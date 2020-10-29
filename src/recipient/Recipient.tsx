@@ -69,7 +69,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             const data: User[] = body.data;
             console.log(data);
             console.log(response);
-            if (data.length === 0) {
+            if (data.length !== 0) {
               this.setState({
                 requestors: data,
                 loadingRequestors: false,
@@ -219,14 +219,11 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     return (
       <>
         {requestors.length === 0 && (
-          <Col className="recipient">
-            <Row>
-              <div className="recipient-header absolute center">
-                <h3> No Letters Received </h3>
-              </div>
-            </Row>
-          </Col>
+          <div className="recipient-header absolute-center">
+            <h3> No Letters Received </h3>
+          </div>
         )}
+
         {!loadingRequestors && !dualMode && requestors.length !== 0 && (
           <Col className="recipient">
             <Row>{recipientRequestors}</Row>

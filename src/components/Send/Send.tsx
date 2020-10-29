@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import UserAuth from "../../common/UserAuth.interface";
 import UserKey from "../../common/UserKey.interface";
+import FileData from "../../common/FileData.interface";
 import Letter from "../../common/LetterDetails.interface";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
@@ -27,7 +28,7 @@ interface SendState {
   loadingContents: boolean;
   sent: boolean;
   encrypted: boolean[];
-  encryptedLetter: any;
+  encryptedLetter?: FileData;
 }
 
 class Send extends React.Component<SendProps, SendState> {
@@ -49,7 +50,6 @@ class Send extends React.Component<SendProps, SendState> {
       loadingContents: true,
       sent: false,
       encrypted: e,
-      encryptedLetter: "",
     };
     this.cryptService = new CryptService();
   }
@@ -66,6 +66,7 @@ class Send extends React.Component<SendProps, SendState> {
     console.log("Pub key is: " + userKey.publicKey);
     console.log("State url: " + this.state.encryptedLetter);
 
+    if (!this.state.encryptedLetter) return;
     let encryptedLetter = await this.cryptService.encryptSend(
       this.state.encryptedLetter,
       userKey.publicKey
@@ -171,14 +172,12 @@ class Send extends React.Component<SendProps, SendState> {
             .then((fileData) => {
               if (fileData) {
                 this.setState({
-                  encryptedLetter: fileData.letterUrl,
+                  encryptedLetter: fileData,
                   loadingContents: false,
                 });
-                return fileData.letterUrl;
               }
             });
         } else {
-          return "";
           console.log("Letter retrieval in send failed");
         }
       })

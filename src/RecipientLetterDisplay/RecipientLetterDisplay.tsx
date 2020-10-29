@@ -79,7 +79,7 @@ class RecipientLetterDisplay extends React.Component<
     this.setState({ viewIsOpen: true });
     const letterId = this.props.letter.letterId;
     const fetchUrl = `/api/v1/letters/${letterId}/recipientContents`;
-    console.log(letterId);
+    console.log("letterId", letterId);
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
       this.retrieveLetterContentsFromServer(fetchUrl);
@@ -129,10 +129,18 @@ class RecipientLetterDisplay extends React.Component<
         console.log(response);
         return response.json();
       })
-      .then((encryptedLetter) => {
+      .then((body: ResponseBody) => {
+        const e: {
+          letterRecipientContents: {
+            letterContents: string;
+            letterSignature: string;
+          };
+        } = body.data;
+
+        console.log(e);
         // decrypt letter
         this.cryptService
-          .decrypt(encryptedLetter, this.props.user.publicAddress)
+          .decrypt(e.letterRecipientContents?.letterContents, this.props.user.publicAddress)
           .then((fileData) => {
             if (fileData) {
               this.setState({

@@ -130,11 +130,9 @@ class Writer extends React.Component<WriterProps, WriterState> {
         )}
 
         {!loadingLetters && letters.length === 0 && (
-          <Col className="writer">
             <div className="writer-header absolute-center">
               <h3> No Letters Requested </h3>
             </div>
-          </Col>
         )}
 
         {loadingLetters && (

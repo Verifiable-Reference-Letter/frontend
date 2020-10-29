@@ -58,21 +58,31 @@ class CryptService {
     }
   }
 
-  async encryptSend(url: string, pubKey: string): Promise<string> {
+  async encryptSend(fileData: FileData, pubKey: string): Promise<string> {
     console.log(pubKey);
+
     try {
-      const encryptedLetter = EthUtil.bufferToHex(
+      // const fileData = await this.createFileData(file);
+      let fileDataString: string | null = null;
+      console.log(fileData.letterType);
+      const encryptedMessage = EthUtil.bufferToHex(
         Buffer.from(
           JSON.stringify(
-            SigUtil.encrypt(pubKey, { data: url }, "x25519-xsalsa20-poly1305")
+            SigUtil.encrypt(
+              pubKey,
+              { data: JSON.stringify(fileData) },
+              "x25519-xsalsa20-poly1305"
+            )
           ),
           "utf8"
         )
       );
-      return encryptedLetter;
+      console.log(encryptedMessage.length);
+      fileDataString = encryptedMessage;
+      return Promise.resolve(fileDataString);
     } catch (error) {
-      console.log("error in encrypting letter", error);
-      return "";
+      console.log("error in file reader and/or encryption");
+      return Promise.reject("error in file reader and/or encryption");
     }
   }
 
