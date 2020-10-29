@@ -74,7 +74,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
                 loadingLetters: false,
               });
             } else {
-              this.setState({loadingLetters: false});
+              this.setState({ loadingLetters: false });
             }
           })
           .catch((e: Error) => {
@@ -122,11 +122,19 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
     return (
       <>
-        {!loadingLetters && (
-            <Col className="writer">
-              <Row>{writerLetters}</Row>
-              {/* <Row>{writerFooter}</Row> */}
-            </Col>
+        {!loadingLetters && letters.length !== 0 && (
+          <Col className="writer">
+            <Row>{writerLetters}</Row>
+            {/* <Row>{writerFooter}</Row> */}
+          </Col>
+        )}
+
+        {!loadingLetters && letters.length === 0 && (
+          <Col className="writer">
+            <div className="writer-header absolute-center">
+              <h3> No Letters Requested </h3>
+            </div>
+          </Col>
         )}
 
         {loadingLetters && (

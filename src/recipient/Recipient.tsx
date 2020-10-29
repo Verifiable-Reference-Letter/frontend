@@ -75,7 +75,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
                 loadingRequestors: false,
               });
             } else {
-              this.setState({loadingRequestors: false});
+              this.setState({ loadingRequestors: false });
             }
           })
           .catch((e: Error) => {
@@ -92,7 +92,11 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     if (selectedUser && selectedUser.publicAddress === user.publicAddress) {
       this.setState({ selectedUser: undefined, dualMode: false });
     } else {
-      this.setState({ selectedUser: user, dualMode: true, loadingLetters: true });
+      this.setState({
+        selectedUser: user,
+        dualMode: true,
+        loadingLetters: true,
+      });
       this.loadLettersList(user.publicAddress);
     }
   }
@@ -145,7 +149,11 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           console.log(e);
         });
     } else {
-      this.setState({ letters: lettersList, loadingLetters: false,  dualMode: true });
+      this.setState({
+        letters: lettersList,
+        loadingLetters: false,
+        dualMode: true,
+      });
     }
   }
 
@@ -210,14 +218,23 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
 
     return (
       <>
-        {!loadingRequestors && !dualMode && (
+        {requestors.length === 0 && (
+          <Col className="recipient">
+            <Row>
+              <div className="recipient-header absolute center">
+                <h3> No Letters Received </h3>
+              </div>
+            </Row>
+          </Col>
+        )}
+        {!loadingRequestors && !dualMode && requestors.length !== 0 && (
           <Col className="recipient">
             <Row>{recipientRequestors}</Row>
             {/* <Row>{requestorFooter}</Row> */}
           </Col>
         )}
 
-        {!loadingRequestors && dualMode && (
+        {!loadingRequestors && dualMode && requestors.length !== 0 && (
           <Col>
             <Row className="recipient-dual">
               <Col className="ml-5 mr-5">

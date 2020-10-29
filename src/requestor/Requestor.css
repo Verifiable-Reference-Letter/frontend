@@ -32,12 +32,14 @@
 
 .requestor .requestor-letterslist {
   max-height: 441px;
+  min-height: 196px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
 .requestor-dual .requestor-letterslist {
   max-height: 539px;
+  min-height: 441px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
