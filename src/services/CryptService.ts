@@ -81,7 +81,7 @@ class CryptService {
       fileDataString = encryptedMessage;
       return Promise.resolve(fileDataString);
     } catch (error) {
-      console.log("error in file reader and/or encryption");
+      console.log("error in file reader and/or encryption", error);
       return Promise.reject("error in file reader and/or encryption");
     }
   }
