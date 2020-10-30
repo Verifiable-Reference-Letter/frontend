@@ -1,13 +1,14 @@
 .writer {
-  padding: 20px 20% 20px;
+  padding: 10px 25% 10px;
 }
 .writer-header {
   text-align: center;
+  width: 100%;
 }
 
 .writer-letters {
   margin-bottom: 10px;
-  margin-top: 20px;
+  width: 100%;
 }
 
 h1,
@@ -21,6 +22,13 @@ h6 {
 
 .writer-footer {
   text-align: center;
+  width: 100%;
+}
+
+.writer .writer-letterslist {
+  max-height: 539px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .left-float-right-button {

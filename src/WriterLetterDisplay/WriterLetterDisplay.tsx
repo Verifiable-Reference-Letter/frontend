@@ -95,10 +95,10 @@ class WriterLetterDisplay extends React.Component<
     });
   }
 
-  async onUploadSubmit() {
+  async onUploadSubmit(customMessage: string) {
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/update`;
     if (this.state.uploadedFile !== undefined) {
-      await this.uploadContentsToServer(this.state.uploadedFile, fetchUrl);
+      await this.uploadContentsToServer(this.state.uploadedFile, fetchUrl, customMessage);
     }
   }
 
@@ -111,7 +111,7 @@ class WriterLetterDisplay extends React.Component<
     });
   }
 
-  async uploadContentsToServer(file: File, fetchUrl: string) {
+  async uploadContentsToServer(file: File, fetchUrl: string, customMessage: string) {
     console.log("uploading to server");
     console.log(file);
 
@@ -139,7 +139,10 @@ class WriterLetterDisplay extends React.Component<
           publicAddress: this.props.user.publicAddress,
           jwtToken: this.props.user.jwtToken,
         },
-        data: encryptedFile,
+        data: {
+          customMessage: customMessage,
+          encryptedFile: encryptedFile,
+        }
       }),
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -217,6 +220,7 @@ class WriterLetterDisplay extends React.Component<
 
         const data: { userKeys: UserKey[]; users: User[] } = body.data;
         console.log(response);
+        console.log(data);
         this.setState({
           unsentRecipientKeys: data.userKeys,
           loadingSend: false,
@@ -694,6 +698,7 @@ class WriterLetterDisplay extends React.Component<
           <Modal.Body>
             <Confirm
               user={this.props.user}
+              custom={true}
               onConfirm={this.onUploadSubmit.bind(this)}
               onClose={this.closeConfirmModal.bind(this)}
             />

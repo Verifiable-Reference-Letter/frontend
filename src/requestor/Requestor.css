@@ -1,5 +1,5 @@
 .requestor {
-  padding: 10px 20% 10px;
+  padding: 10px 25% 10px;
 }
 .requestor-header {
   text-align: center;
@@ -32,12 +32,14 @@
 
 .requestor .requestor-letterslist {
   max-height: 441px;
+  min-height: 392px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
 .requestor-dual .requestor-letterslist {
   max-height: 539px;
+  min-height: 441px;
   overflow-y: scroll;
   overflow-x: hidden;
 }

@@ -132,14 +132,14 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
               body.data;
             console.log(response);
             console.log(body.data);
-            if (data) {
+            if (data && data.letters && data.numRecipients) {
               this.setState({
                 letters: data.letters,
                 numRecipients: data.numRecipients,
                 loadingLetters: false,
               });
             } else {
-              console.log("problem with response data for requestor");
+              this.setState({ loadingLetters: false });
             }
           })
           .catch((e: Error) => {
@@ -167,15 +167,15 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     }
   }
 
-  async onSelectSubmit() {
+  async onSelectSubmit(customMessage: string) {
     console.log("on select submit");
 
     // TODO: necessary checks before fetching backend to create new request with letter details and indicated list of recipients
     const fetchUrl = `/api/v1/letters/create`;
-    this.sendNewLetterRequestToServer(fetchUrl);
+    this.sendNewLetterRequestToServer(fetchUrl, customMessage);
   }
 
-  async sendNewLetterRequestToServer(fetchUrl: string) {
+  async sendNewLetterRequestToServer(fetchUrl: string, customMessage: string) {
     const init: RequestInit = {
       method: "POST",
       headers: {
@@ -190,7 +190,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         data: {
           selectedRecipients: this.state.selectedRecipients,
           letterWriter: this.state.selectedWriter[0].publicAddress,
-          customMessage: "",
+          customMessage: customMessage,
         },
       }),
     };
@@ -369,6 +369,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         users={users}
       />
     ));
+    
     const requestorSelect = (
       <div className="requestor-select">
         <div className="requestor-header">
@@ -410,7 +411,14 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
     return (
       <>
-        {!loadingLetters && !dualMode && (
+        {!loadingLetters && letters.length === 0 && (
+          <Col className="requestor">
+            <Row>{requestorSelect}</Row>
+            {/* <Row>{requestorLetter}</Row> */}
+            {/* <Row>{requestorFooter}</Row> */}
+          </Col>
+        )}
+        {!loadingLetters && !dualMode && letters.length !== 0 && (
           <Col className="requestor">
             <Row>{requestorSelect}</Row>
             <Row>{requestorLetter}</Row>
@@ -418,7 +426,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           </Col>
         )}
 
-        {!loadingLetters && dualMode && (
+        {!loadingLetters && dualMode && letters.length !== 0 && (
           <Col>
             <Row className="requestor-dual">
               <Col className="ml-5 mr-5">
@@ -455,6 +463,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           <Modal.Body>
             <Confirm
               user={this.props.user}
+              custom={true}
               onConfirm={this.onSelectSubmit.bind(this)}
               onClose={this.closeConfirmModal.bind(this)}
             />

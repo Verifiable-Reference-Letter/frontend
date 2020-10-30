@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import UserAuth from "../../common/UserAuth.interface";
 import UserKey from "../../common/UserKey.interface";
+import FileData from "../../common/FileData.interface";
 import Letter from "../../common/LetterDetails.interface";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
@@ -24,8 +25,10 @@ interface SendProps {
   onClose: () => void;
 }
 interface SendState {
-  sent: boolean;
+  loadingContents: boolean;
+  sending: boolean;
   encrypted: boolean[];
+  encryptedLetter?: FileData;
 }
 
 class Send extends React.Component<SendProps, SendState> {
@@ -40,33 +43,72 @@ class Send extends React.Component<SendProps, SendState> {
         e.push(false);
       }
     }
+    console.log(e);
+    console.log(keys);
 
     this.state = {
-      sent: false,
+      loadingContents: true,
+      sending: false,
       encrypted: e,
     };
     this.cryptService = new CryptService();
   }
 
+  async componentDidMount() {
+    let fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/writer`;
+    let url = await this.getLetterContents(
+      this.props.letter.letterId,
+      fetchUrl
+    );
+  }
+
   async encryptAndUpload(key: number, userKey: UserKey) {
-    // const encryptedLetterForm: { encryptedLetter: string, signedHash: string, hash: string } = await this.cryptService.encryptMethod(userKey.publicKey);
-    // TODO: check successful encrypt, make fetch call to backend with signed hashed, hash, and encrypted letters
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientLetterForm/update`;
-    // const success = await this.uploadEncryptedLetterForm(fetchUrl, encryptedLetterForm);
-    const success = true;
+    console.log("Pub key is: " + userKey.publicKey);
+    console.log("State url: " + this.state.encryptedLetter);
+
+    if (!this.state.encryptedLetter) return;
+    let encryptedLetter = await this.cryptService.encryptSend(
+      this.state.encryptedLetter,
+      userKey.publicKey
+    );
+    console.log("Encrypted letter: " + encryptedLetter);
+
+    let signedLetter = await this.cryptService.signLetter(
+      encryptedLetter,
+      this.props.user.publicAddress
+    );
+    console.log("Signed letter: " + signedLetter);
+
+    const encryptedLetterForm: {
+      letterContents: string;
+      letterSignature: string;
+      letterRecipient: string;
+    } = {
+      letterContents: encryptedLetter,
+      letterSignature: signedLetter,
+      letterRecipient: userKey.publicAddress,
+    };
+
+    this.setState({ sending: true });
+
+    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientContents/update`;
+    const success = await this.uploadEncryptedLetterForm(
+      fetchUrl,
+      encryptedLetterForm
+    );
+    // const success = true;
     if (success) {
       let encrypted = [...this.state.encrypted];
       encrypted[key] = true;
-      this.setState({ encrypted: encrypted });
+      this.setState({ encrypted: encrypted, sending: false });
     }
   }
 
   async uploadEncryptedLetterForm(
     fetchUrl: string,
     encryptedLetterForm: {
-      encryptedLetter: string;
-      signedHash: string;
-      hash: string;
+      letterContents: string;
+      letterSignature: string;
     }
   ) {
     const init: RequestInit = {
@@ -102,9 +144,54 @@ class Send extends React.Component<SendProps, SendState> {
     }
   }
 
+  async getLetterContents(id: string, fetchUrl: string) {
+    console.log("Letter Id: " + id);
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+    const letterId = id;
+    // get letter from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+      .then((response) => {
+        return response.json();
+      })
+      .then((body) => {
+        const encryptedLetter: string = body.data;
+        if (encryptedLetter) {
+          //return encryptedLetter;
+          this.cryptService
+            .decrypt(encryptedLetter, this.props.user.publicAddress)
+            .then((fileData) => {
+              if (fileData) {
+                this.setState({
+                  encryptedLetter: fileData,
+                  loadingContents: false,
+                });
+              }
+            });
+        } else {
+          console.log("Letter retrieval in send failed");
+        }
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+  }
+
   render() {
     const { user, letter, unsentRecipientKeys } = this.props;
-    const { sent, encrypted } = this.state;
+    const { loadingContents, sending, encrypted } = this.state;
 
     let recipientList = [];
     if (unsentRecipientKeys) {
@@ -132,7 +219,7 @@ class Send extends React.Component<SendProps, SendState> {
                       className="send-check-square"
                     />
                   )}
-                  {!encrypted[i] && (
+                  {!encrypted[i] && !sending && (
                     <div className="send-check-square-placeholder"></div>
                   )}
                 </div>
@@ -146,7 +233,10 @@ class Send extends React.Component<SendProps, SendState> {
                       className="flex-fill send-entry"
                       onClick={() => {
                         if (!encrypted[i + 1]) {
-                          this.encryptAndUpload(i + 1, unsentRecipientKeys[i + 1]);
+                          this.encryptAndUpload(
+                            i + 1,
+                            unsentRecipientKeys[i + 1]
+                          );
                         }
                       }}
                     >
@@ -181,35 +271,43 @@ class Send extends React.Component<SendProps, SendState> {
 
     return (
       <>
-        <Col>
-          {unsentRecipientKeys && (
-            <Row>
-              <Col>{recipientList}</Col>
+        {!loadingContents && (
+          <Col>
+            {unsentRecipientKeys && (
+              <Row>
+                <Col>{recipientList}</Col>
+              </Row>
+            )}
+            {(!unsentRecipientKeys || unsentRecipientKeys.length === 0) && (
+              <Row className="d-flex justify-content-center">
+                <Spinner
+                  className="float-right mt-4 mr-3"
+                  animation="border"
+                  variant="secondary"
+                />
+              </Row>
+            )}
+            <Row className="d-flex justify-content-end">
+              <div className="mt-3 mr-3">
+                {sending && <Spinner animation="border" variant="secondary" />}
+              </div>
+              <Button
+                className="mt-3 flex-shrink-1"
+                onClick={(e: any) => {
+                  this.props.onClose();
+                }}
+              >
+                Close
+              </Button>
             </Row>
-          )}
-          {(!unsentRecipientKeys || unsentRecipientKeys.length === 0) && (
-            <Row className="d-flex justify-content-center">
-              <Spinner
-                className="float-right mt-4 mr-3"
-                animation="border"
-                variant="secondary"
-              />
-            </Row>
-          )}
-          <Row className="d-flex justify-content-end">
-            <div className="mt-3 mr-3">
-              {sent && <Spinner animation="border" variant="secondary" />}
-            </div>
-            <Button
-              className="mt-3 flex-shrink-1"
-              onClick={(e: any) => {
-                this.props.onClose();
-              }}
-            >
-              Close
-            </Button>
-          </Row>
-        </Col>
+          </Col>
+        )}
+
+        {loadingContents && (
+          <div className="d-flex justify-content-center mb-3">
+            <Spinner className="mb-3" animation="border" variant="secondary" />
+          </div>
+        )}
       </>
     );
   }

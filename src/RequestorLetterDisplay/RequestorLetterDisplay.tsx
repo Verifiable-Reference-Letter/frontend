@@ -72,7 +72,7 @@ class RequestorLetterDisplay extends React.Component<
     this.userProfiles = new Map<string, UserProfile>();
   }
 
-  async onSelectSubmit() {
+  async onSelectSubmit(customMessage: string) {
     console.log("on select submit");
     // this.setState({ confirmIsOpen: false });
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/updateRecipients`;
@@ -558,6 +558,7 @@ class RequestorLetterDisplay extends React.Component<
           <Modal.Body>
             <Confirm
               user={this.props.user}
+              custom={false}
               onConfirm={this.onSelectSubmit.bind(this)}
               onClose={this.closeConfirmModal.bind(this)}
             />

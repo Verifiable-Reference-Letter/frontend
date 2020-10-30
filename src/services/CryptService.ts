@@ -1,6 +1,7 @@
 import * as EthUtil from "ethereumjs-util";
 import * as SigUtil from "eth-sig-util";
 import FileData from "../common/FileData.interface";
+import { web3 } from "../App";
 
 class CryptService {
   private publicKey: string = "";
@@ -28,9 +29,9 @@ class CryptService {
           params: [publicAddress], // you must have access to the specified account
         })
         .then((publicKey: string) => {
-          console.log(publicKey);
+          console.log("publicKey", publicKey);
           this.publicKey = publicKey;
-  
+
           const encryptedMessage = EthUtil.bufferToHex(
             Buffer.from(
               JSON.stringify(
@@ -57,10 +58,107 @@ class CryptService {
     }
   }
 
-  async decrypt(file: string, publicAddress: string) : Promise<FileData> {
+  async encryptSend(fileData: FileData, pubKey: string): Promise<string> {
+    console.log(pubKey);
+
+    try {
+      // const fileData = await this.createFileData(file);
+      let fileDataString: string | null = null;
+      console.log(fileData.letterType);
+      const encryptedMessage = EthUtil.bufferToHex(
+        Buffer.from(
+          JSON.stringify(
+            SigUtil.encrypt(
+              pubKey,
+              { data: JSON.stringify(fileData) },
+              "x25519-xsalsa20-poly1305"
+            )
+          ),
+          "utf8"
+        )
+      );
+      console.log(encryptedMessage.length);
+      fileDataString = encryptedMessage;
+      return Promise.resolve(fileDataString);
+    } catch (error) {
+      console.log("error in file reader and/or encryption", error);
+      return Promise.reject("error in file reader and/or encryption");
+    }
+  }
+
+  async hashFile(letterDetails: string): Promise<string> {
+    try {
+      let hash = EthUtil.bufferToHex(
+        EthUtil.keccak256(Buffer.from(letterDetails, "utf8"))
+      );
+      console.log("Hash is: " + hash);
+      return hash;
+    } catch (error) {
+      console.log("error in file reader and/or fileHash");
+      return "error in file reader and/or fileHash";
+    }
+  }
+
+  async signLetter(letter: string, publicAddress: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      web3.eth.personal
+        .sign(letter, publicAddress, "", (err, signedLetter) => {
+          if (err) {
+            console.log("error when signing");
+            return reject(err);
+          }
+          console.log("message signed");
+          return resolve(signedLetter);
+        })
+        .then(console.log)
+        .catch((err: Error) => {
+          console.log();
+        });
+    });
+  }
+
+  async sign(file: File, publicAddress: string): Promise<string> {
+    try {
+      const fileData = await this.createFileData(file); // rejects on failure
+      let signedFile: string | null = null;
+      let message = JSON.stringify(fileData);
+
+      return new Promise((resolve, reject) => {
+        web3.eth.personal
+          .sign(message, publicAddress, "", (err, signature) => {
+            if (err) {
+              console.log("error when signing");
+              return reject(err);
+            }
+            console.log("message signed");
+            // Did this to test signature
+            // web3.eth.personal.ecRecover(message, signature).then((account: string) => {
+            // 	//console.log("Successfully signed letter")
+            // 	if (account != publicAddress) {
+            // 		console.log("Successfully signed letter")
+            // 	}
+            // });
+            return resolve(signature);
+          })
+          .then(console.log)
+          .catch((err: Error) => {
+            console.log();
+          });
+      });
+    } catch (error) {
+      console.log("error in file reader and/or digital signature");
+      return Promise.reject("error in file reader and/or digital signature");
+    }
+  }
+
+  async decrypt(file: string, publicAddress: string): Promise<FileData> {
     console.log(publicAddress);
     console.log(file);
-    let fileData: FileData = {letterTitle: "", letterType: "invalid", letterUrl: ""};
+    let fileData: FileData = {
+      letterTitle: "",
+      letterType: "invalid",
+      letterUrl: "",
+    };
     return this.ethereum
       .request({
         method: "eth_decrypt",
@@ -78,7 +176,7 @@ class CryptService {
       });
   }
 
-  async createFileData(file: File) : Promise<FileData> {
+  async createFileData(file: File): Promise<FileData> {
     let fileData: FileData = {
       letterUrl: "",
       letterTitle: "",
@@ -105,6 +203,18 @@ class CryptService {
         };
       }
     });
+  }
+
+  async getPublicKey(publicAddress: string): Promise<string | null> {
+    try {
+      return this.ethereum.request({
+        method: "eth_getEncryptionPublicKey",
+        params: [publicAddress], // you must have access to the specified account
+      });
+    } catch (error) {
+      console.log("error in encrypting letter", error);
+      return null;
+    }
   }
 }
 export default CryptService;

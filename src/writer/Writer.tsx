@@ -1,5 +1,5 @@
 import React from "react";
-import { Spinner } from "react-bootstrap";
+import { Spinner, Col, Row } from "react-bootstrap";
 
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
@@ -59,11 +59,14 @@ class Writer extends React.Component<WriterProps, WriterState> {
         response
           .json()
           .then((body: ResponseBody) => {
-            const data: { letters: LetterDetails[], numRecipients: Number[], numUnsentRecipients: Number[] } =
-              body.data;
+            const data: {
+              letters: LetterDetails[];
+              numRecipients: Number[];
+              numUnsentRecipients: Number[];
+            } = body.data;
 
             console.log(response);
-            if (data) {
+            if (data && data.letters && data.numRecipients) {
               this.setState({
                 letters: data.letters,
                 numRecipients: data.numRecipients,
@@ -71,7 +74,7 @@ class Writer extends React.Component<WriterProps, WriterState> {
                 loadingLetters: false,
               });
             } else {
-              console.log("problem with response data for writer");
+              this.setState({ loadingLetters: false });
             }
           })
           .catch((e: Error) => {
@@ -85,7 +88,12 @@ class Writer extends React.Component<WriterProps, WriterState> {
 
   render() {
     const { user } = this.props;
-    const { letters, numRecipients, numUnsentRecipients, loadingLetters } = this.state;
+    const {
+      letters,
+      numRecipients,
+      numUnsentRecipients,
+      loadingLetters,
+    } = this.state;
 
     const lettersList = letters.map((l, k) => (
       <WriterLetterDisplay
@@ -97,22 +105,34 @@ class Writer extends React.Component<WriterProps, WriterState> {
       />
     ));
 
+    const writerLetters = (
+      <div className="writer-letters">
+        <div className="writer-header">
+          <h3> Letters </h3>
+        </div>
+        <div className="writer-letterslist">{lettersList}</div>
+      </div>
+    );
+
+    const writerFooter = (
+      <div className="writer-footer">
+        <span> Product of Team Gas</span>
+      </div>
+    );
+
     return (
       <>
-        {!loadingLetters && (
-          <div id="writer" className="writer">
-            <div className="writer-header mb-3">
-              <h3> Letters </h3>
-            </div>
+        {!loadingLetters && letters.length !== 0 && (
+          <Col className="writer">
+            <Row>{writerLetters}</Row>
+            {/* <Row>{writerFooter}</Row> */}
+          </Col>
+        )}
 
-            <div className="writer-letters">
-              <div>{lettersList}</div>
+        {!loadingLetters && letters.length === 0 && (
+            <div className="writer-header absolute-center">
+              <h3> No Letters Requested </h3>
             </div>
-
-            <div className="writer-footer">
-              <span> Product of Team Gas</span>
-            </div>
-          </div>
         )}
 
         {loadingLetters && (

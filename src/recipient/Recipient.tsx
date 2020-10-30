@@ -69,13 +69,13 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
             const data: User[] = body.data;
             console.log(data);
             console.log(response);
-            if (data) {
+            if (data.length !== 0) {
               this.setState({
                 requestors: data,
                 loadingRequestors: false,
               });
             } else {
-              console.log("problem with response data for recipient");
+              this.setState({ loadingRequestors: false });
             }
           })
           .catch((e: Error) => {
@@ -92,7 +92,11 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
     if (selectedUser && selectedUser.publicAddress === user.publicAddress) {
       this.setState({ selectedUser: undefined, dualMode: false });
     } else {
-      this.setState({ selectedUser: user, dualMode: true, loadingLetters: true });
+      this.setState({
+        selectedUser: user,
+        dualMode: true,
+        loadingLetters: true,
+      });
       this.loadLettersList(user.publicAddress);
     }
   }
@@ -126,7 +130,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
               const data: LetterHistory[] = body.data;
 
               console.log(response);
-              if (data) {
+              if (data && data.length > 0) {
                 this.cacheService.put(publicAddress, data);
                 this.setState({
                   letters: data,
@@ -134,7 +138,9 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
                   dualMode: true,
                 });
               } else {
-                console.log("problem with response data for recipient");
+                this.setState({
+                  loadingLetters: false,
+                })
               }
             })
             .catch((e: Error) => {
@@ -145,7 +151,11 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           console.log(e);
         });
     } else {
-      this.setState({ letters: lettersList, loadingLetters: false,  dualMode: true });
+      this.setState({
+        letters: lettersList,
+        loadingLetters: false,
+        dualMode: true,
+      });
     }
   }
 
@@ -210,14 +220,20 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
 
     return (
       <>
-        {!loadingRequestors && !dualMode && (
+        {!loadingRequestors && requestors.length === 0 && (
+          <div className="recipient-header absolute-center">
+            <h3> No Letters Received </h3>
+          </div>
+        )}
+
+        {!loadingRequestors && !dualMode && requestors.length !== 0 && (
           <Col className="recipient">
             <Row>{recipientRequestors}</Row>
             {/* <Row>{requestorFooter}</Row> */}
           </Col>
         )}
 
-        {!loadingRequestors && dualMode && (
+        {!loadingRequestors && dualMode && requestors.length !== 0 && (
           <Col>
             <Row className="recipient-dual">
               <Col className="ml-5 mr-5">
