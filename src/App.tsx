@@ -1,7 +1,7 @@
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React, {FunctionComponent} from "react";
 //import { RouteComponentProps } from "@reach/router";
-import { BrowserRouter as Router, Route, Link, Redirect, Switch, RouteComponentProps} from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Redirect, Switch, RouteComponentProps, withRouter} from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
 
@@ -104,7 +104,7 @@ export async function deployTutorialToken(): Promise<TutorialToken> {
   return contract;
 }
 
-type MyProps = {};
+type MyProps = {} & RouteComponentProps;
 type MyState = {
   numErcBeingTraded: number;
   contract: TutorialToken;
@@ -168,6 +168,7 @@ class App extends React.Component<MyProps, MyState> {
   }
 
   onLogin(u: UserAuth) {
+  	this.props.history.push("/dashboard")
     console.log("login complete");
     this.setState({ user: u, loggedIn: true });
   }
@@ -204,7 +205,7 @@ class App extends React.Component<MyProps, MyState> {
     );
   }
 }
-export default App;
+export default withRouter(App);
 //{this.state.loggedIn ? <Redirect to="/dashboard" /> : null}
 // <Router>
 //   <Switch>

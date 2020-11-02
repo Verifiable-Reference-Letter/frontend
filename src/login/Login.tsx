@@ -3,16 +3,20 @@ import { Button, InputGroup, FormControl, Form } from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
 import CryptService from "../services/CryptService";
+import { RouteComponentProps, withRouter} from "react-router-dom";
 
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
 
 import { web3 } from "../App";
 
-interface LoginProps {
+interface Props {
   user: UserAuth;
   callback: (u: UserAuth) => void;
 }
+
+type LoginProps = Props & RouteComponentProps;
+
 interface LoginState {
   inputEmail: string;
   inputName: string;
@@ -378,4 +382,4 @@ class Login extends React.Component<LoginProps, LoginState> {
     );
   }
 }
-export default Login;
+export default withRouter(Login);
