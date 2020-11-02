@@ -1,0 +1,45 @@
+.recipient-entry {
+  background-color: RGBA(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  height: 32px;
+  overflow: hidden;
+  word-break: break-all;
+  white-space: nowrap;
+}
+
+.recipient-entry:hover {
+  background-color: RGBA(0, 0, 0, 0.2);
+}
+
+.recipient-entry:active {
+  background-color: rgba(32, 158, 145, 0.2);
+}
+
+.recipient-placeholder {
+  height: 32px;
+  margin-bottom: 10px;
+}
+
+.recipient-display {
+  max-height: 126px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.multiple-typeahead .rbt-token.rbt-token-removeable {
+  padding-left: 7.5px;
+  /* margin-right: 5px; */
+  /* margin-top: 5px;*/
+  /* margin-bottom: 5px; */
+  background-color: rgba(32, 158, 145, 0.2);
+  border-radius: 3px;
+}
+
+.multiple-typeahead:focus .rbt-token.rbt-token-removeable {
+  padding-left: 7.5px;
+  /* margin-right: 5px; */
+  /* margin-top: 5px;
+  margin-bottom: 5px; */
+  background-color: rgba(32, 158, 145, 0.2);
+  border-radius: 3px;
+}

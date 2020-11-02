@@ -1,3 +1,27 @@
 .dashboard {
   padding: 20px 20% 20px
 }
+
+.dashboard {
+  padding: 20px 20% 20px;
+}
+.dashboard-header {
+  text-align: center;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-align: center;
+}
+
+.dashboard-footer {
+  text-align: center;
+}
+
+hr {
+  color: rgba(0,0,0,.03)
+}

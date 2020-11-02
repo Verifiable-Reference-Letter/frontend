@@ -14,11 +14,12 @@ import LoginPage from "./login/Login";
 import DashboardPage from "./dashboard/Dashboard";
 
 import UserAuth from "./common/UserAuth.interface";
-
+import "./App.css";
 import * as ROUTES from "./routes";
 
 import Web3 from "web3";
 export let web3: Web3;
+export let ethereum: any;
 
 type Props = { component: FunctionComponent, authed: boolean } & RouteComponentProps;
 
@@ -106,6 +107,15 @@ class App extends React.Component<MyProps, MyState> {
     web3 = new Web3(web3Provider);
     accounts = await ethereum.request({ method: "eth_accounts" });
     // contract = await deployTutorialToken(); // temporary disable
+    console.log(accounts);
+    // ethereum
+    //       .request({
+    //         method: "eth_getEncryptionPublicKey",
+    //         params: [accounts[0]], // you must have access to the specified account
+    //       })
+    //       .then((publicKey: string) => {
+    //         console.log(publicKey);
+    //       });
 
     this.setState({
       contract,
@@ -137,18 +147,15 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={this.state.loggedIn}
         />
-        {this.state.loggedIn ? <Redirect to="/dashboard" /> : null}
-        <Router>
-
-	          <ProtectedRoute path={ROUTES.HOME} authed={this.state.loggedIn} component={() => home} />
-	          <ProtectedRoute path={ROUTES.REQUESTOR} authed={this.state.loggedIn} component={() => requestor} />
-	          <ProtectedRoute path={ROUTES.WRITER} authed={this.state.loggedIn} component={() => writer} />
-	          <ProtectedRoute path={ROUTES.RECIPIENT} authed={this.state.loggedIn} component={() => recipient} />
-
-	          <Route path={ROUTES.LOGIN} authed={this.state.loggedIn} component={() => login} />
-
-	          <ProtectedRoute path={ROUTES.DASHBOARD} authed={this.state.loggedIn} component={() => dashboard} />
-	      </Router>
+        {this.state.loggedIn ? <Redirect to={ROUTES.REQUESTOR} /> : null}
+        <div className="application-body">
+          <Route exact path={ROUTES.HOME} render={() => home} />
+          <Route exact path={ROUTES.LOGIN} render={() => login} />
+          <Route exact path={ROUTES.DASHBOARD} render={() => dashboard} />
+          <Route exact path={ROUTES.REQUESTOR} render={() => requestor} />
+          <Route exact path={ROUTES.WRITER} render={() => writer} />
+          <Route exact path={ROUTES.RECIPIENT} render={() => recipient} />
+        </div>
       </div>
     );
   }

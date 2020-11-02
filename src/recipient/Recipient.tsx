@@ -1,205 +1,269 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Container from "react-bootstrap/Container";
-import Modal from "react-bootstrap/Modal";
+import { Spinner, Row, Col } from "react-bootstrap";
 
 import UserAuth from "../common/UserAuth.interface";
-import Letter from "../common/LetterDetails.interface";
-
-import CryptService from "../services/CryptService";
+import User from "../common/User.interface";
+import LetterDetails from "../common/LetterDetails.interface";
+import RequestBody from "../common/RequestBody.interface";
+import ResponseBody from "../common/ResponseBody.interface";
 import CacheService from "../services/CacheService";
 
-import FileView from "../components/FileView/FileView";
+import RecipientLetterDisplay from "../RecipientLetterDisplay/RecipientLetterDisplay";
+import RecipientUserDisplay from "../RecipientUserDisplay/RecipientUserDisplay";
 
 import "./Recipient.css";
+import LetterHistory from "../common/LetterHistory.interface";
 
 interface RecipientProps {
   user: UserAuth;
 }
+
 interface RecipientState {
-  letters: Letter[];
-  viewIsOpen: boolean;
-  selectedLetterKey: number;
-  selectedLetterId: number;
-  file: File;
+  requestors: User[];
+  letters: LetterHistory[];
+  numRecipients: Number[];
+  loadingRequestors: boolean;
+  loadingLetters: boolean;
+  dualMode: boolean;
+  selectedUser?: User;
 }
 
 class Recipient extends React.Component<RecipientProps, RecipientState> {
-  private viewModal = React.createRef<FileView>();
-  private cryptService: CryptService;
-  private cacheService: CacheService<number, string>;
-
-  componentWillMount() {
-    // api call to get letters
-    this.setState({
-      letters: [
-        {
-          letterId: 1,
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Simba",
-            publicAddress: "0xabcdefghijklmnop",
-          },
-        },
-        {
-          letterId: 2,
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Curious George",
-            publicAddress: "0x142857142857142857",
-          },
-        },
-      ],
-    });
-  }
-
+  private cacheService: CacheService<string, LetterHistory[]>;
   constructor(props: RecipientProps) {
     super(props);
     this.state = {
+      requestors: [],
       letters: [],
-      viewIsOpen: false,
-      selectedLetterKey: -1,
-      selectedLetterId: -1,
-      file: new File([], ""),
+      numRecipients: [],
+      loadingRequestors: true,
+      loadingLetters: false,
+      dualMode: false,
     };
-    this.cryptService = new CryptService();
     this.cacheService = new CacheService(1);
   }
 
-  openViewModal(key: number) {
-    console.log("opening view modal");
-    const letterId = this.state.letters[key].letterId;
-    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
-    let encryptedLetter = this.cacheService.get(letterId);
-    if (encryptedLetter === null) {
-      this.retrieveFromServer(fetchUrl, key);
-    } else {
-      let file = this.cryptService.decrypt(encryptedLetter);
-      console.log("file", file);
-      if (file) {
-        this.setState({
-          file: file,
-          viewIsOpen: true,
-          selectedLetterKey: key,
-          selectedLetterId: letterId,
-        });
-      }
-    }
-  }
-
-  closeViewModal() {
-    console.log("closing view modal");
-    this.setState({ viewIsOpen: false });
-  }
-
-  retrieveFromServer(fetchUrl: string, key: number) {
-    console.log("retrieving from server");
+  componentWillMount() {
+    const requestorFetchUrl = `/api/v1/letters/receivedRequestors`;
     const init: RequestInit = {
-      method: "GET",
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
     };
-    const letterId = this.state.letters[key].letterId;
-    // get letter from server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+
+    // get letters from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${requestorFetchUrl}`, init)
       .then((response) => {
-        console.log("logging response");
-        console.log(response);
-        return response.json();
-      })
-      .then((encryptedLetter) => {
-        // decrypt letter
-        let file = this.cryptService.decrypt(encryptedLetter);
-        this.setState({
-          file: file,
-          viewIsOpen: true,
-          selectedLetterKey: key,
-          selectedLetterId: letterId,
-        });
+        response
+          .json()
+          .then((body: ResponseBody) => {
+            const data: User[] = body.data;
+            console.log(data);
+            console.log(response);
+            if (data.length !== 0) {
+              this.setState({
+                requestors: data,
+                loadingRequestors: false,
+              });
+            } else {
+              this.setState({ loadingRequestors: false });
+            }
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
       })
       .catch((e: Error) => {
         console.log(e);
       });
   }
-  getUserName() {
-    return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
+
+  async toggleLetterModal(user: User) {
+    const selectedUser = this.state.selectedUser;
+    if (selectedUser && selectedUser.publicAddress === user.publicAddress) {
+      this.setState({ selectedUser: undefined, dualMode: false });
+    } else {
+      this.setState({
+        selectedUser: user,
+        dualMode: true,
+        loadingLetters: true,
+      });
+      this.loadLettersList(user.publicAddress);
+    }
+  }
+
+  async loadLettersList(publicAddress: string) {
+    const letterFetchUrl = `/api/v1/letters/received/${publicAddress}`;
+    const lettersList = await this.cacheService.get(publicAddress);
+
+    if (!lettersList) {
+      const init: RequestInit = {
+        method: "POST",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          auth: {
+            jwtToken: this.props.user.jwtToken,
+            publicAddress: this.props.user.publicAddress,
+          },
+          data: {},
+        }),
+      };
+
+      // get letters from server
+      fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, init)
+        .then((response) => {
+          response
+            .json()
+            .then((body: ResponseBody) => {
+              const data: LetterHistory[] = body.data;
+
+              console.log(response);
+              if (data && data.length > 0) {
+                this.cacheService.put(publicAddress, data);
+                this.setState({
+                  letters: data,
+                  loadingLetters: false,
+                  dualMode: true,
+                });
+              } else {
+                this.setState({
+                  loadingLetters: false,
+                })
+              }
+            })
+            .catch((e: Error) => {
+              console.log(e);
+            });
+        })
+        .catch((e: Error) => {
+          console.log(e);
+        });
+    } else {
+      this.setState({
+        letters: lettersList,
+        loadingLetters: false,
+        dualMode: true,
+      });
+    }
   }
 
   render() {
-    const { name } = this.props.user;
-    const { letters, viewIsOpen, selectedLetterId } = this.state;
+    const { user } = this.props;
+    const {
+      requestors,
+      letters,
+      numRecipients,
+      loadingRequestors,
+      loadingLetters,
+      dualMode,
+      selectedUser,
+    } = this.state;
 
-    const lettersList = letters.map((l, k) => (
-      <Row key={k}>
-        <div className="full-width">
-          <span className="text-float-left">({l.letterId})&nbsp;</span>
-          <span className="text-float-left">For: {l.requestor.name}</span>
-          <Button
-            className="left-float-right-button"
-            onClick={() => {
-              this.openViewModal(k);
-            }}
-          >
-            View
-          </Button>
-        </div>
-      </Row>
+    const requestorList = requestors.map((r, k) => (
+      <RecipientUserDisplay
+        user={user}
+        requestor={r}
+        selected={r.publicAddress === selectedUser?.publicAddress}
+        onView={this.toggleLetterModal.bind(this)}
+      />
     ));
 
-    return (
-      <div className="recipient">
-        <Modal
-          id="view-modal"
-          show={viewIsOpen}
-          onHide={this.closeViewModal.bind(this)}
-          backdrop="static"
-          animation={false}
-          className="modal"
-          scrollable={false}
-          // size="lg"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>
-              {this.getUserName()} ({selectedLetterId})
-            </Modal.Title>
-          </Modal.Header>
+    const lettersList = letters.map((l, k) => (
+      <RecipientLetterDisplay
+        user={user}
+        letter={l}
+        numRecipients={numRecipients[k]}
+      />
+    ));
 
-          <Modal.Body>
-            <FileView
-              ref={this.viewModal}
-              letter={letters[this.state.selectedLetterKey]}
-              onClose={this.closeViewModal.bind(this)}
-            ></FileView>
-          </Modal.Body>
-        </Modal>
-
-        <div className="recipient-header">
-          <h1> Recipient Page </h1>
-          <p>
-            <em>{name}</em>
-          </p>
-          <hr></hr>
+    const recipientRequestors = (
+      <div className="recipient-letters">
+        <div className="recipient-header mb-3">
+          <h3> Users </h3>
         </div>
 
-        <div className="letters">
-          <h3> Letters </h3>
-          <Container fluid>{lettersList}</Container>
-          <hr></hr>
-        </div>
-
-        <div className="recipient-footer">
-          <p> Product of Team Gas</p>
+        <div className="recipient-letterdisplay">
+          <div>{requestorList}</div>
         </div>
       </div>
+    );
+
+    const recipientLetters = (
+      <div className="recipient-letters">
+        <div className="recipient-header mb-3">
+          <h3> {selectedUser?.name} </h3>
+        </div>
+
+        <div className="recipient-letterdisplay">
+          <div>{lettersList}</div>
+        </div>
+      </div>
+    );
+
+    const recipientFooter = (
+      <div className="recipient-footer">
+        <span> Product of Team Gas</span>
+      </div>
+    );
+
+    return (
+      <>
+        {!loadingRequestors && requestors.length === 0 && (
+          <div className="recipient-header absolute-center">
+            <h3> No Letters Received </h3>
+          </div>
+        )}
+
+        {!loadingRequestors && !dualMode && requestors.length !== 0 && (
+          <Col className="recipient">
+            <Row>{recipientRequestors}</Row>
+            {/* <Row>{requestorFooter}</Row> */}
+          </Col>
+        )}
+
+        {!loadingRequestors && dualMode && requestors.length !== 0 && (
+          <Col>
+            <Row className="recipient-dual">
+              <Col className="ml-5 mr-5">
+                <Row>{recipientRequestors}</Row>
+              </Col>
+              <Col className="mr-5 ml-5">
+                {!loadingLetters && <Row>{recipientLetters}</Row>}
+                {loadingLetters && (
+                  <Row>
+                    <div className="d-flex justify-content-center absolute-center">
+                      <Spinner
+                        className=""
+                        animation="border"
+                        variant="secondary"
+                      />
+                    </div>
+                  </Row>
+                )}
+              </Col>
+            </Row>
+            {/* <Row>{requestorFooter}</Row> */}
+          </Col>
+        )}
+
+        {loadingRequestors && (
+          <div className="d-flex justify-content-center absolute-center">
+            <Spinner className="" animation="border" variant="secondary" />
+          </div>
+        )}
+      </>
     );
   }
 }

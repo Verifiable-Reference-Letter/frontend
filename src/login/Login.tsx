@@ -1,32 +1,41 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
+import { Button, InputGroup, FormControl, Form } from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
-import Body from "../common/Body.interface";
+import CryptService from "../services/CryptService";
+
+import RequestBody from "../common/RequestBody.interface";
+import ResponseBody from "../common/ResponseBody.interface";
 
 import { web3 } from "../App";
 
-// let web3: Web3;
 interface LoginProps {
   user: UserAuth;
   callback: (u: UserAuth) => void;
 }
 interface LoginState {
+  inputEmail: string;
   inputName: string;
-  displayMessage: string;
+  // displayMessage: string;
   loginMode: boolean;
 }
 
 class Login extends React.Component<LoginProps, LoginState> {
+  private cryptService: CryptService;
+
   constructor(props: LoginProps) {
     super(props);
     this.state = {
+      inputEmail: "",
       inputName: "",
-      displayMessage: "",
+      // displayMessage: "",
       loginMode: true,
     };
+    this.cryptService = new CryptService();
 
-    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleInputNameChange = this.handleInputNameChange.bind(this);
+    this.handleInputEmailChange = this.handleInputEmailChange.bind(this);
+
     this.onLoginClick = this.onLoginClick.bind(this);
     this.signMessage = this.signMessage.bind(this);
     this.authenticate = this.authenticate.bind(this);
@@ -39,14 +48,16 @@ class Login extends React.Component<LoginProps, LoginState> {
     if (publicAddress === "") {
       // comment out conditional for testing signup
       console.log("Invalid public address. Connect to Metamask.");
-      this.setState({ displayMessage: "Please Connect to Metamask." });
+      // this.setState({ displayMessage: "Connect to Metamask." });
+      alert("Connect to Metamask");
       return;
     }
 
     if (this.state.inputName.length <= 1) {
       console.log(this.state.inputName);
-      console.log("Please enter a name.");
-      this.setState({ displayMessage: "Please Enter Your Name." });
+      console.log("Enter a name.");
+      alert("Please Enter Your Name");
+      // this.setState({ displayMessage: "Enter Your Name." });
       return;
     }
 
@@ -58,9 +69,10 @@ class Login extends React.Component<LoginProps, LoginState> {
       .then(this.signMessage)
       // send signature to backend
       .then(this.authenticate)
-      //.then(this.doStuffWithToken) // after receiving the token
       .catch((err: Error) => {
         console.log(err);
+        // this.setState({ displayMessage: "Error. Please Try Again Later." });
+        alert("Error. Please Try Again Later.");
       });
 
     return;
@@ -77,7 +89,8 @@ class Login extends React.Component<LoginProps, LoginState> {
     if (publicAddress === "") {
       // comment out conditional for testing signup
       console.log("Invalid public address. Connect to Metamask.");
-      this.setState({ displayMessage: "Please Connect to Metamask." });
+      alert("Please Connect to Metamask");
+      // this.setState({ displayMessage: "Please Connect to Metamask." });
       return;
     }
 
@@ -88,10 +101,13 @@ class Login extends React.Component<LoginProps, LoginState> {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
-      }
+      },
     };
 
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${publicAddress}`, init)
+    fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/auth/users/${publicAddress}`,
+      init
+    )
       .then((response) => {
         console.log("logging nonce fetch response");
         console.log(response);
@@ -102,11 +118,10 @@ class Login extends React.Component<LoginProps, LoginState> {
 
         if (users[0] == null) {
           console.log("need to signup.");
-          this.setState({
-            displayMessage: "No Existing Account. Sign Up Instead.",
-            // loginMode: false // automatically redirect to signup form
-          });
-          // this.setState({loginMode: false}); // automatically redirect to signup form
+          // this.setState({
+          //   displayMessage: "No Existing Account. Sign Up Instead.",
+          // });
+          alert("No Existing Account. Sign Up Instead.");
           return Promise.reject("no existing account");
         }
         return users[0];
@@ -118,7 +133,8 @@ class Login extends React.Component<LoginProps, LoginState> {
       //.then(this.doStuffWithToken) // after receiving the token
       .catch((err: Error) => {
         console.log(err);
-        this.setState({displayMessage: "Login Failed. Try Again Later."})
+        // this.setState({ displayMessage: "Login Failed. Try Again Later." });
+        alert("Login Failed.");
       });
 
     return;
@@ -131,19 +147,28 @@ class Login extends React.Component<LoginProps, LoginState> {
     publicAddress: string;
     inputName: string;
   }) {
-    console.log("publicAddress:", publicAddress, "inputName:", inputName);
-    this.setState({ displayMessage: "Signing You Up . . ." });
-    return await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
-      body: JSON.stringify({
-        publicAddress: publicAddress,
-        inputName: inputName,
-      }),
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    })
+    console.log("publicAddress:", publicAddress, "name:", inputName);
+    // this.setState({ displayMessage: "Signing You Up . . ." });
+
+    const publicKey = await this.cryptService.getPublicKey(publicAddress);
+    if (!publicKey) Promise.reject();
+
+    return await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/auth/users/create`,
+      {
+        body: JSON.stringify({
+          publicAddress: publicAddress,
+          name: inputName,
+          email: "placeholder@lehigh.edu",
+          publicKey: publicKey,
+        }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      }
+    )
       .then((response) => {
         console.log("logging signup response");
         console.log(response);
@@ -168,16 +193,24 @@ class Login extends React.Component<LoginProps, LoginState> {
     // this.setState({displayMessage: "Sign the Message to Confirm Public Address."})
     console.log("signing the nonce");
     console.log(nonce);
-    const message = web3.utils.sha3(nonce);
+    // const prefix = '\x19Ethereum Signed Message:\n' + String.fromCharCode(nonce.length);
+    // const message = web3.utils.keccak256(prefix + nonce);
+    const message = nonce;
+    // const message = web3.utils.keccak256(nonce);
     console.log(message);
+    console.log(web3.utils.utf8ToHex(`${message}`));
+    console.log(publicAddress);
     return new Promise((resolve, reject) => {
       // web3.eth.sign doesn't seem to work (never finishes)
       web3.eth.personal
         .sign(
-          web3.utils.utf8ToHex(`${message}`),
+          message,
+          // web3.utils.utf8ToHex(`${message}`),
           publicAddress,
           "",
           (err, signature) => {
+            //console.log(web3.eth.accounts.recover(web3.utils.keccak256(nonce), signature));
+            //web3.eth.personal.ecRecover(message, signature).then((v) => console.log(v));
             if (err) {
               console.log("error when signing");
               return reject(err);
@@ -201,11 +234,11 @@ class Login extends React.Component<LoginProps, LoginState> {
     signature: string;
   }) {
     console.log("authenticating");
-    this.setState({
-      displayMessage: this.state.loginMode
-        ? "Logging You In . . ."
-        : "Signing You Up . . .",
-    });
+    // this.setState({
+    //   displayMessage: this.state.loginMode
+    //     ? "Logging You In . . ."
+    //     : "Signing You Up . . .",
+    // });
     return fetch(`${process.env.REACT_APP_BACKEND_URL}/auth`, {
       body: JSON.stringify({ publicAddress, signature }),
       headers: {
@@ -220,15 +253,13 @@ class Login extends React.Component<LoginProps, LoginState> {
 
         response
           .json()
-          .then((body: Body) => {
+          .then((body: ResponseBody) => {
             console.log(body);
-            const auth = body.auth;
-            const j = auth.jwtToken;
+            const data = body.data;
+            const j = data.jwtToken;
             console.log("jwtToken", j);
             let jwtToken = j ? j : undefined;
-            if (this.props.user.publicAddress !== auth.publicAddress) {
-              console.log("error in backend: publicAddresses do not match");
-            } else if (jwtToken) {
+            if (jwtToken) {
               console.log(jwtToken);
               this.props.callback({
                 publicAddress: this.props.user.publicAddress,
@@ -248,19 +279,28 @@ class Login extends React.Component<LoginProps, LoginState> {
       });
   }
 
-  handleInputChange(event: any) {
+  handleInputNameChange(event: any) {
+    console.log(event.target.value);
     this.setState({ inputName: event.target.value });
   }
 
+  handleInputEmailChange(event: any) {
+    console.log(event.target.value);
+    this.setState({ inputEmail: event.target.value });
+  }
+
   toggleMode() {
-    this.setState({ loginMode: !this.state.loginMode, displayMessage: "" });
+    this.setState({
+      loginMode: !this.state.loginMode,
+    });
   }
 
   render() {
     const loginDisplay = (
-      <div>
+      <div className="button-blur">
         <Button
-          className="left-button"
+          variant="outline-light"
+          className="mr-3"
           onClick={() => {
             this.toggleMode();
           }}
@@ -268,7 +308,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           Sign Up
         </Button>
         <Button
-          className="left-button"
+          variant="outline-light"
           onClick={() => {
             this.onLoginClick();
           }}
@@ -279,41 +319,60 @@ class Login extends React.Component<LoginProps, LoginState> {
     );
 
     const signupDisplay = (
-      <form>
-        <label className="label-top">
-          Name &nbsp;
-          <input
+      <form className="justify-content-between">
+        <InputGroup className="label-top border-radius">
+          <Form.Group controlId="formEmail">
+            {/* <Form.Label>Email address</Form.Label> */}
+            <Form.Control
+              type="email"
+              className="w-100 mb-3"
+              placeholder="Email"
+              onChange={this.handleInputEmailChange}
+            />
+            {/* <Form.Text className="text-muted">
+              We'll never share your email with anyone else.
+            </Form.Text> */}
+          </Form.Group>
+          {/* <InputGroup.Prepend className="m-2 flex-shrink-1">
+              Sign Up
+            </InputGroup.Prepend> */}
+          <FormControl
             type="text"
-            placeholder="Not Yet Verified"
+            className="w-100"
+            placeholder="Name"
             value={this.state.inputName}
-            onChange={this.handleInputChange}
+            onChange={this.handleInputNameChange}
           />
-        </label>
-        <Button
-          className="left-float-right-button"
-          onClick={() => {
-            this.toggleMode();
-            this.setState({ inputName: "" });
-          }}
-        >
-          Back
-        </Button>
-        <Button
-          className="left-float-right-button"
-          onClick={() => {
-            this.onSignupClick();
-          }}
-        >
-          Sign Up
-        </Button>
+        </InputGroup>
+        <div className="d-flex button-blur">
+          <Button
+            variant="outline-light"
+            className="float-right flex-fill"
+            onClick={() => {
+              this.onSignupClick();
+            }}
+          >
+            Sign Up
+          </Button>
+          <Button
+            variant="outline-light"
+            className="float-right flex-fill ml-3"
+            onClick={() => {
+              this.toggleMode();
+              this.setState({ inputName: "" });
+            }}
+          >
+            Back
+          </Button>
+        </div>
       </form>
     );
 
     return (
-      <div>
-        <div className="login">
+      <div className="login">
+        <div className="login-form">
           <div>{this.state.loginMode ? loginDisplay : signupDisplay}</div>
-          <div className="alert"> {this.state.displayMessage}</div>
+          {/* <div className="alert"> {this.state.displayMessage}</div> */}
         </div>
       </div>
     );

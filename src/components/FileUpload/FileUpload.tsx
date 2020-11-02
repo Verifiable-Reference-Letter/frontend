@@ -5,6 +5,7 @@ import Spinner from "react-bootstrap/Spinner";
 
 import User from "../../common/UserAuth.interface";
 import "./FileUpload.css";
+import { DropdownDivider } from "react-bootstrap/Dropdown";
 
 interface FileUploadProps {
   user: User;
@@ -38,7 +39,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
   onFormSubmit() {
     const file = this.state.file;
     console.log(file);
-    if (file && file.size === 0) {
+    if (!file || file.size === 0) {
       console.log("no file uploaded");
       this.setState({ displayMessage: "No File Uploaded." });
     } else if (this.props.restrictPdf && file.type !== "application/pdf") {
@@ -103,21 +104,36 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     return (
       <Form onSubmit={this.onFormSubmit.bind(this)}>
         <Form.Group>
-          <Form.File id="fileUpload" onChange={this.onChange} />
-          <div>
-            <div className="display-message"> {displayMessage} </div>
+          <Form.File id="fileUpload" className="file-upload-form" onChange={this.onChange} />
+          <div className="d-flex border-radius button-blur mb-2">
+            <div className="text-warning mt-3 flex-fill ">
+              {displayMessage}
+            </div>
+            {/* {buffering && (
+              <div className="d-flex justify-content-end">
+                <Spinner
+                  className="mt-4 mr-3"
+                  animation="border"
+                  variant="secondary"
+                />
+              </div>
+            )} */}
             <Button
-              className="form-button"
+              className="mt-3 mr-3 flex-shrink-1 float-right"
+              variant="outline-light"
+              onClick={this.onFormSubmit}
+            >
+              Submit
+            </Button>
+            <Button
+              className="mt-3 flex-shrink-1 float-right"
+              variant="outline-light"
               onClick={(e: any) => {
                 this.props.onClose();
               }}
             >
               Close
             </Button>
-            <Button className="form-button" onClick={this.onFormSubmit}>
-              Upload
-            </Button>
-           {buffering && <Spinner className="float-right mt-4 mr-3" animation="border" variant="secondary" />}
           </div>
         </Form.Group>
       </Form>

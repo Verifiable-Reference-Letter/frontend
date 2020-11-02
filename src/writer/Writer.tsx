@@ -1,17 +1,12 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Modal from "react-bootstrap/Modal";
-import Container from "react-bootstrap/Container";
+import { Spinner, Col, Row } from "react-bootstrap";
 
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
+import RequestBody from "../common/RequestBody.interface";
+import ResponseBody from "../common/ResponseBody.interface";
 
-import CryptService from "../services/CryptService";
-import CacheService from "../services/CacheService";
-
-import FileUpload from "../components/FileUpload/FileUpload";
-import FileView from "../components/FileView/FileView";
+import WriterLetterDisplay from "../WriterLetterDisplay/WriterLetterDisplay";
 
 import "./Writer.css";
 
@@ -21,283 +16,131 @@ interface WriterProps {
 
 interface WriterState {
   letters: LetterDetails[];
-  uploadIsOpen: boolean;
-  viewIsOpen: boolean;
-  selectedLetterKey: number;
-  selectedLetterId: number;
-  selectedFile?: File;
+  numRecipients: Number[];
+  numUnsentRecipients: Number[];
+  loadingLetters: boolean;
 }
 
 class Writer extends React.Component<WriterProps, WriterState> {
-  private uploadModal = React.createRef<FileUpload>();
-  private viewModal = React.createRef<FileView>();
-  private cryptService: CryptService;
-  private cacheService: CacheService<number, string>;
-  private testCacheService: CacheService<number, File>;
-
-  componentWillMount() {
-    // api call to get letters
-    console.log("componentWillMount");
-    this.setState({
-      letters: [
-        {
-          letterId: 1,
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Simba",
-            publicAddress: "0xabcdefghijklmnop",
-          },
-        },
-        {
-          letterId: 2,
-          writer: {
-            name: "Mary Poppins",
-            publicAddress: "0x314159265358979323",
-          },
-          requestor: {
-            name: "Curious George",
-            publicAddress: "0x142857142857142857",
-          },
-        },
-      ],
-    });
-  }
-
   constructor(props: WriterProps) {
     super(props);
     this.state = {
       letters: [],
-      viewIsOpen: false,
-      uploadIsOpen: false,
-      selectedLetterKey: -1,
-      selectedLetterId: -1,
+      numRecipients: [],
+      numUnsentRecipients: [],
+      loadingLetters: true,
     };
-    this.cryptService = new CryptService();
-    this.cacheService = new CacheService(1);
-    this.testCacheService = new CacheService(1);
   }
 
-  openUploadModal(key: number) {
-    console.log("opening upload modal");
-    this.setState({
-      uploadIsOpen: true,
-      selectedLetterKey: key,
-      selectedLetterId: this.state.letters[key].letterId,
-    });
+  componentWillMount() {
+    // api call to get letters
+    this.loadLetterList();
   }
 
-  onUploadSubmit(file: File) {
-    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${this.state.selectedLetterId}/content`;
-    this.uploadToServer(file, fetchUrl);
-  }
-
-  closeUploadModal() {
-    console.log("closing upload modal");
-    this.setState({ uploadIsOpen: false });
-  }
-
-  uploadToServer(file: File, fetchUrl: string) {
-    console.log("uploading to server");
-    // encrypt file
-    let encryptedFile: string = this.cryptService.encrypt(file);
-    // cache encrypted file
-    // this.cacheService.put(this.state.selectedLetterId, encryptedFile);
-    this.testCacheService.put(this.state.selectedLetterId, file);
-
-    // post encrypted file to server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, {
-      body: JSON.stringify({ content: encryptedFile }),
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-type": "application/json",
-        jwtToken: this.props.user.jwtToken,
-      },
-      method: "POST",
-    })
-      .then((response: any) => {
-        console.log(response.status);
-        if (response.status === 200) {
-          this.closeUploadModal();
-        } else {
-          this.uploadModal.current!.changeDisplayMessage(
-            "Upload Failed. Try Again Later."
-          );
-          this.closeUploadModal(); // DELETE
-        }
-      })
-      .catch((e: Error) => {
-        console.log(e);
-      });
-  }
-
-  openViewModal(key: number) {
-    console.log("opening view modal");
-    const letterId = this.state.letters[key].letterId;
-    const fetchUrl = `/api/users/${this.props.user.publicAddress}/letters/${letterId}/content`;
-
-    // let encryptedLetter = this.cacheService.get(letterId);
-    let encryptedLetter = this.testCacheService.get(letterId); // DELETE
-    if (encryptedLetter === null) {
-      this.retrieveFromServer(fetchUrl, key);
-    } else {
-      // let file = this.cryptService.decrypt(encryptedLetter);
-      let file = encryptedLetter; // DELETE
-      console.log("file", file);
-      if (file) {
-        this.setState({
-          viewIsOpen: true,
-          selectedLetterKey: key,
-          selectedLetterId: letterId,
-          selectedFile: file,
-        });
-      }
-    }
-  }
-
-  closeViewModal() {
-    console.log("closing view modal");
-    this.setState({ viewIsOpen: false });
-  }
-
-  retrieveFromServer(fetchUrl: string, key: number) {
-    console.log("retrieving from server");
+  async loadLetterList() {
+    const letterFetchUrl = `/api/v1/letters/written`;
     const init: RequestInit = {
-      method: "GET",
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
     };
-    const letterId = this.state.letters[key].letterId;
-    // get letter from server
-    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+    // get letters from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${letterFetchUrl}`, init)
       .then((response) => {
-        console.log("logging response");
-        console.log(response);
-        return response.json();
-      })
-      .then((encryptedLetter) => {
-        // decrypt letter
-        let file = this.cryptService.decrypt(encryptedLetter);
-        this.setState({
-          viewIsOpen: true,
-          selectedLetterKey: key,
-          selectedLetterId: letterId,
-          selectedFile: file,
-        });
+        response
+          .json()
+          .then((body: ResponseBody) => {
+            const data: {
+              letters: LetterDetails[];
+              numRecipients: Number[];
+              numUnsentRecipients: Number[];
+            } = body.data;
+
+            console.log(response);
+            if (data && data.letters && data.numRecipients) {
+              this.setState({
+                letters: data.letters,
+                numRecipients: data.numRecipients,
+                numUnsentRecipients: data.numUnsentRecipients,
+                loadingLetters: false,
+              });
+            } else {
+              this.setState({ loadingLetters: false });
+            }
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
       })
       .catch((e: Error) => {
         console.log(e);
       });
   }
 
-  getUserName() {
-    return this.state.letters[this.state.selectedLetterKey]?.requestor.name;
-  }
-
   render() {
-    const { name } = this.props.user;
-    const { letters, uploadIsOpen, viewIsOpen, selectedLetterId } = this.state;
+    const { user } = this.props;
+    const {
+      letters,
+      numRecipients,
+      numUnsentRecipients,
+      loadingLetters,
+    } = this.state;
 
     const lettersList = letters.map((l, k) => (
-      <Row key={k}>
-        <div className="full-width">
-          <span className="text-float-left">({l.letterId})&nbsp;</span>
-          <span className="text-float-left">For: {l.requestor.name}</span>
-          <Button
-            className="left-float-right-button"
-            onClick={() => {
-              this.openViewModal(k);
-            }}
-          >
-            View
-          </Button>
-
-          <Button
-            className="left-float-right-button"
-            onClick={() => {
-              this.openUploadModal(k);
-            }}
-          >
-            Upload
-          </Button>
-        </div>
-      </Row>
+      <WriterLetterDisplay
+        user={user}
+        letter={l}
+        numRecipients={numRecipients[k]}
+        numUnsentRecipients={numUnsentRecipients[k]}
+        onReload={this.loadLetterList.bind(this)}
+      />
     ));
 
-    return (
-      <div id="writer" className="writer">
-        <Modal
-          id="upload-modal"
-          show={uploadIsOpen}
-          onHide={this.closeUploadModal.bind(this)}
-          backdrop="static"
-          size="lg"
-          animation={false}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>
-              {this.getUserName()} ({selectedLetterId})
-            </Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <FileUpload
-              ref={this.uploadModal}
-              user={this.props.user}
-              restrictPdf={true}
-              onUpload={this.onUploadSubmit.bind(this)}
-              onClose={this.closeUploadModal.bind(this)}
-            ></FileUpload>
-          </Modal.Body>
-        </Modal>
-
-        <Modal
-          id="view-modal"
-          show={viewIsOpen}
-          onHide={this.closeViewModal.bind(this)}
-          backdrop="static"
-          animation={false}
-          className="modal"
-          scrollable={false}
-          size="lg"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>
-              {this.getUserName()} ({selectedLetterId})
-            </Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <FileView
-              file={this.state.selectedFile}
-              ref={this.viewModal}
-              letter={letters[this.state.selectedLetterKey]}
-              onClose={this.closeViewModal.bind(this)}
-            ></FileView>
-          </Modal.Body>
-        </Modal>
+    const writerLetters = (
+      <div className="writer-letters">
         <div className="writer-header">
-          <h1> Writer Page </h1>
-          <p>
-            <em>{name}</em>
-          </p>
-          <hr></hr>
-        </div>
-
-        <div className="letters">
           <h3> Letters </h3>
-          <Container fluid>{lettersList}</Container>
-          <hr></hr>
         </div>
-
-        <div className="writer-footer">
-          <p> Product of Team Gas</p>
-        </div>
+        <div className="writer-letterslist">{lettersList}</div>
       </div>
+    );
+
+    const writerFooter = (
+      <div className="writer-footer">
+        <span> Product of Team Gas</span>
+      </div>
+    );
+
+    return (
+      <>
+        {!loadingLetters && letters.length !== 0 && (
+          <Col className="writer">
+            <Row>{writerLetters}</Row>
+            {/* <Row>{writerFooter}</Row> */}
+          </Col>
+        )}
+
+        {!loadingLetters && letters.length === 0 && (
+            <div className="writer-header absolute-center">
+              <h3> No Letters Requested </h3>
+            </div>
+        )}
+
+        {loadingLetters && (
+          <div className="d-flex justify-content-center absolute-center">
+            <Spinner className="" animation="border" variant="secondary" />
+          </div>
+        )}
+      </>
     );
   }
 }

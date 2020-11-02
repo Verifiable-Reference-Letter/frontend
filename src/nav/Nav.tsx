@@ -37,7 +37,6 @@ class Nav extends React.Component<NavProps, NavState> {
           }}
           href={brandLink}
         >
-          {" "}
           ETC Reference Letter dApp
         </Navbar.Brand>
         <Navbar.Toggle />
@@ -54,10 +53,7 @@ class Nav extends React.Component<NavProps, NavState> {
           )}
           {this.props.connectedTo && (
             <Navbar.Text className="navText">
-              Signed in as:{" "}
-              <a>
-                {this.props.connectedTo ? this.props.user.publicAddress : "--"}
-              </a>
+              Connected to Metamask: <span>{this.props.connectedTo ? this.props.user.publicAddress : "--"}</span>
             </Navbar.Text>
           )}
         </Navbar.Collapse>

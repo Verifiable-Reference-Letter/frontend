@@ -1,88 +1,141 @@
 import React from "react";
-import { Button, ListGroup, Table } from "react-bootstrap";
+import { Modal, Button, Spinner } from "react-bootstrap";
 import LetterDetails from "../../common/LetterDetails.interface";
+import UserProfile from "../../common/UserProfile.interface";
+import FileData from "../../common/FileData.interface";
+import Profile from "../../components/Profile";
+import RequestBody from "../../common/RequestBody.interface";
+import ResponseBody from "../../common/ResponseBody.interface";
 import "./FileView.css";
+import UserAuth from "../../common/UserAuth.interface";
 
 interface FileViewProps {
-  letter: LetterDetails;
-  file?: File;
+  user: UserAuth;
+  fileData?: FileData;
   onClose: () => void;
 }
 interface FileViewState {
-  letterUrl: any;
-  letterType: string;
+  profileIsOpen: boolean;
+  selectedPublicAddress: string;
+  selectedUserProfile?: UserProfile;
 }
 
 class FileView extends React.Component<FileViewProps, FileViewState> {
-  componentWillMount() {
-    const file = this.props.file;
-    let reader = new FileReader();
-    if (file !== undefined) {
-      reader.readAsDataURL(file);
-      reader.onload = (e: any) => {
-        this.setState({ letterUrl: reader.result, letterType: file.type });
-      };
-      console.log("letterUrl", this.state.letterUrl);
-    }
-  }
-
   constructor(props: FileViewProps) {
     super(props);
-    this.state = { letterUrl: null, letterType: "" };
+    this.state = {
+      profileIsOpen: false,
+      selectedPublicAddress: "",
+    };
   }
 
-  /*decryptLetter(letter: string) {
-    console.log("decrypting letter");
-    return new File([""], "filename.pdf", {type: "application/pdf"});
-  }*/
+  openProfileModal(selectedPublicAddress: string) {
+    console.log("opening view modal");
+    const fetchUrl = `/api/v1/users/${selectedPublicAddress}/profile`;
+    this.retrieveProfileFromServer(fetchUrl);
+  }
 
+  retrieveProfileFromServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    // get user profile from server
+    fetch(`${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`, init)
+      .then((response) => {
+        response
+          .json()
+          .then((body: ResponseBody) => {
+            const data: UserProfile[] = body.data;
+            console.log(response);
+            if (data && data.length !== 0) {
+              this.setState({
+                selectedUserProfile: data[0],
+                profileIsOpen: true,
+              });
+            }
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+  }
+
+  closeProfileModal() {
+    console.log("closing view modal");
+    this.setState({ profileIsOpen: false });
+  }
   render() {
-    const { letter, file } = this.props;
-    const requestor = letter.requestor;
-    const writer = letter.writer;
-    const { letterUrl, letterType } = this.state;
+    const { fileData } = this.props;
+    const { profileIsOpen } = this.state;
     return (
       <div>
         <div className="mb-3">
-          {file && (
+          {fileData && (
             <embed
-              type={letterType}
-              src={letterUrl}
+              type={fileData.letterType}
+              src={fileData.letterUrl}
               width="100%"
-              height="360px"
+              height="500px"
             />
+          )}
+          {!fileData && (
+            <div className="d-flex justify-content-center">
+              <Spinner
+                className="mb-3 .absolute-center"
+                animation="border"
+                variant="secondary"
+              />
+            </div>
           )}
         </div>
 
-        <Table hover className="border border-secondary">
-          <thead>
-            <tr>
-              <th className="border border-secondary .bg-secondary">Letter ID</th>
-              <th className="border border-secondary">Requestor</th>
-              <th className="border border-secondary">Writer</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-secondary">{letter.letterId}</td>
-              <td className="border border-secondary">
-                {requestor.name} ({requestor.publicAddress})
-              </td>
-              <td className="border border-secondary">
-                {writer.name} ({writer.publicAddress})
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-
         <Button
-          className="form-button"
+          className="mt-3 float-right"
           onClick={(e: any) => {
             this.props.onClose();
           }}
         >
           Close
         </Button>
+
+        <Modal
+          id="profile-modal"
+          show={profileIsOpen}
+          onHide={this.closeProfileModal.bind(this)}
+          backdrop="static"
+          animation={false}
+          className="modal"
+          scrollable={false}
+          size="sm"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>User Profile</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            {this.state.selectedUserProfile && (
+              <Profile
+                user={this.state.selectedUserProfile}
+                onClose={this.closeProfileModal.bind(this)}
+              />
+            )}
+          </Modal.Body>
+        </Modal>
       </div>
     );
   }
