@@ -1,7 +1,7 @@
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
 import React, {FunctionComponent} from "react";
-import { RouteComponentProps } from "@reach/router";
-import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
+//import { RouteComponentProps } from "@reach/router";
+import { BrowserRouter as Router, Route, Link, Redirect, Switch, RouteComponentProps} from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
 
@@ -147,15 +147,18 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={this.state.loggedIn}
         />
-        {this.state.loggedIn ? <Redirect to={ROUTES.REQUESTOR} /> : null}
-        <div className="application-body">
-          <Route exact path={ROUTES.HOME} render={() => home} />
-          <Route exact path={ROUTES.LOGIN} render={() => login} />
-          <Route exact path={ROUTES.DASHBOARD} render={() => dashboard} />
-          <Route exact path={ROUTES.REQUESTOR} render={() => requestor} />
-          <Route exact path={ROUTES.WRITER} render={() => writer} />
-          <Route exact path={ROUTES.RECIPIENT} render={() => recipient} />
-        </div>
+        {this.state.loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null}
+        <Router>
+
+	          <Route path={ROUTES.HOME} authed={this.state.loggedIn} component={() => home} />
+	          <Route path={ROUTES.REQUESTOR} authed={this.state.loggedIn} component={() => requestor} />
+	          <Route path={ROUTES.WRITER} authed={this.state.loggedIn} component={() => writer} />
+	          <Route path={ROUTES.RECIPIENT} authed={this.state.loggedIn} component={() => recipient} />
+
+	          <Route path={ROUTES.LOGIN} authed={this.state.loggedIn} component={() => login} />
+
+	          <Route path={ROUTES.DASHBOARD} authed={this.state.loggedIn} component={() => dashboard} />
+	      </Router>
       </div>
     );
   }
