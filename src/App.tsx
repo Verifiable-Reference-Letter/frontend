@@ -21,15 +21,57 @@ import Web3 from "web3";
 export let web3: Web3;
 export let ethereum: any;
 
-type Props = { component: FunctionComponent, authed: boolean } & RouteComponentProps;
 
-const ProtectedRoute: FunctionComponent<Props> = ({ component: Component, authed, ...rest }) => (
-    authed ? (
-        <Component {...rest}/>
-    ) : (
-        <Redirect to={{ pathname: '/login' }} />
-    )
-);
+enum AuthRoutes {
+	dashboard = '/dashboard',
+	requestor = '/requestor',
+	writer = '/writer',
+	recipient = '/recipient'
+}
+
+enum NonAuthRoutes {
+	home = '/',
+	login = '/login'
+}
+
+interface Props {
+	Component : React.FC<RouteComponentProps>
+	path: string;
+	exact?: boolean;
+	authed: boolean
+};
+
+const AuthRoute = ({ Component, path, exact = false, authed}: Props): JSX.Element => {
+	const isAuthed = authed;
+	const message = "Login to view this page"
+	return (
+		<Route
+			exact={exact}
+			path={path}
+			render={(props : RouteComponentProps) => 
+				isAuthed ? (
+					<Component {...props} />
+				) : (
+					<Redirect to={{
+						pathname: NonAuthRoutes.login
+					}}
+				/>
+				)
+			}
+		/>
+	);
+};
+
+
+//type Props = {path:string, component: FunctionComponent, authed: boolean } & RouteComponentProps;
+
+// const ProtectedRoute: FunctionComponent<Props> = ({ component: Component, authed, ...rest }) => (
+//     authed ? (
+//         <Component {...rest}/>
+//     ) : (
+//         <Redirect to={{ pathname: '/login' }} />
+//     )
+// );
 
 export const GAS_LIMIT_STANDARD = 6000000;
 export let accounts: string[];
@@ -147,20 +189,32 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={this.state.loggedIn}
         />
-        {this.state.loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null}
+        
         <Router>
-
-	          <Route path={ROUTES.HOME} authed={this.state.loggedIn} component={() => home} />
-	          <Route path={ROUTES.REQUESTOR} authed={this.state.loggedIn} component={() => requestor} />
-	          <Route path={ROUTES.WRITER} authed={this.state.loggedIn} component={() => writer} />
-	          <Route path={ROUTES.RECIPIENT} authed={this.state.loggedIn} component={() => recipient} />
-
-	          <Route path={ROUTES.LOGIN} authed={this.state.loggedIn} component={() => login} />
-
-	          <Route path={ROUTES.DASHBOARD} authed={this.state.loggedIn} component={() => dashboard} />
+	        <Switch>
+	        	<Route path={NonAuthRoutes.login} authed={this.state.loggedIn} component={() => login} />
+		        <Route path={NonAuthRoutes.home} authed={this.state.loggedIn} component={() => home} />
+	          <AuthRoute path={AuthRoutes.requestor} authed={this.state.loggedIn} Component={() => requestor} />
+	          <AuthRoute path={AuthRoutes.writer} authed={this.state.loggedIn} Component={() => writer} />
+	          <AuthRoute path={AuthRoutes.recipient} authed={this.state.loggedIn} Component={() => recipient} />
+	          <AuthRoute exact path={AuthRoutes.dashboard} authed={this.state.loggedIn} Component={() => dashboard} />
+	        </Switch>
 	      </Router>
       </div>
     );
   }
 }
 export default App;
+//{this.state.loggedIn ? <Redirect to="/dashboard" /> : null}
+// <Router>
+//   <Switch>
+//     <Route path={ROUTES.HOME} authed={this.state.loggedIn} component={() => home} />
+//     <Route path={ROUTES.REQUESTOR} authed={this.state.loggedIn} component={() => requestor} />
+//     <Route path={ROUTES.WRITER} authed={this.state.loggedIn} component={() => writer} />
+//     <Route path={ROUTES.RECIPIENT} authed={this.state.loggedIn} component={() => recipient} />
+
+//     <Route exact path={ROUTES.LOGIN} authed={this.state.loggedIn} component={() => login} />
+
+//     <Route path={ROUTES.DASHBOARD} authed={this.state.loggedIn} component={() => dashboard} />
+//   </Switch>
+// </Router>
