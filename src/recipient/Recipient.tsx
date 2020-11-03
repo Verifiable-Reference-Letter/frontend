@@ -1,5 +1,7 @@
 import React from "react";
-import { Spinner, Row, Col } from "react-bootstrap";
+import { Spinner, Row, Col, Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSync } from "@fortawesome/free-solid-svg-icons";
 
 import UserAuth from "../common/UserAuth.interface";
 import User from "../common/User.interface";
@@ -44,6 +46,10 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
   }
 
   componentWillMount() {
+    this.loadRequestorList();
+  }
+
+  async loadRequestorList() {
     const requestorFetchUrl = `/api/v1/letters/receivedRequestors`;
     const init: RequestInit = {
       method: "POST",
@@ -140,7 +146,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
               } else {
                 this.setState({
                   loadingLetters: false,
-                })
+                });
               }
             })
             .catch((e: Error) => {
@@ -194,7 +200,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           <h3> Users </h3>
         </div>
 
-        <div className="recipient-letterdisplay">
+        <div className="recipient-requestorslist">
           <div>{requestorList}</div>
         </div>
       </div>
@@ -206,15 +212,28 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
           <h3> {selectedUser?.name} </h3>
         </div>
 
-        <div className="recipient-letterdisplay">
+        <div className="recipient-letterslist">
           <div>{lettersList}</div>
         </div>
       </div>
     );
 
     const recipientFooter = (
-      <div className="recipient-footer">
+      <div className="recipient-footer button-blur-no-border text-white-50">
         <span> Product of Team Gas</span>
+        <Button
+          variant="outline-light"
+          onClick={() => {
+            this.setState({
+              letters: [],
+              requestors: [],
+              loadingRequestors: true,
+            });
+            this.loadRequestorList();
+          }}
+        >
+          <FontAwesomeIcon icon={faSync} />
+        </Button>
       </div>
     );
 
@@ -229,15 +248,16 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         {!loadingRequestors && !dualMode && requestors.length !== 0 && (
           <Col className="recipient">
             <Row>{recipientRequestors}</Row>
-            {/* <Row>{requestorFooter}</Row> */}
+            <Row>{recipientFooter}</Row>
           </Col>
         )}
 
         {!loadingRequestors && dualMode && requestors.length !== 0 && (
-          <Col>
-            <Row className="recipient-dual">
+          <Col className="recipient-dual">
+            <Row>
               <Col className="ml-5 mr-5">
                 <Row>{recipientRequestors}</Row>
+                {/* <Row>{recipientFooter}</Row> */}
               </Col>
               <Col className="mr-5 ml-5">
                 {!loadingLetters && <Row>{recipientLetters}</Row>}
@@ -254,7 +274,7 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
                 )}
               </Col>
             </Row>
-            {/* <Row>{requestorFooter}</Row> */}
+            <Row>{recipientFooter}</Row>
           </Col>
         )}
 

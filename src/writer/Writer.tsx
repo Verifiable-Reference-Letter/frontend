@@ -1,5 +1,7 @@
 import React from "react";
-import { Spinner, Col, Row } from "react-bootstrap";
+import { Spinner, Col, Row, Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSync } from "@fortawesome/free-solid-svg-icons";
 
 import UserAuth from "../common/UserAuth.interface";
 import LetterDetails from "../common/LetterDetails.interface";
@@ -115,8 +117,17 @@ class Writer extends React.Component<WriterProps, WriterState> {
     );
 
     const writerFooter = (
-      <div className="writer-footer">
+      <div className="writer-footer button-blur-no-border text-white-50">
         <span> Product of Team Gas</span>
+        <Button
+          variant="outline-light"
+          onClick={() => {
+            this.setState({ letters: [], loadingLetters: true });
+            this.loadLetterList();
+          }}
+        >
+          <FontAwesomeIcon icon={faSync} />
+        </Button>
       </div>
     );
 
@@ -125,14 +136,14 @@ class Writer extends React.Component<WriterProps, WriterState> {
         {!loadingLetters && letters.length !== 0 && (
           <Col className="writer">
             <Row>{writerLetters}</Row>
-            {/* <Row>{writerFooter}</Row> */}
+            <Row>{writerFooter}</Row>
           </Col>
         )}
 
         {!loadingLetters && letters.length === 0 && (
-            <div className="writer-header absolute-center">
-              <h3> No Letters Requested </h3>
-            </div>
+          <div className="writer-header absolute-center">
+            <h3> No Letters Requested </h3>
+          </div>
         )}
 
         {loadingLetters && (

@@ -1,6 +1,16 @@
 .writer {
-  padding: 10px 25% 10px;
+  padding: 10px 20% 10px;
 }
+
+.writer-letterslist {
+  /* max-height: 539px; */
+  max-height: 441px;
+  min-height: 441px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-bottom: 46.5px;
+}
+
 .writer-header {
   text-align: center;
   width: 100%;

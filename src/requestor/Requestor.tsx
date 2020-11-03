@@ -9,10 +9,11 @@ import {
   Spinner,
   Row,
   Col,
-  Container,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { Fragment } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSync } from "@fortawesome/free-solid-svg-icons";
 
 import User from "../common/User.interface";
 import UserAuth from "../common/UserAuth.interface";
@@ -65,6 +66,11 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
   componentWillMount() {
     // api call to get users and letters
     // TODO: move users fetch to parent component
+    this.loadUsersList();
+    this.loadLettersList();
+  }
+
+  async loadUsersList() {
     const userFetchUrl = `/api/v1/users`;
     const userInit: RequestInit = {
       method: "POST",
@@ -105,7 +111,9 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
       .catch((e: Error) => {
         console.log(e);
       });
+  }
 
+  async loadLettersList() {
     const letterFetchUrl = `/api/v1/letters/requested`;
     const letterInit: RequestInit = {
       method: "POST",
@@ -369,7 +377,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         users={users}
       />
     ));
-    
+
     const requestorSelect = (
       <div className="requestor-select">
         <div className="requestor-header">
@@ -404,8 +412,17 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
     );
 
     const requestorFooter = (
-      <div className="requestor-footer">
+      <div className="requestor-footer button-blur-no-border text-white-50">
         <span> Product of Team Gas</span>
+        <Button
+          variant="outline-light"
+          onClick={() => {
+            this.setState({ letters: [], loadingLetters: true });
+            this.loadLettersList();
+          }}
+        >
+          <FontAwesomeIcon icon={faSync} />
+        </Button>
       </div>
     );
 
@@ -414,29 +431,30 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
         {!loadingLetters && letters.length === 0 && (
           <Col className="requestor">
             <Row>{requestorSelect}</Row>
-            {/* <Row>{requestorLetter}</Row> */}
-            {/* <Row>{requestorFooter}</Row> */}
+            <Row>{requestorFooter}</Row>
           </Col>
         )}
         {!loadingLetters && !dualMode && letters.length !== 0 && (
           <Col className="requestor">
             <Row>{requestorSelect}</Row>
             <Row>{requestorLetter}</Row>
-            {/* <Row>{requestorFooter}</Row> */}
+            <Row>{requestorFooter}</Row>
           </Col>
         )}
 
         {!loadingLetters && dualMode && letters.length !== 0 && (
-          <Col>
-            <Row className="requestor-dual">
+          <Col className="requestor-dual">
+            <Row>
               <Col className="ml-5 mr-5">
                 <Row>{requestorSelect}</Row>
+                {/* <Row>{requestorFooter}</Row> */}
               </Col>
               <Col className="mr-5 ml-5">
                 <Row>{requestorLetter}</Row>
+                {/* <Row>{requestorFooter}</Row> */}
               </Col>
             </Row>
-            {/* <Row>{requestorFooter}</Row> */}
+            <Row>{requestorFooter}</Row>
           </Col>
         )}
 
