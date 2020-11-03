@@ -62,17 +62,6 @@ const AuthRoute = ({ Component, path, exact = false, authed}: Props): JSX.Elemen
 	);
 };
 
-
-//type Props = {path:string, component: FunctionComponent, authed: boolean } & RouteComponentProps;
-
-// const ProtectedRoute: FunctionComponent<Props> = ({ component: Component, authed, ...rest }) => (
-//     authed ? (
-//         <Component {...rest}/>
-//     ) : (
-//         <Redirect to={{ pathname: '/login' }} />
-//     )
-// );
-
 export const GAS_LIMIT_STANDARD = 6000000;
 export let accounts: string[];
 let web3Provider;
@@ -203,16 +192,3 @@ class App extends React.Component<MyProps, MyState> {
   }
 }
 export default withRouter(App);
-//{this.state.loggedIn ? <Redirect to="/dashboard" /> : null}
-// <Router>
-//   <Switch>
-//     <Route path={ROUTES.HOME} authed={this.state.loggedIn} component={() => home} />
-//     <Route path={ROUTES.REQUESTOR} authed={this.state.loggedIn} component={() => requestor} />
-//     <Route path={ROUTES.WRITER} authed={this.state.loggedIn} component={() => writer} />
-//     <Route path={ROUTES.RECIPIENT} authed={this.state.loggedIn} component={() => recipient} />
-
-//     <Route exact path={ROUTES.LOGIN} authed={this.state.loggedIn} component={() => login} />
-
-//     <Route path={ROUTES.DASHBOARD} authed={this.state.loggedIn} component={() => dashboard} />
-//   </Switch>
-// </Router>

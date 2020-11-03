@@ -15,7 +15,6 @@ interface LoginProps {
   callback: (u: UserAuth) => void;
 }
 
-//type LoginProps = Props & RouteComponentProps;
 
 interface LoginState {
   inputEmail: string;
