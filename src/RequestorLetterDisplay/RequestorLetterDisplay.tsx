@@ -42,6 +42,7 @@ interface RequestorLetterDisplayState {
   confirmIsOpen: boolean;
   collapseIsOpen: boolean;
   previouslySelectedRecipients: User[];
+  sentRecipients: User[];
   selectedRecipients: User[];
   selectedPublicAddress?: string;
   selectedUserProfile?: UserProfile;
@@ -66,6 +67,7 @@ class RequestorLetterDisplay extends React.Component<
       confirmIsOpen: false,
       collapseIsOpen: false,
       previouslySelectedRecipients: [],
+      sentRecipients: [],
       selectedRecipients: [],
     };
 
@@ -135,7 +137,8 @@ class RequestorLetterDisplay extends React.Component<
   async openSelectModal() {
     console.log("on send click");
     // fetch backend to get recipients list (who the letter has not been sent to)
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/unsentRecipients`;
+    const unsentUrl = `/api/v1/letters/${this.props.letter.letterId}/unsentRecipients`;
+    const sentUrl = `/api/v1/letters/${this.props.letter.letterId}/sentRecipients`;
 
     if (this.state.previouslySelectedRecipients.length === 0) {
       this.setState({
@@ -143,7 +146,8 @@ class RequestorLetterDisplay extends React.Component<
         collapseIsOpen: true,
         selectIsOpen: true,
       });
-      this.retrieveUnsentRecipientsFromServer(fetchUrl);
+      await this.retrieveUnsentRecipientsFromServer(unsentUrl);
+      await this.retrieveSentRecipientsFromServer(sentUrl)
     } else {
       this.setState({
         selectIsOpen: true,
@@ -188,6 +192,55 @@ class RequestorLetterDisplay extends React.Component<
         console.log(data);
         this.setState({
           previouslySelectedRecipients: data,
+          // loadingSelect: false,
+        });
+      }
+    } catch (e) {
+      console.log(e);
+      this.setState({
+        loadingSelect: false,
+        // selectIsOpen: false,
+        // collapseIsOpen: this.state.historyIsOpen,
+      });
+    }
+  }
+
+  async retrieveSentRecipientsFromServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      if (response.status === 400) {
+        console.log(response.status);
+        this.setState({
+          loadingSelect: false,
+          // selectIsOpen: false,
+          // collapseIsOpen: this.state.historyIsOpen,
+        });
+      } else {
+        let body = await response.json();
+
+        const data: User[] = body.data;
+        console.log(response);
+        console.log(data);
+        this.setState({
+          sentRecipients: data,
           loadingSelect: false,
         });
       }
@@ -387,6 +440,7 @@ class RequestorLetterDisplay extends React.Component<
       confirmIsOpen,
       collapseIsOpen,
       previouslySelectedRecipients,
+      sentRecipients,
       selectedRecipients,
       selectedPublicAddress,
     } = this.state;
@@ -476,8 +530,15 @@ class RequestorLetterDisplay extends React.Component<
                   onClose={this.closeSelectModal.bind(this)}
                   onSubmit={this.openMessageModal.bind(this)}
                   users={users.filter(
-                    (user: User) =>
-                      user.publicAddress !== letter.letterWriter.publicAddress
+                    (user: User) => {
+                      let b = user.publicAddress !== letter.letterWriter.publicAddress;
+                      if (b) {
+                        for (let i = 0; i < sentRecipients.length; i++) {
+                          b = user.publicAddress !== sentRecipients[i]?.publicAddress
+                        }
+                      }
+                      return b;
+                    }
                   )}
                 ></Select>
               </div>
