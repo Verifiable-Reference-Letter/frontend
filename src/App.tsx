@@ -168,9 +168,9 @@ class App extends React.Component<MyProps, MyState> {
   }
 
   onLogin(u: UserAuth) {
-  	this.props.history.push("/dashboard")
     console.log("login complete");
     this.setState({ user: u, loggedIn: true });
+    this.props.history.push("/dashboard")
   }
 
   render() {
@@ -190,17 +190,14 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={this.state.loggedIn}
         />
-        
-        <Router>
-	        <Switch>
+        <Switch>
 	        	<Route path={NonAuthRoutes.login} authed={this.state.loggedIn} component={() => login} />
-		        <Route path={NonAuthRoutes.home} authed={this.state.loggedIn} component={() => home} />
+		        <Route exact path={NonAuthRoutes.home} authed={this.state.loggedIn} component={() => home} />
 	          <AuthRoute path={AuthRoutes.requestor} authed={this.state.loggedIn} Component={() => requestor} />
 	          <AuthRoute path={AuthRoutes.writer} authed={this.state.loggedIn} Component={() => writer} />
 	          <AuthRoute path={AuthRoutes.recipient} authed={this.state.loggedIn} Component={() => recipient} />
-	          <AuthRoute exact path={AuthRoutes.dashboard} authed={this.state.loggedIn} Component={() => dashboard} />
-	        </Switch>
-	      </Router>
+	          <AuthRoute path={AuthRoutes.dashboard} authed={this.state.loggedIn} Component={() => dashboard} />
+	      </Switch>
       </div>
     );
   }

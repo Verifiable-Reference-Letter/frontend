@@ -10,12 +10,12 @@ import ResponseBody from "../common/ResponseBody.interface";
 
 import { web3 } from "../App";
 
-interface Props {
+interface LoginProps {
   user: UserAuth;
   callback: (u: UserAuth) => void;
 }
 
-type LoginProps = Props & RouteComponentProps;
+//type LoginProps = Props & RouteComponentProps;
 
 interface LoginState {
   inputEmail: string;
@@ -382,4 +382,4 @@ class Login extends React.Component<LoginProps, LoginState> {
     );
   }
 }
-export default withRouter(Login);
+export default Login;
