@@ -26,6 +26,7 @@ interface SendProps {
 }
 interface SendState {
   loadingContents: boolean;
+  signingLetter: boolean;
   sending: boolean;
   encrypted: boolean[];
   encryptedLetter?: FileData;
@@ -48,6 +49,7 @@ class Send extends React.Component<SendProps, SendState> {
 
     this.state = {
       loadingContents: true,
+      signingLetter: false,
       sending: false,
       encrypted: e,
     };
@@ -62,7 +64,7 @@ class Send extends React.Component<SendProps, SendState> {
     );
   }
 
-  async encryptAndUpload(key: number, userKey: UserKey) {
+  async encryptSignAndUpload(key: number, userKey: UserKey) {
     console.log("Pub key is: " + userKey.publicKey);
     console.log("State url: " + this.state.encryptedLetter);
 
@@ -73,10 +75,12 @@ class Send extends React.Component<SendProps, SendState> {
     );
     console.log("Encrypted letter: " + encryptedLetter);
 
+    this.setState({ signingLetter: true });
     let signedLetter = await this.cryptService.signLetter(
       encryptedLetter,
       this.props.user.publicAddress
     );
+    this.setState({ signingLetter: false });
     console.log("Signed letter: " + signedLetter);
 
     const encryptedLetterForm: {
@@ -191,7 +195,7 @@ class Send extends React.Component<SendProps, SendState> {
 
   render() {
     const { user, letter, unsentRecipientKeys } = this.props;
-    const { loadingContents, sending, encrypted } = this.state;
+    const { loadingContents, signingLetter, sending, encrypted } = this.state;
 
     let recipientList = [];
     if (unsentRecipientKeys) {
@@ -205,7 +209,7 @@ class Send extends React.Component<SendProps, SendState> {
                     className="flex-fill send-entry"
                     onClick={() => {
                       if (!encrypted[i]) {
-                        this.encryptAndUpload(i, unsentRecipientKeys[i]);
+                        this.encryptSignAndUpload(i, unsentRecipientKeys[i]);
                       }
                     }}
                   >
@@ -219,7 +223,7 @@ class Send extends React.Component<SendProps, SendState> {
                       className="send-check-square"
                     />
                   )}
-                  {!encrypted[i] && !sending && (
+                  {!encrypted[i] && (
                     <div className="send-check-square-placeholder"></div>
                   )}
                 </div>
@@ -233,7 +237,7 @@ class Send extends React.Component<SendProps, SendState> {
                       className="flex-fill send-entry"
                       onClick={() => {
                         if (!encrypted[i + 1]) {
-                          this.encryptAndUpload(
+                          this.encryptSignAndUpload(
                             i + 1,
                             unsentRecipientKeys[i + 1]
                           );
@@ -274,9 +278,12 @@ class Send extends React.Component<SendProps, SendState> {
         {!loadingContents && (
           <Col>
             {unsentRecipientKeys && (
-              <Row>
-                <Col>{recipientList}</Col>
-              </Row>
+              <>
+                {/* <Row className="mb-2">Select a Recipient:</Row> */}
+                <Row>
+                  <Col>{recipientList}</Col>
+                </Row>
+              </>
             )}
             {(!unsentRecipientKeys || unsentRecipientKeys.length === 0) && (
               <Row className="d-flex justify-content-center">
@@ -287,8 +294,14 @@ class Send extends React.Component<SendProps, SendState> {
                 />
               </Row>
             )}
-            <Row className="d-flex justify-content-end">
-              <div className="mt-3 mr-3">
+            <Row className="d-flex justify-content-between">
+              <div className="d-flex justify-content-between mt-4 ml-4 text-info float-left flex-fill">
+                {signingLetter
+                  ? "See Metamask to digitally sign this letter . . ."
+                  : ""}
+                {sending ? "Sending letter to recipient . . . ": ""}
+              </div>
+              <div className="mt-3 mr-3 flex-shrink-1">
                 {sending && <Spinner animation="border" variant="secondary" />}
               </div>
               <Button
@@ -304,9 +317,18 @@ class Send extends React.Component<SendProps, SendState> {
         )}
 
         {loadingContents && (
-          <div className="d-flex justify-content-center mb-3">
-            <Spinner className="mb-3" animation="border" variant="secondary" />
-          </div>
+          <>
+            <div className="d-flex justify-content-center mb-3">
+              <Spinner
+                className="mb-3"
+                animation="border"
+                variant="secondary"
+              />
+            </div>
+            <div className="d-flex justify-content-center mb-3 text-info">
+              See Metamask to retrieve encrypted letter . . .
+            </div>
+          </>
         )}
       </>
     );

@@ -716,7 +716,7 @@ class WriterLetterDisplay extends React.Component<
           // size="sm"
         >
           <Modal.Header closeButton>
-            <Modal.Title>List of Recipients</Modal.Title>
+            <Modal.Title>Select a Recipient</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
