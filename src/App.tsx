@@ -137,7 +137,7 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={this.state.loggedIn}
         />
-        {this.state.loggedIn ? <Redirect to={ROUTES.REQUESTOR} /> : null}
+        {this.state.loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null}
         <div className="application-body">
           <Route exact path={ROUTES.HOME} render={() => home} />
           <Route exact path={ROUTES.LOGIN} render={() => login} />
