@@ -10,10 +10,12 @@ class CryptService {
   constructor() {
     this.publicKey = "";
     this.ethereum = (window as any).ethereum;
-    this.ethereum
-      .enable()
-      .then(() => {})
-      .catch((e: Error) => {});
+    if (this.ethereum) {
+      this.ethereum
+        .enable()
+        .then(() => {})
+        .catch((e: Error) => {});
+    }
   }
 
   async encrypt(file: File, publicAddress: string): Promise<string> {
