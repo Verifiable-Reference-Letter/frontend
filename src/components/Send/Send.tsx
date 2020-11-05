@@ -76,8 +76,11 @@ class Send extends React.Component<SendProps, SendState> {
     console.log("Encrypted letter: " + encryptedLetter);
 
     this.setState({ signingLetter: true });
+
+    // this padding is necessary for correct signature and verification of encrypted recipient letters
+    // the first 10 characters are 'encrypted:'
     let signedLetter = await this.cryptService.signLetter(
-      encryptedLetter,
+      "encrypted:" + encryptedLetter,
       this.props.user.publicAddress
     );
     this.setState({ signingLetter: false });
@@ -299,7 +302,7 @@ class Send extends React.Component<SendProps, SendState> {
                 {signingLetter
                   ? "See Metamask to digitally sign this letter . . ."
                   : ""}
-                {sending ? "Sending letter to recipient . . . ": ""}
+                {sending ? "Sending letter to recipient . . . " : ""}
               </div>
               <div className="mt-3 mr-3 flex-shrink-1">
                 {sending && <Spinner animation="border" variant="secondary" />}
