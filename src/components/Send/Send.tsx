@@ -7,6 +7,8 @@ import {
   Card,
   Collapse,
   Form,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
 import UserAuth from "../../common/UserAuth.interface";
 import UserKey from "../../common/UserKey.interface";
@@ -14,6 +16,8 @@ import FileData from "../../common/FileData.interface";
 import Letter from "../../common/LetterDetails.interface";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+
 import CryptService from "../../services/CryptService";
 
 import "./Send.css";
@@ -299,10 +303,35 @@ class Send extends React.Component<SendProps, SendState> {
             )}
             <Row className="d-flex justify-content-between">
               <div className="d-flex justify-content-between mt-4 ml-4 text-info float-left flex-fill">
-                {signingLetter
-                  ? "See Metamask to digitally sign this letter . . ."
+                {signingLetter && !sending ? (
+                  <div className="d-flex justify-content-between">
+                    <div>See Metamask to Sign Your Letter</div>
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip id="learn-more" placement="left">
+                          <div>
+                            We ask you to <b>sign</b> your letter as{" "}
+                            <b>proof</b> that this letter is from you. Your{" "}
+                            <b>signature</b> will give the recipient confidence
+                            that the letter is authentic. Learn more about{" "}
+                            <a>Signing / Verification</a>.
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        size="lg"
+                        className="ml-3"
+                      />
+                    </OverlayTrigger>
+                  </div>
+                ) : (
+                  ""
+                )}
+                {sending && !signingLetter
+                  ? "Sending letter to recipient . . . "
                   : ""}
-                {sending ? "Sending letter to recipient . . . " : ""}
               </div>
               <div className="mt-3 mr-3 flex-shrink-1">
                 {sending && <Spinner animation="border" variant="secondary" />}
@@ -329,7 +358,7 @@ class Send extends React.Component<SendProps, SendState> {
               />
             </div>
             <div className="d-flex justify-content-center mb-3 text-info">
-              See Metamask to retrieve encrypted letter . . .
+              See Metamask to retrieve your secure letter . . .
             </div>
           </>
         )}

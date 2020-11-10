@@ -209,7 +209,7 @@ class CryptService {
 
   async getPublicKey(publicAddress: string): Promise<string | null> {
     try {
-      return this.ethereum.request({
+      return await this.ethereum.request({
         method: "eth_getEncryptionPublicKey",
         params: [publicAddress], // you must have access to the specified account
       });
