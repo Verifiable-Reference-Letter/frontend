@@ -44,7 +44,7 @@ class Confirm extends React.Component<ConfirmProps, ConfirmState> {
               onChange={this.handleMessageChange.bind(this)}
             />
             <Form.Text className="text-muted">
-              This will be visible in the email notification.
+              This will be visible to the other user.
             </Form.Text>
           </Form.Group>
         </Row>)}

@@ -308,13 +308,13 @@ class Send extends React.Component<SendProps, SendState> {
                     <div>See Metamask to Sign Your Letter</div>
                     <OverlayTrigger
                       overlay={
-                        <Tooltip id="learn-more" placement="left">
+                        <Tooltip id="learn-more">
                           <div>
                             We ask you to <b>sign</b> your letter as{" "}
                             <b>proof</b> that this letter is from you. Your{" "}
                             <b>signature</b> will give the recipient confidence
                             that the letter is authentic. Learn more about{" "}
-                            <a>Signing / Verification</a>.
+                            <b>Signing / Verification</b> in the FAQS.
                           </div>
                         </Tooltip>
                       }

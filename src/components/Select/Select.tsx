@@ -234,7 +234,7 @@ class Select extends React.Component<SelectProps, SelectState> {
           {selectedRecipients.length === 0 && (
             <OverlayTrigger
               overlay={
-                <Tooltip id="tooltip-disabled" placement="right">
+                <Tooltip id="tooltip-disabled">
                   No Recipients Selected
                 </Tooltip>
               }

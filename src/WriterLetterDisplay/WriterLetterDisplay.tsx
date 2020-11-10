@@ -40,6 +40,7 @@ interface WriterLetterDisplayProps {
 interface WriterLetterDisplayState {
   history: LetterHistory[];
   loadingHistory: boolean;
+  loadingView: boolean;
   loadingSend: boolean;
   profileIsOpen: boolean;
   historyIsOpen: boolean;
@@ -50,7 +51,7 @@ interface WriterLetterDisplayState {
   confirmIsOpen: boolean;
   collapseIsOpen: boolean;
   selectedUserProfile?: UserProfile;
-  uploadedFile?: File;
+  uploadedFile?: string;
   fileData?: FileData;
   unsentRecipientKeys: UserKey[];
 }
@@ -71,6 +72,7 @@ class WriterLetterDisplay extends React.Component<
       history: [],
       unsentRecipientKeys: [],
       loadingHistory: false,
+      loadingView: false,
       loadingSend: false,
       profileIsOpen: false,
       historyIsOpen: false,
@@ -98,7 +100,11 @@ class WriterLetterDisplay extends React.Component<
   async onUploadSubmit(customMessage: string) {
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/update`;
     if (this.state.uploadedFile !== undefined) {
-      await this.uploadContentsToServer(this.state.uploadedFile, fetchUrl, customMessage);
+      await this.uploadContentsToServer(
+        this.state.uploadedFile,
+        fetchUrl,
+        customMessage
+      );
     }
   }
 
@@ -111,22 +117,13 @@ class WriterLetterDisplay extends React.Component<
     });
   }
 
-  async uploadContentsToServer(file: File, fetchUrl: string, customMessage: string) {
+  async uploadContentsToServer(
+    encryptedFile: string,
+    fetchUrl: string,
+    customMessage: string
+  ) {
     console.log("uploading to server");
-    console.log(file);
-
-    // encrypt file
-    let encryptedFile = await this.cryptService.encrypt(
-      file,
-      this.props.user.publicAddress
-    );
-    console.log(encryptedFile);
-
-    if (!encryptedFile) {
-      console.log("encryption failed");
-      this.closeUploadModal();
-      return;
-    }
+    // console.log(file);
 
     // cache encrypted file
     // this.cacheService.put(this.props.letter.letterId, encryptedFile);
@@ -142,7 +139,7 @@ class WriterLetterDisplay extends React.Component<
         data: {
           customMessage: customMessage,
           encryptedFile: encryptedFile,
-        }
+        },
       }),
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -244,6 +241,7 @@ class WriterLetterDisplay extends React.Component<
     console.log(letterId);
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
+      this.setState({ loadingView: true });
       this.retrieveLetterContentsFromServer(fetchUrl);
     } else {
       try {
@@ -304,6 +302,13 @@ class WriterLetterDisplay extends React.Component<
                   fileData: fileData,
                 });
               }
+            })
+            .catch((e: Error) => {
+              this.setState({
+                // viewIsOpen: false,
+                loadingView: false,
+              });
+              // alert("Failed to decrypt retrieved letter . . . ");
             });
         } else {
           this.setState({
@@ -316,8 +321,8 @@ class WriterLetterDisplay extends React.Component<
       });
   }
 
-  async openMessageModal(file: File) {
-    this.setState({ uploadedFile: file, messageIsOpen: true });
+  async openMessageModal(encryptedFile: string) {
+    this.setState({ uploadedFile: encryptedFile, messageIsOpen: true });
     this.openConfirmModal();
   }
 
@@ -496,6 +501,7 @@ class WriterLetterDisplay extends React.Component<
     const {
       history,
       loadingHistory,
+      loadingView,
       loadingSend,
       profileIsOpen,
       historyIsOpen,
@@ -506,6 +512,7 @@ class WriterLetterDisplay extends React.Component<
       confirmIsOpen,
       collapseIsOpen,
       unsentRecipientKeys,
+      fileData,
     } = this.state;
 
     return (
@@ -615,9 +622,11 @@ class WriterLetterDisplay extends React.Component<
               <div>
                 <FileUpload
                   ref={this.uploadModal}
-                  user={this.props.user}
+                  user={user}
+                  reUpload={letter.uploadedAt !== null}
                   restrictPdf={true}
-                  onUpload={this.openMessageModal.bind(this)}
+                  encrypt={true}
+                  onEncryptedUpload={this.openMessageModal.bind(this)}
                   onClose={this.closeUploadModal.bind(this)}
                 ></FileUpload>
               </div>
@@ -697,7 +706,7 @@ class WriterLetterDisplay extends React.Component<
 
           <Modal.Body>
             <Confirm
-              user={this.props.user}
+              user={user}
               custom={true}
               onConfirm={this.onUploadSubmit.bind(this)}
               onClose={this.closeConfirmModal.bind(this)}
@@ -721,7 +730,7 @@ class WriterLetterDisplay extends React.Component<
 
           <Modal.Body>
             <Send
-              user={this.props.user}
+              user={user}
               letter={this.props.letter}
               unsentRecipientKeys={this.state.unsentRecipientKeys}
               onClose={this.onSendSubmit.bind(this)}
@@ -745,9 +754,10 @@ class WriterLetterDisplay extends React.Component<
 
           <Modal.Body>
             <FileView
-              fileData={this.state.fileData}
+              fileData={fileData}
+              loadingView={loadingView}
               ref={this.viewModal}
-              user={this.props.user}
+              user={user}
               onClose={this.closeViewModal.bind(this)}
             ></FileView>
           </Modal.Body>

@@ -405,7 +405,7 @@ class Login extends React.Component<LoginProps, LoginState> {
               {/* <FontAwesomeIcon icon={faInfoCircle} size="lg" className="ml-3" /> */}
               <OverlayTrigger
                 overlay={
-                  <Tooltip id="learn-more" placement="left">
+                  <Tooltip id="learn-more">
                     <div>
                       We ask you to provide your <b>Public Key</b> so that you
                       can <b>1.</b> keep your letters <b>secure</b> with

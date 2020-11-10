@@ -341,7 +341,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           {/* {selectedWriter.length === 0 && (
             <OverlayTrigger
               overlay={
-                <Tooltip id="tooltip-disabled" placement="left">
+                <Tooltip id="tooltip-disabled">
                   Select An User
                 </Tooltip>
               }
