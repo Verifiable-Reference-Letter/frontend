@@ -35,6 +35,7 @@ interface RecipientLetterDisplayProps {
 interface RecipientLetterDisplayState {
   history: LetterHistory[];
   loadingHistory: boolean;
+  loadingView: boolean;
   profileIsOpen: boolean;
   historyIsOpen: boolean;
   uploadIsOpen: boolean;
@@ -61,6 +62,7 @@ class RecipientLetterDisplay extends React.Component<
     this.state = {
       history: [],
       loadingHistory: false,
+      loadingView: false,
       profileIsOpen: false,
       historyIsOpen: false,
       uploadIsOpen: false,
@@ -140,7 +142,10 @@ class RecipientLetterDisplay extends React.Component<
         console.log(e);
         // decrypt letter
         this.cryptService
-          .decrypt(e.letterRecipientContents?.letterContents, this.props.user.publicAddress)
+          .decrypt(
+            e.letterRecipientContents?.letterContents,
+            this.props.user.publicAddress
+          )
           .then((fileData) => {
             if (fileData) {
               this.setState({
@@ -148,6 +153,12 @@ class RecipientLetterDisplay extends React.Component<
                 fileData: fileData,
               });
             }
+          })
+          .catch((e: Error) => {
+            alert("Failed to Decrypt Retrieved Letter . . . ");
+            this.setState({
+              viewIsOpen: false,
+            });
           });
       })
       .catch((e: Error) => {
@@ -333,12 +344,14 @@ class RecipientLetterDisplay extends React.Component<
     const {
       history,
       loadingHistory,
+      loadingView,
       profileIsOpen,
       historyIsOpen,
       uploadIsOpen,
       viewIsOpen,
       confirmIsOpen,
       collapseIsOpen,
+      fileData,
     } = this.state;
 
     return (
@@ -543,7 +556,8 @@ class RecipientLetterDisplay extends React.Component<
 
           <Modal.Body>
             <FileView
-              fileData={this.state.fileData}
+              fileData={fileData}
+              loadingView={loadingView}
               ref={this.viewModal}
               user={this.props.user}
               onClose={this.closeViewModal.bind(this)}
