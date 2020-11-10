@@ -401,7 +401,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           <div>{loginMode ? loginDisplay : signupDisplay}</div>
           {signingUp && (
             <div className="mt-3 d-flex justify-content-between">
-              <div className="mt-1">See Metamask</div>
+              <div className="mt-1">See Metamask to Signup</div>
               {/* <FontAwesomeIcon icon={faInfoCircle} size="lg" className="ml-3" /> */}
               <OverlayTrigger
                 overlay={

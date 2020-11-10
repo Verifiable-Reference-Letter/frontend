@@ -115,6 +115,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
                   </div> */}
                   <div className="d-flex justify-content-center">
                     <OverlayTrigger
+                      placement="bottom"
                       overlay={
                         <Tooltip id="learn-more">
                           <div>
@@ -132,18 +133,19 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
                         className="mr-3"
                       />
                     </OverlayTrigger>
-                    <div>See Metamask</div>
+                    <div>See Metamask to Retrieve Your Letter</div>
                   </div>
                 </>
               )}
               {!loadingView && (
                 <div className="d-flex justify-content-center">
-                  <div>Failed to Decrypt</div>
+                  <div className="text-warning">Failed to Decrypt</div>
                   <OverlayTrigger
+                    placement="bottom"
                     overlay={
                       <Tooltip id="learn-more">
                         <div>
-                          Please click <em>confirm</em> on Metamask to decrypt
+                          Please click <em>Decrypt</em> on Metamask to decrypt
                           your letter. This is because we use end-to-end
                           encryption to keep your letters secure. See{" "}
                           <b>Encryption / Decryption</b> in the FAQs.

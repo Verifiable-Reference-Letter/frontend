@@ -204,8 +204,8 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
               <Row>
                 <Col className="history-display">{historyList}</Col>
               </Row>
-              <Row className="d-flex justify-content-betweenmb-2">
-                <div className="mt-3 flex-shrink-1">
+              <Row className="d-flex mb-2">
+                <div className="mt-4 flex-shrink-1">
                   <OverlayTrigger
                     placement="right"
                     overlay={
@@ -213,7 +213,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
                         <div>
                           Your letter <b>History</b> indicates a list of
                           recipients that the letter has been sent to. You may
-                          view the public profile of each recipient. See more in
+                          view the profile of each recipient. See more in
                           the FAQs.
                         </div>
                       </Tooltip>

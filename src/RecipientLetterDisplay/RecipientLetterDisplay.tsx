@@ -155,7 +155,7 @@ class RecipientLetterDisplay extends React.Component<
             }
           })
           .catch((e: Error) => {
-            alert("Failed to Decrypt Retrieved Letter . . . ");
+            // alert("Failed to Decrypt Retrieved Letter . . . ");
             this.setState({
               viewIsOpen: false,
             });

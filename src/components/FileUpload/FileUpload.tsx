@@ -74,7 +74,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
     } else {
       if (this.props.encrypt) {
         this.setState({
-          displayMessage: "See Metamask",
+          displayMessage: "See Metamask to Upload",
           displayVariant: 0,
           submitClicked: true,
           failedEncryption: false,
@@ -193,7 +193,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
                     <Tooltip id="learn-more">
                       <>
                         <div>
-                          Please click <em>confirm</em> on Metamask. We need
+                          Please click <em>Confirm</em> on Metamask. We need
                           your <b>Public Key</b> to encrypt your letter. This
                           keeps your letters secure so that only you can view
                           it. See <b>End-to-End Encryption</b> in the FAQs.

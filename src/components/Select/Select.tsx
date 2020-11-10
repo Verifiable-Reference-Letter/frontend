@@ -232,16 +232,14 @@ class Select extends React.Component<SelectProps, SelectState> {
                         Please indicate a list of intended recipients. This
                         recipient list can be updated in <b>Edit</b>. Note that once the
                         letter is sent to a recipient, the recipient will be
-                        moved into <b>History</b>. Learn more about this process
-                        in the FAQs.
+                        moved into <b>History</b>. Learn more in the FAQs.
                       </div>
                     )}
                     {header === "Edit Recipients" && (
                       <div>
-                        You may add or remove intended recipients. Note that once the
+                        You may add and remove intended recipients. Note that once the
                         writer uploads and sends your letter to a recipient, the
-                        recipient will be moved into <b>History</b>. Learn more
-                        about this process in the FAQs.
+                        recipient will be moved into <b>History</b>. Learn more in the FAQs.
                       </div>
                     )}
                   </>
