@@ -11,6 +11,8 @@ import {
   Row,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 // import LetterDetails from "../../common/LetterDetails.interface";
 // import FileData from "../../common/FileData.interface";
 import UserProfile from "../../common/UserProfile.interface";
@@ -109,7 +111,7 @@ class Select extends React.Component<SelectProps, SelectState> {
   }
 
   render() {
-    const { users, header } = this.props;
+    const { users, header, previouslySelectedRecipients } = this.props;
     const { profileIsOpen, selectedRecipients } = this.state;
 
     const selectRecipients = (
@@ -219,7 +221,39 @@ class Select extends React.Component<SelectProps, SelectState> {
         )}
 
         <div className="d-flex border-radius button-blur mb-2">
+          <div className="mt-3">
+            <OverlayTrigger
+              placement="right"
+              overlay={
+                <Tooltip id="learn-more">
+                  <>
+                    {header === "Select Recipients" && (
+                      <div>
+                        Please indicate a list of intended recipients. This
+                        recipient list can be updated in <b>Edit</b>. Note that once the
+                        letter is sent to a recipient, the recipient will be
+                        moved into <b>History</b>. Learn more about this process
+                        in the FAQs.
+                      </div>
+                    )}
+                    {header === "Edit Recipients" && (
+                      <div>
+                        You may add or remove intended recipients. Note that once the
+                        writer uploads and sends your letter to a recipient, the
+                        recipient will be moved into <b>History</b>. Learn more
+                        about this process in the FAQs.
+                      </div>
+                    )}
+                  </>
+                </Tooltip>
+              }
+            >
+              <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+            </OverlayTrigger>
+          </div>
+
           <div className="flex-fill"></div>
+
           {selectedRecipients.length !== 0 && (
             <Button
               variant="outline-light"
@@ -234,17 +268,15 @@ class Select extends React.Component<SelectProps, SelectState> {
           {selectedRecipients.length === 0 && (
             <OverlayTrigger
               overlay={
-                <Tooltip id="tooltip-disabled">
-                  No Recipients Selected
-                </Tooltip>
+                <Tooltip id="tooltip">No Recipients Selected</Tooltip>
               }
             >
               <span className="d-inline-block">
                 <Button
                   variant="outline-light"
                   className="flex-shrink-1 float-right"
-                  disabled
-                  style={{ pointerEvents: "none" }}
+                  // disabled
+                  // style={{ pointerEvents: "none" }}
                   onClick={() => {
                     this.props.onSubmit(selectedRecipients);
                   }}
@@ -259,7 +291,7 @@ class Select extends React.Component<SelectProps, SelectState> {
             className="flex-shrink-1 ml-3"
             onClick={() => {
               this.setState({
-                selectedRecipients: this.props.previouslySelectedRecipients,
+                selectedRecipients: previouslySelectedRecipients,
               });
             }}
           >

@@ -1,5 +1,14 @@
 import React from "react";
-import { Card, Collapse, Col, Row, Button, Modal } from "react-bootstrap";
+import {
+  Card,
+  Collapse,
+  Col,
+  Row,
+  Button,
+  Modal,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import "./FileHistory.css";
 import LetterHistory from "../../common/LetterHistory.interface";
 import UserProfile from "../../common/UserProfile.interface";
@@ -8,6 +17,9 @@ import RequestBody from "../../common/RequestBody.interface";
 import ResponseBody from "../../common/ResponseBody.interface";
 import User from "../../common/User.interface";
 import UserAuth from "../../common/UserAuth.interface";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 
 interface FileHistoryProps {
   user: UserAuth;
@@ -148,7 +160,6 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
                   </Card.Header>
                   <Card.Header
                     className="flex-shrink-1 history-collapse-button"
-
                     onClick={() => {
                       this.openProfileModal(
                         history[i + 1].letterRecipient.publicAddress
@@ -193,9 +204,27 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
               <Row>
                 <Col className="history-display">{historyList}</Col>
               </Row>
-              <Row className="justify-content-end mb-2">
+              <Row className="d-flex justify-content-betweenmb-2">
+                <div className="mt-3 flex-shrink-1">
+                  <OverlayTrigger
+                    placement="right"
+                    overlay={
+                      <Tooltip id="learn-more">
+                        <div>
+                          Your letter <b>History</b> indicates a list of
+                          recipients that the letter has been sent to. You may
+                          view the public profile of each recipient. See more in
+                          the FAQs.
+                        </div>
+                      </Tooltip>
+                    }
+                  >
+                    <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+                  </OverlayTrigger>
+                </div>
+                <div className="flex-fill"></div>
                 <Button
-                  className="mt-3 float-right"
+                  className="mt-3 float-right flex-shrink-1"
                   variant="outline-light"
                   onClick={(e: any) => {
                     this.props.onClose();
