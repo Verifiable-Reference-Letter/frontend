@@ -117,6 +117,22 @@ class App extends React.Component<MyProps, MyState> {
     //this.handleErcInputChange = this.handleErcInputChange.bind(this);
   }
 
+  componentWillMount() {
+    let u = window.localStorage.getItem("dappUser");
+    //let user = { publicAddress: accounts[0], name: "", jwtToken: "" };
+    if (u != null) {
+      let t = JSON.parse(u)
+      let user = { publicAddress: t.publicAddress, name: t.name, jwtToken: t.jwtToken };
+      console.log("User from storage: " + user.publicAddress);
+      this.setState({
+        connectedTo: true,
+        user: user,
+        loggedIn: true 
+      });
+      this.props.history.push("/dashboard")
+    }
+  }
+
   handleErcInputChange(event: any) {
     this.setState({
       numErcBeingTraded: event.target.value,
@@ -148,10 +164,18 @@ class App extends React.Component<MyProps, MyState> {
     //         console.log(publicKey);
     //       });
 
+    let u = window.localStorage.getItem("dappUser");
+    let user = { publicAddress: accounts[0], name: "", jwtToken: "" };
+    if (u != null) {
+      let t = JSON.parse(u)
+      user = { publicAddress: t.publicAddress, name: t.name, jwtToken: t.jwtToken };
+    }
+    console.log("User from storage: " + user.publicAddress);
     this.setState({
       contract,
       connectedTo: true,
-      user: { publicAddress: accounts[0], name: "", jwtToken: "" },
+
+      user: user,
       // loggedIn: true, // testing purposes only
     });
   }
@@ -160,6 +184,10 @@ class App extends React.Component<MyProps, MyState> {
     console.log("login complete");
     this.setState({ user: u, loggedIn: true });
     this.props.history.push("/dashboard")
+    window.localStorage.setItem(
+      "dappUser",
+      JSON.stringify(u)
+    );
   }
 
   render() {
