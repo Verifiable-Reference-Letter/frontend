@@ -95,6 +95,7 @@ export async function deployTutorialToken(): Promise<TutorialToken> {
 
 type MyProps = {} & RouteComponentProps;
 type MyState = {
+  windowEthereum: boolean;
   numErcBeingTraded: number;
   contract: TutorialToken;
   connectedTo: boolean; // metamask
@@ -106,6 +107,7 @@ class App extends React.Component<MyProps, MyState> {
   constructor(props: any) {
     super(props);
     this.state = {
+      windowEthereum: true,
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
       connectedTo: false,
@@ -145,39 +147,49 @@ class App extends React.Component<MyProps, MyState> {
   }
 
   async onConnect() {
+    console.log("onConnect");
     const ethereum = (window as any).ethereum;
-    await ethereum.enable();
-    web3Provider = (window as any).web3.currentProvider;
-    // NOTE you might need this
-    //await ethereum.send('eth_requestAccounts')
+    if (ethereum) {
+      await ethereum.enable();
+      web3Provider = (window as any).web3.currentProvider;
+      // NOTE you might need this
+      //await ethereum.send('eth_requestAccounts')
 
-    web3 = new Web3(web3Provider);
-    accounts = await ethereum.request({ method: "eth_accounts" });
-    // contract = await deployTutorialToken(); // temporary disable
-    console.log(accounts);
-    // ethereum
-    //       .request({
-    //         method: "eth_getEncryptionPublicKey",
-    //         params: [accounts[0]], // you must have access to the specified account
-    //       })
-    //       .then((publicKey: string) => {
-    //         console.log(publicKey);
-    //       });
+      web3 = new Web3(web3Provider);
+      accounts = await ethereum.request({ method: "eth_accounts" });
+      // contract = await deployTutorialToken(); // temporary disable
+      console.log(accounts);
+      // ethereum
+      //       .request({
+      //         method: "eth_getEncryptionPublicKey",
+      //         params: [accounts[0]], // you must have access to the specified account
+      //       })
+      //       .then((publicKey: string) => {
+      //         console.log(publicKey);
+      //       });
 
     let u = window.localStorage.getItem("dappUser");
     let user = { publicAddress: accounts[0], name: "", jwtToken: "" };
+
     if (u != null) {
       let t = JSON.parse(u)
       user = { publicAddress: t.publicAddress, name: t.name, jwtToken: t.jwtToken };
     }
+
     console.log("User from storage: " + user.publicAddress);
     this.setState({
       contract,
       connectedTo: true,
-
       user: user,
       // loggedIn: true, // testing purposes only
     });
+
+    } else {
+      alert(
+        "Please download the Metamask browser extension (supported on Chrome & Firefox)"
+      );
+      this.setState({ windowEthereum: false });
+    }
   }
 
   onLogin(u: UserAuth) {
@@ -191,29 +203,31 @@ class App extends React.Component<MyProps, MyState> {
   }
 
   render() {
-    const home = <HomePage user={this.state.user} />;
-    const login = <LoginPage callback={this.onLogin.bind(this)} user={this.state.user} />
-
-    const dashboard = <DashboardPage user={this.state.user} />;
-    const requestor = <RequestorPage user={this.state.user} />;
-    const writer = <WriterPage user={this.state.user} />;
-    const recipient = <RecipientPage user={this.state.user} />;
+    const { windowEthereum, connectedTo, loggedIn, user } = this.state;
+    const home = <HomePage user={user} />;
+    const login = <LoginPage callback={this.onLogin.bind(this)} user={user} />
+    const dashboard = <DashboardPage user={user} />;
+    const requestor = <RequestorPage user={user} />;
+    const writer = <WriterPage user={user} />;
+    const recipient = <RecipientPage user={user} />;
 
     return (
       <div>
         <Nav
-          user={this.state.user}
-          connectedTo={this.state.connectedTo}
+          user={user}
+          connectedTo={connectedTo}
           onConnect={this.onConnect}
-          loggedIn={this.state.loggedIn}
+          loggedIn={loggedIn}
         />
+        {loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null}
+        {!windowEthereum ? <Redirect to={ROUTES.METAMASK_TUTORIAL} /> : null}
         <Switch>
-	        	<Route path={NonAuthRoutes.login} authed={this.state.loggedIn} component={() => login} />
-		        <Route exact path={NonAuthRoutes.home} authed={this.state.loggedIn} component={() => home} />
-	          <AuthRoute path={AuthRoutes.requestor} authed={this.state.loggedIn} Component={() => requestor} />
-	          <AuthRoute path={AuthRoutes.writer} authed={this.state.loggedIn} Component={() => writer} />
-	          <AuthRoute path={AuthRoutes.recipient} authed={this.state.loggedIn} Component={() => recipient} />
-	          <AuthRoute path={AuthRoutes.dashboard} authed={this.state.loggedIn} Component={() => dashboard} />
+	        	<Route path={NonAuthRoutes.login} authed={loggedIn} component={() => login} />
+		        <Route exact path={NonAuthRoutes.home} authed={loggedIn} component={() => home} />
+	          <AuthRoute path={AuthRoutes.requestor} authed={loggedIn} Component={() => requestor} />
+	          <AuthRoute path={AuthRoutes.writer} authed={loggedIn} Component={() => writer} />
+	          <AuthRoute path={AuthRoutes.recipient} authed={loggedIn} Component={() => recipient} />
+	          <AuthRoute path={AuthRoutes.dashboard} authed={loggedIn} Component={() => dashboard} />
 	      </Switch>
       </div>
     );

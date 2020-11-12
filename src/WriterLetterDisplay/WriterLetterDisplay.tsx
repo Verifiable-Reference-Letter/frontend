@@ -8,6 +8,8 @@ import {
   Collapse,
   Col,
   Row,
+  Tooltip,
+  OverlayTrigger,
 } from "react-bootstrap";
 import UserProfile from "../common/UserProfile.interface";
 import UserAuth from "../common/UserAuth.interface";
@@ -40,6 +42,7 @@ interface WriterLetterDisplayProps {
 interface WriterLetterDisplayState {
   history: LetterHistory[];
   loadingHistory: boolean;
+  loadingView: boolean;
   loadingSend: boolean;
   profileIsOpen: boolean;
   historyIsOpen: boolean;
@@ -50,7 +53,7 @@ interface WriterLetterDisplayState {
   confirmIsOpen: boolean;
   collapseIsOpen: boolean;
   selectedUserProfile?: UserProfile;
-  uploadedFile?: File;
+  uploadedFile?: string;
   fileData?: FileData;
   unsentRecipientKeys: UserKey[];
 }
@@ -71,6 +74,7 @@ class WriterLetterDisplay extends React.Component<
       history: [],
       unsentRecipientKeys: [],
       loadingHistory: false,
+      loadingView: false,
       loadingSend: false,
       profileIsOpen: false,
       historyIsOpen: false,
@@ -98,7 +102,11 @@ class WriterLetterDisplay extends React.Component<
   async onUploadSubmit(customMessage: string) {
     const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/contents/update`;
     if (this.state.uploadedFile !== undefined) {
-      await this.uploadContentsToServer(this.state.uploadedFile, fetchUrl, customMessage);
+      await this.uploadContentsToServer(
+        this.state.uploadedFile,
+        fetchUrl,
+        customMessage
+      );
     }
   }
 
@@ -111,22 +119,13 @@ class WriterLetterDisplay extends React.Component<
     });
   }
 
-  async uploadContentsToServer(file: File, fetchUrl: string, customMessage: string) {
+  async uploadContentsToServer(
+    encryptedFile: string,
+    fetchUrl: string,
+    customMessage: string
+  ) {
     console.log("uploading to server");
-    console.log(file);
-
-    // encrypt file
-    let encryptedFile = await this.cryptService.encrypt(
-      file,
-      this.props.user.publicAddress
-    );
-    console.log(encryptedFile);
-
-    if (!encryptedFile) {
-      console.log("encryption failed");
-      this.closeUploadModal();
-      return;
-    }
+    // console.log(file);
 
     // cache encrypted file
     // this.cacheService.put(this.props.letter.letterId, encryptedFile);
@@ -142,7 +141,7 @@ class WriterLetterDisplay extends React.Component<
         data: {
           customMessage: customMessage,
           encryptedFile: encryptedFile,
-        }
+        },
       }),
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -244,6 +243,7 @@ class WriterLetterDisplay extends React.Component<
     console.log(letterId);
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
+      this.setState({ loadingView: true });
       this.retrieveLetterContentsFromServer(fetchUrl);
     } else {
       try {
@@ -304,6 +304,13 @@ class WriterLetterDisplay extends React.Component<
                   fileData: fileData,
                 });
               }
+            })
+            .catch((e: Error) => {
+              this.setState({
+                // viewIsOpen: false,
+                loadingView: false,
+              });
+              // alert("Failed to decrypt retrieved letter . . . ");
             });
         } else {
           this.setState({
@@ -316,8 +323,8 @@ class WriterLetterDisplay extends React.Component<
       });
   }
 
-  async openMessageModal(file: File) {
-    this.setState({ uploadedFile: file, messageIsOpen: true });
+  async openMessageModal(encryptedFile: string) {
+    this.setState({ uploadedFile: encryptedFile, messageIsOpen: true });
     this.openConfirmModal();
   }
 
@@ -496,6 +503,7 @@ class WriterLetterDisplay extends React.Component<
     const {
       history,
       loadingHistory,
+      loadingView,
       loadingSend,
       profileIsOpen,
       historyIsOpen,
@@ -506,6 +514,7 @@ class WriterLetterDisplay extends React.Component<
       confirmIsOpen,
       collapseIsOpen,
       unsentRecipientKeys,
+      fileData,
     } = this.state;
 
     return (
@@ -517,95 +526,151 @@ class WriterLetterDisplay extends React.Component<
           >
             <div className="flex-fill">
               <span className="mr-3">For:</span>
-              <Button
-                variant="outline-light"
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  this.openProfileModal(letter.letterRequestor.publicAddress);
-                }}
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="main-buttons">
+                    <div>View {letter.letterRequestor?.name}'s profile</div>
+                  </Tooltip>
+                }
               >
-                {letter.letterRequestor?.name}
-              </Button>
+                <Button
+                  variant="outline-light"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    this.openProfileModal(letter.letterRequestor.publicAddress);
+                  }}
+                >
+                  {letter.letterRequestor?.name}
+                </Button>
+              </OverlayTrigger>
             </div>
 
             {numUnsentRecipients > 0 && letter.uploadedAt !== null && (
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="main-buttons">Send letter to recipients</Tooltip>
+                }
+              >
+                <Button
+                  // TODO: add Tooltip
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right ml-3"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    if (sendIsOpen) {
+                      this.closeSendModal();
+                    } else {
+                      this.openSendModal();
+                    }
+                  }}
+                >
+                  Send
+                </Button>
+              </OverlayTrigger>
+            )}
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  {uploadIsOpen ? "Close upload" : "Upload letter from device"}
+                </Tooltip>
+              }
+            >
+                <Button
+                  // TODO: add Tooltip
+                  disabled={numRecipients > 0}
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right ml-3"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    if (uploadIsOpen) {
+                      this.closeUploadModal();
+                    } else {
+                      this.openUploadModal();
+                    }
+                  }}
+                >
+                  Upload
+                </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  View letter for {letter.letterRequestor?.name}
+                </Tooltip>
+              }
+            >
+                <Button
+                  // TODO: add Tooltip
+                  disabled={letter.uploadedAt === null}
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right ml-3"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    if (viewIsOpen) {
+                      this.closeViewModal();
+                    } else {
+                      this.openViewModal();
+                    }
+                  }}
+                >
+                  View
+                </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  <div>
+                    {!historyIsOpen
+                      ? "Check who it has been sent to"
+                      : "Close letter history"}
+                  </div>
+                </Tooltip>
+              }
+            >
+                <Button
+                  // TODO: add Tooltip
+                  disabled={numRecipients === 0}
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right ml-3"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    if (historyIsOpen) {
+                      this.closeHistoryModal();
+                    } else {
+                      this.openHistoryModal();
+                    }
+                  }}
+                >
+                  History
+                </Button>
+            </OverlayTrigger>
+            {/* <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  {!collapseIsOpen ? "See details" : "Close"}
+                </Tooltip>
+              }
+            >
               <Button
                 // TODO: add Tooltip
                 variant="outline-light"
                 className="flex-shrink-1 float-right ml-3"
                 onClick={(e: any) => {
                   e.stopPropagation();
-                  if (sendIsOpen) {
-                    this.closeSendModal();
-                  } else {
-                    this.openSendModal();
-                  }
+                  this.setState({ collapseIsOpen: !collapseIsOpen });
                 }}
+                aria-controls="example-collapse-text"
+                aria-expanded={collapseIsOpen}
               >
-                Send
+                *
               </Button>
-            )}
-            <Button
-              // TODO: add Tooltip
-              disabled={numRecipients > 0}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (uploadIsOpen) {
-                  this.closeUploadModal();
-                } else {
-                  this.openUploadModal();
-                }
-              }}
-            >
-              Upload
-            </Button>
-            <Button
-              // TODO: add Tooltip
-              disabled={letter.uploadedAt === null}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (viewIsOpen) {
-                  this.closeViewModal();
-                } else {
-                  this.openViewModal();
-                }
-              }}
-            >
-              View
-            </Button>
-            <Button
-              // TODO: add Tooltip
-              disabled={numRecipients === 0}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (historyIsOpen) {
-                  this.closeHistoryModal();
-                } else {
-                  this.openHistoryModal();
-                }
-              }}
-            >
-              History
-            </Button>
-            <Button
-              // TODO: add Tooltip
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.setState({ collapseIsOpen: !collapseIsOpen });
-              }}
-              aria-controls="example-collapse-text"
-              aria-expanded={collapseIsOpen}
-            >
-              *
-            </Button>
+            </OverlayTrigger> */}
           </Card.Header>
         </Card>
         <Collapse in={collapseIsOpen}>
@@ -615,9 +680,11 @@ class WriterLetterDisplay extends React.Component<
               <div>
                 <FileUpload
                   ref={this.uploadModal}
-                  user={this.props.user}
+                  user={user}
+                  reUpload={letter.uploadedAt !== null}
                   restrictPdf={true}
-                  onUpload={this.openMessageModal.bind(this)}
+                  encrypt={true}
+                  onEncryptedUpload={this.openMessageModal.bind(this)}
                   onClose={this.closeUploadModal.bind(this)}
                 ></FileUpload>
               </div>
@@ -640,7 +707,6 @@ class WriterLetterDisplay extends React.Component<
                 ></FileHistory>
               </div>
             )}
-            {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}
             {!uploadIsOpen && !historyIsOpen && (
               <div className="display-text d-flex text-white-50">
                 <div className="flex-fill">
@@ -652,7 +718,9 @@ class WriterLetterDisplay extends React.Component<
                   </div>
                 )}
                 {!letter.uploadedAt && (
-                  <div className=" flex-shrink-1 float-right">Not Uploaded</div>
+                  <div className=" flex-shrink-1 float-right">
+                    You have not uploaded the letter
+                  </div>
                 )}
               </div>
             )}
@@ -697,7 +765,7 @@ class WriterLetterDisplay extends React.Component<
 
           <Modal.Body>
             <Confirm
-              user={this.props.user}
+              user={user}
               custom={true}
               onConfirm={this.onUploadSubmit.bind(this)}
               onClose={this.closeConfirmModal.bind(this)}
@@ -716,12 +784,12 @@ class WriterLetterDisplay extends React.Component<
           // size="sm"
         >
           <Modal.Header closeButton>
-            <Modal.Title>List of Recipients</Modal.Title>
+            <Modal.Title>Select a Recipient</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
             <Send
-              user={this.props.user}
+              user={user}
               letter={this.props.letter}
               unsentRecipientKeys={this.state.unsentRecipientKeys}
               onClose={this.onSendSubmit.bind(this)}
@@ -745,9 +813,10 @@ class WriterLetterDisplay extends React.Component<
 
           <Modal.Body>
             <FileView
-              fileData={this.state.fileData}
+              fileData={fileData}
+              loadingView={loadingView}
               ref={this.viewModal}
-              user={this.props.user}
+              user={user}
               onClose={this.closeViewModal.bind(this)}
             ></FileView>
           </Modal.Body>

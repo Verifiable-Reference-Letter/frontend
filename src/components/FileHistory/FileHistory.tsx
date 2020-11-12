@@ -1,5 +1,14 @@
 import React from "react";
-import { Card, Collapse, Col, Row, Button, Modal } from "react-bootstrap";
+import {
+  Card,
+  Collapse,
+  Col,
+  Row,
+  Button,
+  Modal,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import "./FileHistory.css";
 import LetterHistory from "../../common/LetterHistory.interface";
 import UserProfile from "../../common/UserProfile.interface";
@@ -8,6 +17,9 @@ import RequestBody from "../../common/RequestBody.interface";
 import ResponseBody from "../../common/ResponseBody.interface";
 import User from "../../common/User.interface";
 import UserAuth from "../../common/UserAuth.interface";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 
 interface FileHistoryProps {
   user: UserAuth;
@@ -97,7 +109,7 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
 
   render() {
     const { history } = this.props;
-    const { profileIsOpen } = this.state;
+    const { profileIsOpen, collapseIsOpen } = this.state;
 
     let historyList = [];
     for (let i = 0; i < history.length; i += 2) {
@@ -106,27 +118,47 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
           <Col>
             <Card className="full-width opacity-0 mt-3">
               <div className="d-flex justify-content-between">
-                <Card.Header
-                  className="flex-fill history-entry"
-                  onClick={() => {
-                    let collapseIsOpen = [...this.state.collapseIsOpen];
-                    collapseIsOpen[i] = !collapseIsOpen[i];
-                    this.setState({ collapseIsOpen: collapseIsOpen });
-                  }}
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id="history-entries">
+                      {!collapseIsOpen[i] ? "See history details" : "Close details"}
+                    </Tooltip>
+                  }
                 >
-                  {history[i].letterRecipient.name}
-                </Card.Header>
-                <Card.Header
-                  className="flex-shrink-1 history-collapse-button"
-                  onClick={() => {
-                    this.openProfileModal(
-                      history[i].letterRecipient.publicAddress
-                    );
-                  }}
-                ></Card.Header>
+                  <Card.Header
+                    className="flex-fill history-entry"
+                    onClick={() => {
+                      let c = [...collapseIsOpen];
+                      c[i] = !c[i];
+                      this.setState({ collapseIsOpen: c });
+                    }}
+                  >
+                    {history[i].letterRecipient.name}
+                  </Card.Header>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id="main-buttons">
+                      <div>
+                        View {history[i].letterRecipient.name}'s profile
+                      </div>
+                    </Tooltip>
+                  }
+                >
+                  <Card.Header
+                    className="flex-shrink-1 history-collapse-button"
+                    onClick={() => {
+                      this.openProfileModal(
+                        history[i].letterRecipient.publicAddress
+                      );
+                    }}
+                  />
+                </OverlayTrigger>
               </div>
             </Card>
-            <Collapse in={this.state.collapseIsOpen[i]}>
+            <Collapse in={collapseIsOpen[i]}>
               <div className="body-text text-white-50">
                 Sent At: {history[i].sentAt}
               </div>
@@ -136,28 +168,47 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
             <Col>
               <Card className="full-width opacity-0 mt-3">
                 <div className="d-flex justify-content-between">
-                  <Card.Header
-                    className="flex-fill history-entry"
-                    onClick={() => {
-                      let collapseIsOpen = [...this.state.collapseIsOpen];
-                      collapseIsOpen[i + 1] = !collapseIsOpen[i + 1];
-                      this.setState({ collapseIsOpen: collapseIsOpen });
-                    }}
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id="main-buttons">
+                        {!collapseIsOpen[i + 1] ? "See history details" : "Close details"}
+                      </Tooltip>
+                    }
                   >
-                    {history[i + 1].letterRecipient.name}
-                  </Card.Header>
-                  <Card.Header
-                    className="flex-shrink-1 history-collapse-button"
-
-                    onClick={() => {
-                      this.openProfileModal(
-                        history[i + 1].letterRecipient.publicAddress
-                      );
-                    }}
-                  ></Card.Header>
+                    <Card.Header
+                      className="flex-fill history-entry"
+                      onClick={() => {
+                        let c = [...collapseIsOpen];
+                        c[i + 1] = !c[i + 1];
+                        this.setState({ collapseIsOpen: c });
+                      }}
+                    >
+                      {history[i + 1].letterRecipient.name}
+                    </Card.Header>
+                  </OverlayTrigger>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id="main-buttons">
+                        <div>
+                          View {history[i + 1].letterRecipient.name}'s profile
+                        </div>
+                      </Tooltip>
+                    }
+                  >
+                    <Card.Header
+                      className="flex-shrink-1 history-collapse-button"
+                      onClick={() => {
+                        this.openProfileModal(
+                          history[i + 1].letterRecipient.publicAddress
+                        );
+                      }}
+                    />
+                  </OverlayTrigger>
                 </div>
               </Card>
-              <Collapse in={this.state.collapseIsOpen[i + 1]}>
+              <Collapse in={collapseIsOpen[i + 1]}>
                 <div className="body-text text-white-50">
                   Sent At: {history[i + 1].sentAt}
                 </div>
@@ -193,16 +244,41 @@ class FileHistory extends React.Component<FileHistoryProps, FileHistoryState> {
               <Row>
                 <Col className="history-display">{historyList}</Col>
               </Row>
-              <Row className="justify-content-end mb-2">
-                <Button
-                  className="mt-3 float-right"
-                  variant="outline-light"
-                  onClick={(e: any) => {
-                    this.props.onClose();
-                  }}
+              <Row className="d-flex mb-2">
+                <div className="mt-5 flex-shrink-1">
+                  <OverlayTrigger
+                    placement="right"
+                    overlay={
+                      <Tooltip id="learn-more">
+                        <div>
+                          Your letter <b>History</b> indicates <em>who</em> your
+                          letter has been sent to. You may view the profile of
+                          each recipient. See more in the FAQs.
+                        </div>
+                      </Tooltip>
+                    }
+                  >
+                    <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+                  </OverlayTrigger>
+                </div>
+                <div className="flex-fill"></div>
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip id="tooltip">
+                      Close letter history
+                    </Tooltip>
+                  }
                 >
-                  Close
-                </Button>
+                  <Button
+                    className="mt-3 float-right flex-shrink-1"
+                    variant="outline-light"
+                    onClick={(e: any) => {
+                      this.props.onClose();
+                    }}
+                  >
+                    Close
+                  </Button>
+                </OverlayTrigger>
               </Row>
             </Col>
 

@@ -8,6 +8,8 @@ import {
   Collapse,
   Col,
   Row,
+  Tooltip,
+  OverlayTrigger,
 } from "react-bootstrap";
 import UserProfile from "../common/UserProfile.interface";
 import UserAuth from "../common/UserAuth.interface";
@@ -35,6 +37,7 @@ interface RecipientLetterDisplayProps {
 interface RecipientLetterDisplayState {
   history: LetterHistory[];
   loadingHistory: boolean;
+  loadingView: boolean;
   profileIsOpen: boolean;
   historyIsOpen: boolean;
   uploadIsOpen: boolean;
@@ -61,6 +64,7 @@ class RecipientLetterDisplay extends React.Component<
     this.state = {
       history: [],
       loadingHistory: false,
+      loadingView: false,
       profileIsOpen: false,
       historyIsOpen: false,
       uploadIsOpen: false,
@@ -76,12 +80,13 @@ class RecipientLetterDisplay extends React.Component<
 
   async openViewModal() {
     console.log("opening view modal");
-    this.setState({ viewIsOpen: true });
+    this.setState({ viewIsOpen: true});
     const letterId = this.props.letter.letterId;
     const fetchUrl = `/api/v1/letters/${letterId}/recipientContents`;
     console.log("letterId", letterId);
     let encryptedLetter = this.cacheService.get(letterId);
     if (encryptedLetter === null) {
+      this.setState({loadingView: true});
       this.retrieveLetterContentsFromServer(fetchUrl);
     } else {
       try {
@@ -140,18 +145,28 @@ class RecipientLetterDisplay extends React.Component<
         console.log(e);
         // decrypt letter
         this.cryptService
-          .decrypt(e.letterRecipientContents?.letterContents, this.props.user.publicAddress)
+          .decrypt(
+            e.letterRecipientContents?.letterContents,
+            this.props.user.publicAddress
+          )
           .then((fileData) => {
             if (fileData) {
               this.setState({
-                viewIsOpen: true,
                 fileData: fileData,
+                loadingView: false,
               });
             }
+          })
+          .catch((e: Error) => {
+            // alert("Failed to Decrypt Retrieved Letter . . . ");
+            this.setState({
+              loadingView: false,
+            });
           });
       })
       .catch((e: Error) => {
         console.log(e);
+        this.setState({loadingView: true});
       });
   }
 
@@ -333,12 +348,14 @@ class RecipientLetterDisplay extends React.Component<
     const {
       history,
       loadingHistory,
+      loadingView,
       profileIsOpen,
       historyIsOpen,
       uploadIsOpen,
       viewIsOpen,
       confirmIsOpen,
       collapseIsOpen,
+      fileData,
     } = this.state;
 
     return (
@@ -350,15 +367,24 @@ class RecipientLetterDisplay extends React.Component<
           >
             <div className="flex-fill">
               <span className="mr-3">From:</span>
-              <Button
-                variant="outline-light"
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  this.openProfileModal(letter.letterWriter.publicAddress);
-                }}
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="main-buttons">
+                    <div>View {letter.letterWriter?.name}'s profile</div>
+                  </Tooltip>
+                }
               >
-                {letter.letterWriter?.name}
-              </Button>
+                <Button
+                  variant="outline-light"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    this.openProfileModal(letter.letterWriter.publicAddress);
+                  }}
+                >
+                  {letter.letterWriter?.name}
+                </Button>
+              </OverlayTrigger>
             </div>
             {/* <Button
               // TODO: add Tooltip
@@ -377,47 +403,51 @@ class RecipientLetterDisplay extends React.Component<
             </Button> */}
             {/* <div className="flex-shrink-1 float-right">
               <span className="mr-3">For:</span>
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="main-buttons">
+                    <div>View {letter.letterRequestor?.name}'s profile</div>
+                  </Tooltip>
+                }
+              >
+                <Button
+                  variant="outline-light"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    this.openProfileModal(letter.letterRequestor.publicAddress);
+                  }}
+                >
+                  {letter.letterRequestor?.name}
+                </Button>
+              </OverlayTrigger>
+            </div> */}
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  View letter for {letter.letterRequestor?.name}
+                </Tooltip>
+              }
+            >
               <Button
+                // TODO: add Tooltip
                 variant="outline-light"
+                className="flex-shrink-1 float-right ml-3"
                 onClick={(e: any) => {
                   e.stopPropagation();
-                  this.openProfileModal(letter.letterRequestor.publicAddress);
+                  if (viewIsOpen) {
+                    this.closeViewModal();
+                  } else {
+                    this.openViewModal();
+                  }
                 }}
               >
-                {letter.letterRequestor?.name}
+                View
               </Button>
-            </div> */}
-            <Button
-              // TODO: add Tooltip
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (viewIsOpen) {
-                  this.closeViewModal();
-                } else {
-                  this.openViewModal();
-                }
-              }}
-            >
-              View
-            </Button>
+            </OverlayTrigger>
+
             {/* <Button
-              disabled={numRecipients === 0}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (historyIsOpen) {
-                  this.closeHistoryModal();
-                } else {
-                  this.openHistoryModal();
-                }
-              }}
-            >
-              History
-            </Button> */}
-            <Button
               variant="outline-light"
               className="flex-shrink-1 float-right ml-3"
               onClick={(e: any) => {
@@ -428,7 +458,7 @@ class RecipientLetterDisplay extends React.Component<
               aria-expanded={collapseIsOpen}
             >
               *
-            </Button>
+            </Button>*/}
           </Card.Header>
         </Card>
         <Collapse in={collapseIsOpen}>
@@ -461,8 +491,7 @@ class RecipientLetterDisplay extends React.Component<
                   onClose={this.closeHistoryModal.bind(this)}
                 ></FileHistory>
               </div>
-            )}
-            {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}*/}
+            )}*/}
             {!uploadIsOpen && !historyIsOpen && (
               <div className="display-text d-flex text-white-50">
                 <div className="flex-fill">Letter Information</div>
@@ -533,7 +562,7 @@ class RecipientLetterDisplay extends React.Component<
           onHide={this.closeViewModal.bind(this)}
           backdrop="static"
           animation={false}
-          className="modal view-modal"
+          className="w-100"
           scrollable={false}
           size="xl"
         >
@@ -543,7 +572,8 @@ class RecipientLetterDisplay extends React.Component<
 
           <Modal.Body>
             <FileView
-              fileData={this.state.fileData}
+              fileData={fileData}
+              loadingView={loadingView}
               ref={this.viewModal}
               user={this.props.user}
               onClose={this.closeViewModal.bind(this)}

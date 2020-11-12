@@ -1,10 +1,18 @@
 import React from "react";
-import { Button, InputGroup, FormControl, Form } from "react-bootstrap";
+import {
+  Button,
+  InputGroup,
+  FormControl,
+  Form,
+  Tooltip,
+  OverlayTrigger,
+} from "react-bootstrap";
 import UserAuth from "../common/UserAuth.interface";
 import "./Login.css";
 import CryptService from "../services/CryptService";
 import { RouteComponentProps, withRouter} from "react-router-dom";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
 
@@ -17,6 +25,7 @@ interface LoginProps {
 
 
 interface LoginState {
+  signingUp: boolean;
   inputEmail: string;
   inputName: string;
   // displayMessage: string;
@@ -29,6 +38,7 @@ class Login extends React.Component<LoginProps, LoginState> {
   constructor(props: LoginProps) {
     super(props);
     this.state = {
+      signingUp: false,
       inputEmail: "",
       inputName: "",
       // displayMessage: "",
@@ -67,16 +77,16 @@ class Login extends React.Component<LoginProps, LoginState> {
     this.signup({
       publicAddress: publicAddress,
       inputName: this.state.inputName,
-    })
-      // metamask popup to sign
-      .then(this.signMessage)
-      // send signature to backend
-      .then(this.authenticate)
-      .catch((err: Error) => {
-        console.log(err);
-        // this.setState({ displayMessage: "Error. Please Try Again Later." });
-        alert("Error. Please Try Again Later.");
-      });
+    });
+    // // metamask popup to sign
+    // .then(this.signMessage)
+    // // send signature to backend
+    // .then(this.authenticate)
+    // .catch((err: Error) => {
+    // console.log(err);
+    // this.setState({ displayMessage: "Error. Please Try Again Later." });
+    // alert("Error. Please Try Again Later.");
+    // });
 
     return;
   }
@@ -137,7 +147,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       .catch((err: Error) => {
         console.log(err);
         // this.setState({ displayMessage: "Login Failed. Try Again Later." });
-        alert("Login Failed.");
+        // alert("Login Failed.");
       });
 
     return;
@@ -153,8 +163,17 @@ class Login extends React.Component<LoginProps, LoginState> {
     console.log("publicAddress:", publicAddress, "name:", inputName);
     // this.setState({ displayMessage: "Signing You Up . . ." });
 
+    this.setState({ signingUp: true });
     const publicKey = await this.cryptService.getPublicKey(publicAddress);
-    if (!publicKey) Promise.reject();
+    console.log(publicKey);
+
+    if (!publicKey) {
+      alert("Failed to Get Public Key . . .");
+      this.setState({ signingUp: false });
+      return Promise.reject("failed to get public key");
+    }
+
+    this.setState({ signingUp: false });
 
     return await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/auth/users/create`,
@@ -180,10 +199,15 @@ class Login extends React.Component<LoginProps, LoginState> {
       .then((users) => {
         console.log(users);
         console.log("signup finish");
-        return users[0];
-      });
-    // .then((response) => response.json()) // needs to handle response in which user has existing account
-    // .catch((err: Error) => console.log(err));
+        if (!users || users.length === 0) {
+          alert("Please Login Instead . . .");
+        } else {
+          alert("You're Signed Up. Please Login . . . ");
+          return users[0];
+        }
+      })
+      // .then((response) => response.json()) // needs to handle response in which user has existing account
+      .catch((err: Error) => console.log(err));
   }
 
   async signMessage({
@@ -216,6 +240,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             //web3.eth.personal.ecRecover(message, signature).then((v) => console.log(v));
             if (err) {
               console.log("error when signing");
+              alert("Signing Failed . . .");
               return reject(err);
             }
             console.log("message signed");
@@ -371,10 +396,36 @@ class Login extends React.Component<LoginProps, LoginState> {
       </form>
     );
 
+    const { signingUp, loginMode } = this.state;
+
     return (
       <div className="login">
         <div className="login-form">
-          <div>{this.state.loginMode ? loginDisplay : signupDisplay}</div>
+          <div>{loginMode ? loginDisplay : signupDisplay}</div>
+          {signingUp && (
+            <div className="mt-3 d-flex justify-content-between">
+              <div className="mt-1">See Metamask to Signup</div>
+              {/* <FontAwesomeIcon icon={faInfoCircle} size="lg" className="ml-3" /> */}
+              <OverlayTrigger
+                overlay={
+                  <Tooltip id="learn-more">
+                    <div>
+                      We ask you to provide your <b>Public Key</b> so that you
+                      can <b>1.</b> keep your letters <b>secure</b> with
+                      end-to-end encryption <b>2.</b> allow other users to send
+                      you letters.
+                    </div>
+                  </Tooltip>
+                }
+              >
+                <FontAwesomeIcon
+                  icon={faInfoCircle}
+                  size="lg"
+                  className="ml-3"
+                />
+              </OverlayTrigger>
+            </div>
+          )}
           {/* <div className="alert"> {this.state.displayMessage}</div> */}
         </div>
       </div>
