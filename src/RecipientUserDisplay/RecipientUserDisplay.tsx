@@ -8,6 +8,8 @@ import {
   Collapse,
   Col,
   Row,
+  Tooltip,
+  OverlayTrigger,
 } from "react-bootstrap";
 import UserProfile from "../common/UserProfile.interface";
 import UserAuth from "../common/UserAuth.interface";
@@ -27,7 +29,6 @@ interface RecipientUserDisplayProps {
 }
 interface RecipientUserDisplayState {
   profileIsOpen: boolean;
-  viewIsOpen: boolean;
   collapseIsOpen: boolean;
   selectedUserProfile?: UserProfile;
 }
@@ -43,7 +44,6 @@ class RecipientUserDisplay extends React.Component<
     super(props);
     this.state = {
       profileIsOpen: false,
-      viewIsOpen: false,
       collapseIsOpen: false,
     };
 
@@ -125,7 +125,7 @@ class RecipientUserDisplay extends React.Component<
 
   render() {
     const { user, requestor, selected } = this.props;
-    const { profileIsOpen, viewIsOpen, collapseIsOpen } = this.state;
+    const { profileIsOpen, collapseIsOpen } = this.state;
 
     return (
       <div>
@@ -136,46 +136,76 @@ class RecipientUserDisplay extends React.Component<
           >
             <div className="flex-fill">
               <span className="mr-3">For: </span>
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="main-buttons">
+                    <div>View {requestor?.name}'s profile</div>
+                  </Tooltip>
+                }
+              >
+                <Button
+                  variant="outline-light"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    this.openProfileModal(requestor?.publicAddress);
+                  }}
+                >
+                  {requestor?.name}
+                </Button>
+              </OverlayTrigger>
+            </div>
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  <>
+                    {!selected && <div> View letters for {requestor?.name}</div>}
+                    {selected && <div> Close letters for {requestor?.name}</div>}
+                  </>
+                </Tooltip>
+              }
+            >
               <Button
+                // TODO: add Tooltip
                 variant="outline-light"
+                className="flex-shrink-1 float-right ml-3"
                 onClick={(e: any) => {
                   e.stopPropagation();
-                  this.openProfileModal(requestor?.publicAddress);
+                  this.props.onView(requestor);
                 }}
               >
-                {requestor?.name}
+                {/* {selected ? "Close" : "Letters"} */}
+                Letters
               </Button>
-            </div>
-            <Button
-              // TODO: add Tooltip
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.props.onView(requestor);
-              }}
+            </OverlayTrigger>
+            {/* <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  {!collapseIsOpen ? "See details" : "Close"}
+                </Tooltip>
+              }
             >
-              {/* {selected ? "Close" : "Letters"} */}
-              Letters
-            </Button>
-            <Button
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.setState({ collapseIsOpen: !collapseIsOpen });
-              }}
-              aria-controls="example-collapse-text"
-              aria-expanded={collapseIsOpen}
-            >
-              *
-            </Button>
+              <Button
+                variant="outline-light"
+                className="flex-shrink-1 float-right ml-3"
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  this.setState({ collapseIsOpen: !collapseIsOpen });
+                }}
+                aria-controls="example-collapse-text"
+                aria-expanded={collapseIsOpen}
+              >
+                *
+              </Button>
+            </OverlayTrigger> */}
           </Card.Header>
         </Card>
         <Collapse in={collapseIsOpen}>
           <div className="collapse-body-select">
             <div className="display-text d-flex text-white-50">
-              <div className="flex-fill">Applicant Information</div>
+              <div className="flex-fill">User Information</div>
             </div>
           </div>
         </Collapse>

@@ -10,10 +10,12 @@ class CryptService {
   constructor() {
     this.publicKey = "";
     this.ethereum = (window as any).ethereum;
-    this.ethereum
-      .enable()
-      .then(() => {})
-      .catch((e: Error) => {});
+    if (this.ethereum) {
+      this.ethereum
+        .enable()
+        .then(() => {})
+        .catch((e: Error) => {});
+    }
   }
 
   async encrypt(file: File, publicAddress: string): Promise<string> {
@@ -207,7 +209,7 @@ class CryptService {
 
   async getPublicKey(publicAddress: string): Promise<string | null> {
     try {
-      return this.ethereum.request({
+      return await this.ethereum.request({
         method: "eth_getEncryptionPublicKey",
         params: [publicAddress], // you must have access to the specified account
       });

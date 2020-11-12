@@ -1,5 +1,13 @@
 import React from "react";
-import { Modal, Button, Spinner } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Spinner,
+  Tooltip,
+  OverlayTrigger,
+} from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import LetterDetails from "../../common/LetterDetails.interface";
 import UserProfile from "../../common/UserProfile.interface";
 import FileData from "../../common/FileData.interface";
@@ -12,6 +20,7 @@ import UserAuth from "../../common/UserAuth.interface";
 interface FileViewProps {
   user: UserAuth;
   fileData?: FileData;
+  loadingView: boolean;
   onClose: () => void;
 }
 interface FileViewState {
@@ -80,7 +89,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
     this.setState({ profileIsOpen: false });
   }
   render() {
-    const { fileData } = this.props;
+    const { fileData, loadingView } = this.props;
     const { profileIsOpen } = this.state;
     return (
       <div>
@@ -94,13 +103,61 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
             />
           )}
           {!fileData && (
-            <div className="d-flex justify-content-center">
-              <Spinner
-                className="mb-3 .absolute-center"
-                animation="border"
-                variant="secondary"
-              />
-            </div>
+            <>
+              {loadingView && (
+                <>
+                  {/* <div className="d-flex justify-content-center">
+                    <Spinner
+                      className="mb-3 .absolute-center"
+                      animation="border"
+                      variant="secondary"
+                    />
+                  </div> */}
+                  <div className="d-flex justify-content-center">
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="learn-more">
+                          <div>
+                            We use <b>Metamask</b> to retrieve your letter{" "}
+                            <em>securely</em>. Metamask uses your{" "}
+                            <b>Private Key</b> to decrypt the letter. Learn more
+                            about <b>Encryption / Decryption</b> in the FAQS.
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        size="lg"
+                        className="mr-3"
+                      />
+                    </OverlayTrigger>
+                    <div>See Metamask to Retrieve Your Letter</div>
+                  </div>
+                </>
+              )}
+              {!loadingView && (
+                <div className="d-flex justify-content-center">
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={
+                      <Tooltip id="learn-more">
+                        <div>
+                          Please click <em>Decrypt</em> on Metamask to decrypt
+                          your letter. This is because we use end-to-end
+                          encryption to keep your letters secure. See{" "}
+                          <b>Encryption / Decryption</b> in the FAQs.
+                        </div>
+                      </Tooltip>
+                    }
+                  >
+                    <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+                  </OverlayTrigger>
+                  <div className="ml-3">Failed to Decrypt</div>
+                </div>
+              )}
+            </>
           )}
         </div>
 

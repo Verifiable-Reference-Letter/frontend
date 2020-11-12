@@ -1,5 +1,7 @@
 .recipient {
-  padding: 10px 20% 10px;
+  padding: 30px 20% 0px;
+  background-color: rgba(50, 0, 50, 0.10);
+  height: 100%
 }
 .recipient-header {
   text-align: center;
@@ -10,6 +12,15 @@
 .recipient-letters {
   margin-bottom: 10px;
   width: 100%;
+}
+
+.recipient-requestorslist {
+  /* max-height: 539px; */
+  max-height: 441px;
+  min-height: 441px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-bottom: 46.5px;
 }
 
 h1,
@@ -27,7 +38,9 @@ h6 {
 }
 
 .recipient-dual {
-  padding: 10px 3em 10px;
+  padding: 30px 3em 0px;
+  background-color: rgba(50, 0, 50, 0.10);
+  height: 100%
 }
 
 h1,
