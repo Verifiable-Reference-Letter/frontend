@@ -185,14 +185,24 @@ class App extends React.Component<MyProps, MyState> {
         }
       }
 
-      console.log("User from storage: " + user.publicAddress);
+      console.log(
+        "User from storage: " + user.publicAddress,
+        user.name,
+        user.jwtToken
+      );
       this.setState({
         contract,
         connectedTo: true,
         user: user,
-        // loggedIn: true, // testing purposes only
+        loggedIn: user.jwtToken !== "",
       });
-      
+      // TODO: query here to check that jwt is correct
+
+      // const verified = await this.checkJWT(user);
+      const verified = true;
+      if (verified) {
+        this.props.history.push(ROUTES.DASHBOARD);
+      }
     } else {
       alert(
         "Please download the Metamask browser extension (supported on Chrome & Firefox)"
@@ -200,6 +210,10 @@ class App extends React.Component<MyProps, MyState> {
       this.setState({ windowEthereum: false });
       this.props.history.push(ROUTES.METAMASK_TUTORIAL);
     }
+  }
+
+  async checkJWT(user: UserAuth) {
+    
   }
 
   onLogin(u: UserAuth) {

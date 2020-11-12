@@ -193,7 +193,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
                     <Tooltip id="learn-more">
                       <>
                         <div>
-                          Please click <em>Confirm</em> on Metamask. We need
+                          Please click <em>Provide</em> on Metamask. We need
                           your <b>Public Key</b> to encrypt your letter. This
                           keeps your letters secure so that only you can view
                           it. See <b>End-to-End Encryption</b> in the FAQs.

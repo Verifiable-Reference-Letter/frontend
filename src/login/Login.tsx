@@ -121,6 +121,8 @@ class Login extends React.Component<LoginProps, LoginState> {
       publicAddress: publicAddress,
       email: this.state.inputEmail,
       inputName: this.state.inputName,
+    }).catch((e: Error) => {
+      console.log(e);
     });
     // // metamask popup to sign
     // .then(this.signMessage)
@@ -536,6 +538,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           <div className="mt-3 d-flex justify-content-between">
             {/* <FontAwesomeIcon icon={faInfoCircle} size="lg" className="ml-3" /> */}
             <OverlayTrigger
+              placement="bottom"
               overlay={
                 <Tooltip id="learn-more">
                   <>
@@ -547,21 +550,86 @@ class Login extends React.Component<LoginProps, LoginState> {
                         send you letters.
                       </div>
                     )}
-                    {failedKey && <div></div>}
-                    {invalidEmail && <div></div>}
-                    {invalidName && <div></div>}
-                    {user.publicAddress === "" && <div></div>}
-                    {signUpSuccess && <div></div>}
-                    {alreadySignedUp && <div></div>}
-                    {noAccount && <div></div>}
-                    {failedSigning && <div></div>}
+                    {failedKey && (
+                      <div>
+                        Please click <em>Provide</em> on Metamask to sign up. We
+                        need your <b>Public Key</b> to 1. keep your letters
+                        secure 2. Allow other users to send letters to you.
+                        Learn more about <b>End-to-End Encryption</b> in the
+                        FAQs.
+                      </div>
+                    )}
+                    {invalidEmail && (
+                      <div>
+                        Please enter a valid email. You will need to verify your
+                        email to complete the sign up process. Ex:{" "}
+                        <b>placeholder@lehigh.edu</b>
+                      </div>
+                    )}
+                    {invalidName && (
+                      <div>
+                        Please enter a valid name. This name will be{" "}
+                        <b>publicly visible</b> to other users.
+                      </div>
+                    )}
+                    {user.publicAddress === "" && (
+                      <div>
+                        Please connect to metamask. You may need to check the
+                        Metamask extension. For Metamask troubleshooting, check
+                        out the FAQs.
+                      </div>
+                    )}
+                    {signUpSuccess && (
+                      <div>
+                        You've successfully signed up. Please check your{" "}
+                        <b>Email</b>
+                        to verify your identity!{" "}
+                      </div>
+                    )}
+                    {alreadySignedUp && (
+                      <div>
+                        You already have an account. Please click <b>Login</b>{" "}
+                        to authenticate. For troubleshooting, check out the
+                        FAQs.
+                      </div>
+                    )}
+                    {noAccount && (
+                      <div>
+                        No account found. Please click <b>Sign Up</b> to create
+                        an account. For troubleshooting, check out the FAQs.
+                      </div>
+                    )}
+                    {failedSigning && (
+                      <div>
+                        Please click <em>Sign</em> on Metamask to <b>Login</b>.
+                        We need your signature to verify your identity. Learn
+                        more about <b>Signing / Verification</b> in the FAQs.
+                      </div>
+                    )}
                     {!signingUp &&
                       !failedKey &&
                       !invalidEmail &&
                       !invalidName &&
                       !signUpSuccess &&
                       !alreadySignedUp &&
-                      !failedSigning && <div></div>}
+                      !failedSigning && (
+                        <>
+                          {loginMode && (
+                            <div>
+                              We're excited that you're with us. Please{" "}
+                              <b>Login</b> to send, upload, or receive
+                              verifiable letters!
+                            </div>
+                          )}
+                          {!loginMode && (
+                            <div>
+                              We're excited that you're with us. Please fill out
+                              the form and <b>Sign Up</b> to send, upload, or
+                              receive verifiable letters!
+                            </div>
+                          )}
+                        </>
+                      )}
                   </>
                 </Tooltip>
               }
@@ -579,14 +647,14 @@ class Login extends React.Component<LoginProps, LoginState> {
             {user.publicAddress === "" && (
               <div className="mt-1">Please connect to Metamask</div>
             )}
-            {signUpSuccess && <div className="mt-1">Success. Please verify your email</div>}
+            {signUpSuccess && (
+              <div className="mt-1">Success. Please verify your email</div>
+            )}
             {alreadySignedUp && (
               <div className="mt-1">Please login instead</div>
             )}
-            {noAccount && <div className="mt-1">Please signup</div>}
-            {failedSigning && (
-              <div className="mt-1">Failed to verify identity</div>
-            )}
+            {noAccount && <div className="mt-1">Please signup instead</div>}
+            {failedSigning && <div className="mt-1">Failed to login</div>}
             {!signingUp &&
               !failedKey &&
               !invalidEmail &&
