@@ -174,11 +174,15 @@ class App extends React.Component<MyProps, MyState> {
 
       if (u != null) {
         let t = JSON.parse(u);
-        user = {
-          publicAddress: t.publicAddress,
-          name: t.name,
-          jwtToken: t.jwtToken,
-        };
+
+        // need to check if different account, else do not set JWT
+        if (user.publicAddress === t.publicAddress) {
+          user = {
+            publicAddress: t.publicAddress,
+            name: t.name,
+            jwtToken: t.jwtToken,
+          };
+        }
       }
 
       console.log("User from storage: " + user.publicAddress);
@@ -188,6 +192,7 @@ class App extends React.Component<MyProps, MyState> {
         user: user,
         // loggedIn: true, // testing purposes only
       });
+      
     } else {
       alert(
         "Please download the Metamask browser extension (supported on Chrome & Firefox)"
