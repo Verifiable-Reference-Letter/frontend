@@ -1,7 +1,15 @@
 import { TutorialToken } from "./contract-types/TutorialToken"; // import is correct
-import React, {FunctionComponent} from "react";
+import React, { FunctionComponent } from "react";
 //import { RouteComponentProps } from "@reach/router";
-import { BrowserRouter as Router, Route, Link, Redirect, Switch, RouteComponentProps, withRouter} from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect,
+  Switch,
+  RouteComponentProps,
+  withRouter,
+} from "react-router-dom";
 import TutorialTokenContractData from "./contract-data/TutorialToken.json";
 import BN from "bn.js";
 
@@ -21,45 +29,50 @@ import Web3 from "web3";
 export let web3: Web3;
 export let ethereum: any;
 
-
 enum AuthRoutes {
-	dashboard = '/dashboard',
-	requestor = '/requestor',
-	writer = '/writer',
-	recipient = '/recipient'
+  dashboard = "/dashboard",
+  requestor = "/requestor",
+  writer = "/writer",
+  recipient = "/recipient",
 }
 
 enum NonAuthRoutes {
-	home = '/',
-	login = '/login'
+  home = "/",
+  login = "/login",
 }
 
 interface Props {
-	Component : React.FC<RouteComponentProps>
-	path: string;
-	exact?: boolean;
-	authed: boolean
-};
+  Component: React.FC<RouteComponentProps>;
+  path: string;
+  exact?: boolean;
+  authed: boolean;
+}
 
-const AuthRoute = ({ Component, path, exact = false, authed}: Props): JSX.Element => {
-	const isAuthed = authed;
-	const message = "Login to view this page"
-	return (
-		<Route
-			exact={exact}
-			path={path}
-			render={(props : RouteComponentProps) => 
-				isAuthed ? (
-					<Component {...props} />
-				) : (
-					<Redirect to={{
-						pathname: NonAuthRoutes.login
-					}}
-				/>
-				)
-			}
-		/>
-	);
+const AuthRoute = ({
+  Component,
+  path,
+  exact = false,
+  authed,
+}: Props): JSX.Element => {
+  const isAuthed = authed;
+  const message = "Login to view this page";
+  return (
+    <Route
+      exact={exact}
+      path={path}
+      render={(props: RouteComponentProps) =>
+        isAuthed ? (
+          <Component {...props} />
+        ) : (
+          <Redirect
+            to={{
+              pathname: NonAuthRoutes.login,
+            }}
+          />
+        )
+      }
+    />
+  );
 };
 
 export const GAS_LIMIT_STANDARD = 6000000;
@@ -120,19 +133,7 @@ class App extends React.Component<MyProps, MyState> {
   }
 
   componentWillMount() {
-    let u = window.localStorage.getItem("dappUser");
-    //let user = { publicAddress: accounts[0], name: "", jwtToken: "" };
-    if (u != null) {
-      let t = JSON.parse(u)
-      let user = { publicAddress: t.publicAddress, name: t.name, jwtToken: t.jwtToken };
-      console.log("User from storage: " + user.publicAddress);
-      this.setState({
-        connectedTo: true,
-        user: user,
-        loggedIn: true 
-      });
-      this.props.history.push("/dashboard")
-    }
+    this.onConnect();
   }
 
   handleErcInputChange(event: any) {
@@ -168,44 +169,45 @@ class App extends React.Component<MyProps, MyState> {
       //         console.log(publicKey);
       //       });
 
-    let u = window.localStorage.getItem("dappUser");
-    let user = { publicAddress: accounts[0], name: "", jwtToken: "" };
+      let u = window.localStorage.getItem("dappUser");
+      let user = { publicAddress: accounts[0], name: "", jwtToken: "" };
 
-    if (u != null) {
-      let t = JSON.parse(u)
-      user = { publicAddress: t.publicAddress, name: t.name, jwtToken: t.jwtToken };
-    }
+      if (u != null) {
+        let t = JSON.parse(u);
+        user = {
+          publicAddress: t.publicAddress,
+          name: t.name,
+          jwtToken: t.jwtToken,
+        };
+      }
 
-    console.log("User from storage: " + user.publicAddress);
-    this.setState({
-      contract,
-      connectedTo: true,
-      user: user,
-      // loggedIn: true, // testing purposes only
-    });
-
+      console.log("User from storage: " + user.publicAddress);
+      this.setState({
+        contract,
+        connectedTo: true,
+        user: user,
+        // loggedIn: true, // testing purposes only
+      });
     } else {
       alert(
         "Please download the Metamask browser extension (supported on Chrome & Firefox)"
       );
       this.setState({ windowEthereum: false });
+      this.props.history.push(ROUTES.METAMASK_TUTORIAL);
     }
   }
 
   onLogin(u: UserAuth) {
     console.log("login complete");
     this.setState({ user: u, loggedIn: true });
-    this.props.history.push("/dashboard")
-    window.localStorage.setItem(
-      "dappUser",
-      JSON.stringify(u)
-    );
+    this.props.history.push(ROUTES.DASHBOARD);
+    window.localStorage.setItem("dappUser", JSON.stringify(u));
   }
 
   render() {
     const { windowEthereum, connectedTo, loggedIn, user } = this.state;
     const home = <HomePage user={user} />;
-    const login = <LoginPage callback={this.onLogin.bind(this)} user={user} />
+    const login = <LoginPage callback={this.onLogin.bind(this)} user={user} />;
     const dashboard = <DashboardPage user={user} />;
     const requestor = <RequestorPage user={user} />;
     const writer = <WriterPage user={user} />;
@@ -219,16 +221,43 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={loggedIn}
         />
-        {loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null}
-        {!windowEthereum ? <Redirect to={ROUTES.METAMASK_TUTORIAL} /> : null}
-        <Switch>
-	        	<Route path={NonAuthRoutes.login} authed={loggedIn} component={() => login} />
-		        <Route exact path={NonAuthRoutes.home} authed={loggedIn} component={() => home} />
-	          <AuthRoute path={AuthRoutes.requestor} authed={loggedIn} Component={() => requestor} />
-	          <AuthRoute path={AuthRoutes.writer} authed={loggedIn} Component={() => writer} />
-	          <AuthRoute path={AuthRoutes.recipient} authed={loggedIn} Component={() => recipient} />
-	          <AuthRoute path={AuthRoutes.dashboard} authed={loggedIn} Component={() => dashboard} />
-	      </Switch>
+        {/* {loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null} */}
+        {/* {!windowEthereum ? <Redirect to={ROUTES.METAMASK_TUTORIAL} /> : null} */}
+        <div className="application-body">
+          <Switch>
+            <Route
+              path={NonAuthRoutes.login}
+              authed={loggedIn}
+              component={() => login}
+            />
+            <Route
+              exact
+              path={NonAuthRoutes.home}
+              authed={loggedIn}
+              component={() => home}
+            />
+            <AuthRoute
+              path={AuthRoutes.requestor}
+              authed={loggedIn}
+              Component={() => requestor}
+            />
+            <AuthRoute
+              path={AuthRoutes.writer}
+              authed={loggedIn}
+              Component={() => writer}
+            />
+            <AuthRoute
+              path={AuthRoutes.recipient}
+              authed={loggedIn}
+              Component={() => recipient}
+            />
+            <AuthRoute
+              path={AuthRoutes.dashboard}
+              authed={loggedIn}
+              Component={() => dashboard}
+            />
+          </Switch>
+        </div>
       </div>
     );
   }
