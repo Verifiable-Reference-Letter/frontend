@@ -255,11 +255,11 @@ class Recipient extends React.Component<RecipientProps, RecipientState> {
         {!loadingRequestors && dualMode && requestors.length !== 0 && (
           <Col className="recipient-dual">
             <Row>
-              <Col className="ml-5 mr-5">
+              <Col className="ml-5">
                 <Row>{recipientRequestors}</Row>
                 {/* <Row>{recipientFooter}</Row> */}
               </Col>
-              <Col className="mr-5 ml-5">
+              <Col className="ml-5">
                 {!loadingLetters && <Row>{recipientLetters}</Row>}
                 {loadingLetters && (
                   <Row>

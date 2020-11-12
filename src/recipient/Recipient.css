@@ -1,5 +1,7 @@
 .recipient {
-  padding: 10px 20% 10px;
+  padding: 30px 20% 0px;
+  background-color: rgba(50, 0, 50, 0.10);
+  height: 100%
 }
 .recipient-header {
   text-align: center;
@@ -36,7 +38,9 @@ h6 {
 }
 
 .recipient-dual {
-  padding: 10px 3em 10px;
+  padding: 30px 3em 0px;
+  background-color: rgba(50, 0, 50, 0.10);
+  height: 100%
 }
 
 h1,

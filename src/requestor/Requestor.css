@@ -1,5 +1,7 @@
 .requestor {
-  padding: 10px 25% 10px;
+  padding: 30px 25% 0px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .1);
 }
 .requestor-header {
   text-align: center;
@@ -22,7 +24,9 @@
 }
 
 .requestor-dual {
-  padding: 10px 3em 10px;
+  padding: 30px 3em 0px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .1);
 }
 
 .requestor-footer {

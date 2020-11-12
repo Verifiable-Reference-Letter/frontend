@@ -406,7 +406,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
 
     const requestorLetter = (
       <div className="requestor-letters">
-        <h3> Requests </h3>
+        <h3> {letters.length !== 0 ? "Requests" : ""} </h3>
         <div className="requestor-letterslist">{lettersList}</div>
       </div>
     );
@@ -434,6 +434,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
             <Row>{requestorFooter}</Row>
           </Col>
         )}
+
         {!loadingLetters && !dualMode && letters.length !== 0 && (
           <Col className="requestor">
             <Row>{requestorSelect}</Row>
@@ -472,7 +473,7 @@ class Requestor extends React.Component<RequestorProps, RequestorState> {
           animation={false}
           className="modal"
           scrollable={false}
-          // size="sm"
+          // size="xl"
         >
           <Modal.Header closeButton>
             <Modal.Title>Please Confirm</Modal.Title>

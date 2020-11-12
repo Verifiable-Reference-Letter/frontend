@@ -60,14 +60,14 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
       console.log("no file uploaded");
       this.setState({
         displayMessage: "No File Uploaded.",
-        displayVariant: 1,
+        displayVariant: 0,
         submitClicked: true,
       });
     } else if (this.props.restrictPdf && file.type !== "application/pdf") {
       console.log("not a pdf");
       this.setState({
         displayMessage: "Please Upload a PDF.",
-        displayVariant: 1,
+        displayVariant: 0,
         submitClicked: true,
         file: new File([], ""),
       });
@@ -93,7 +93,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
             failedEncryption: true,
             submitClicked: false,
             displayMessage: "Failed to Encrypt",
-            displayVariant: 1,
+            displayVariant: 0,
           });
         } else {
           console.log("checking if upload to server");

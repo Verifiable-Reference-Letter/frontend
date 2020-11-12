@@ -139,7 +139,6 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
               )}
               {!loadingView && (
                 <div className="d-flex justify-content-center">
-                  <div className="text-warning">Failed to Decrypt</div>
                   <OverlayTrigger
                     placement="bottom"
                     overlay={
@@ -153,12 +152,9 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
                       </Tooltip>
                     }
                   >
-                    <FontAwesomeIcon
-                      icon={faInfoCircle}
-                      size="lg"
-                      className="ml-3"
-                    />
+                    <FontAwesomeIcon icon={faInfoCircle} size="lg" />
                   </OverlayTrigger>
+                  <div className="ml-3">Failed to Decrypt</div>
                 </div>
               )}
             </>

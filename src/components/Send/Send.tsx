@@ -34,6 +34,7 @@ interface SendState {
   signingLetter: boolean;
   failedSigning: boolean;
   sending: boolean;
+  sendSuccess: boolean;
   encrypted: boolean[];
   encryptedLetter?: FileData;
 }
@@ -59,6 +60,7 @@ class Send extends React.Component<SendProps, SendState> {
       signingLetter: false,
       failedSigning: false,
       sending: false,
+      sendSuccess: false,
       encrypted: e,
     };
     this.cryptService = new CryptService();
@@ -73,7 +75,7 @@ class Send extends React.Component<SendProps, SendState> {
   }
 
   async encryptSignAndUpload(key: number, userKey: UserKey) {
-    this.setState({ failedSigning: false });
+    this.setState({ failedLoad: false, failedSigning: false, sendSuccess: false, });
     try {
       console.log("Pub key is: " + userKey.publicKey);
       console.log("State url: " + this.state.encryptedLetter);
@@ -116,10 +118,19 @@ class Send extends React.Component<SendProps, SendState> {
         encryptedLetterForm
       );
       // const success = true;
+      // check if letter sent successfully
       if (success) {
         let encrypted = [...this.state.encrypted];
         encrypted[key] = true;
-        this.setState({ encrypted: encrypted, sending: false });
+        this.setState({
+          encrypted: encrypted,
+          sending: false,
+          sendSuccess: true,
+        });
+      } else {
+        this.setState({
+          sending: false,
+        });
       }
     } catch (e) {
       if (this.state.signingLetter) {
@@ -248,6 +259,7 @@ class Send extends React.Component<SendProps, SendState> {
       signingLetter,
       failedSigning,
       sending,
+      sendSuccess,
       encrypted,
     } = this.state;
 
@@ -271,11 +283,20 @@ class Send extends React.Component<SendProps, SendState> {
                   </Card.Header>
 
                   {encrypted[i] && (
-                    <FontAwesomeIcon
-                      icon={faCheckSquare}
-                      size="lg"
-                      className="send-check-square"
-                    />
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="learn-more">
+                          <div>Letter has been sent!</div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faCheckSquare}
+                        size="lg"
+                        className="send-check-square"
+                      />
+                    </OverlayTrigger>
                   )}
                   {!encrypted[i] && (
                     <div className="send-check-square-placeholder"></div>
@@ -301,11 +322,20 @@ class Send extends React.Component<SendProps, SendState> {
                       {unsentRecipientKeys[i + 1].name}
                     </Card.Header>
                     {encrypted[i + 1] && (
-                      <FontAwesomeIcon
-                        icon={faCheckSquare}
-                        size="lg"
-                        className="send-check-square"
-                      />
+                      <OverlayTrigger
+                        placement="bottom"
+                        overlay={
+                          <Tooltip id="learn-more">
+                            <div>Letter has been sent!</div>
+                          </Tooltip>
+                        }
+                      >
+                        <FontAwesomeIcon
+                          icon={faCheckSquare}
+                          size="lg"
+                          className="send-check-square"
+                        />
+                      </OverlayTrigger>
                     )}
                     {!encrypted[i + 1] && (
                       <div className="send-check-square-placeholder"></div>
@@ -347,9 +377,7 @@ class Send extends React.Component<SendProps, SendState> {
             >
               <FontAwesomeIcon icon={faInfoCircle} size="lg" />
             </OverlayTrigger>
-            <div className="ml-3 text-warning">
-              Failed to Retrieve Your Letter
-            </div>
+            <div className="ml-3">Failed to Retrieve Your Letter</div>
           </div>
         )}
         {!loadingContents && !failedLoad && (
@@ -398,6 +426,28 @@ class Send extends React.Component<SendProps, SendState> {
                     <div>See Metamask to Sign Your Letter</div>
                   </div>
                 )}
+                {failedSigning && !sending && !signingLetter && (
+                  <div className="d-flex justify-content-between">
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="learn-more">
+                          <div>
+                            Please click <em>Sign</em> on Metamask to sign your
+                            letter. Your <b>signature</b> will give the
+                            recipient confidence that the letter is authentic.
+                            Learn more about <b>Signing / Verification</b> in
+                            the FAQS.
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+                    </OverlayTrigger>
+                    <div className="ml-3">Failed to Sign Your Letter</div>
+                  </div>
+                )}
+
                 {sending && !signingLetter && (
                   <div className="d-flex justify-content-between">
                     <OverlayTrigger
@@ -422,27 +472,27 @@ class Send extends React.Component<SendProps, SendState> {
                     <div> Sending Your Letter . . . </div>
                   </div>
                 )}
-                {failedSigning && !sending && !signingLetter && (
+                {sendSuccess && !sending && !signingLetter && (
                   <div className="d-flex justify-content-between">
                     <OverlayTrigger
                       placement="bottom"
                       overlay={
                         <Tooltip id="learn-more">
                           <div>
-                            Please click <em>Sign</em> on Metamask to sign your
-                            letter. Your <b>signature</b> will give the
-                            recipient confidence that the letter is authentic.
-                            Learn more about <b>Signing / Verification</b> in
-                            the FAQS.
+                            Your letter has been sent! You can continue to send
+                            letters to recipients or click <b>Close</b> to
+                            finish the session. Learn more in the FAQS.
                           </div>
                         </Tooltip>
                       }
                     >
-                      <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        size="lg"
+                        className="mr-3"
+                      />
                     </OverlayTrigger>
-                    <div className="text-warning ml-3">
-                      Failed to Sign Your Letter
-                    </div>
+                    <div>Your letter has been sent!</div>
                   </div>
                 )}
               </div>
@@ -487,7 +537,7 @@ class Send extends React.Component<SendProps, SendState> {
               >
                 <FontAwesomeIcon icon={faInfoCircle} size="lg" />
               </OverlayTrigger>
-              <div className="ml-3">See Metamask to Retrieve Your Letter</div>
+              <div className="ml-3">See Metamask to start sending</div>
             </div>
           </>
         )}

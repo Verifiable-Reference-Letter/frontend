@@ -151,29 +151,49 @@ class Select extends React.Component<SelectProps, SelectState> {
           <Row>
             <Col>
               <div className="d-flex justify-content-between recipient-entry">
-                <div
-                  className="flex-fill body-text"
-                  onClick={() =>
-                    this.openProfileModal(selectedRecipients[i].publicAddress)
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id="main-buttons">
+                      <div>View {selectedRecipients[i].name}'s profile</div>
+                    </Tooltip>
                   }
                 >
-                  {selectedRecipients[i].name}
-                </div>
+                  <div
+                    className="flex-fill body-text"
+                    onClick={() =>
+                      this.openProfileModal(selectedRecipients[i].publicAddress)
+                    }
+                  >
+                    {selectedRecipients[i].name}
+                  </div>
+                </OverlayTrigger>
               </div>
             </Col>
             {i + 1 < selectedRecipients.length && (
               <Col>
                 <div className="d-flex justify-content-between recipient-entry">
-                  <div
-                    className="flex-fill body-text"
-                    onClick={() =>
-                      this.openProfileModal(
-                        selectedRecipients[i + 1].publicAddress
-                      )
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id="main-buttons">
+                        <div>
+                          View {selectedRecipients[i + 1].name}'s profile
+                        </div>
+                      </Tooltip>
                     }
                   >
-                    {selectedRecipients[i + 1].name}
-                  </div>
+                    <div
+                      className="flex-fill body-text"
+                      onClick={() =>
+                        this.openProfileModal(
+                          selectedRecipients[i + 1].publicAddress
+                        )
+                      }
+                    >
+                      {selectedRecipients[i + 1].name}
+                    </div>
+                  </OverlayTrigger>
                 </div>
               </Col>
             )}
@@ -187,16 +207,27 @@ class Select extends React.Component<SelectProps, SelectState> {
             {i + 2 < selectedRecipients.length && (
               <Col>
                 <div className="d-flex justify-content-between recipient-entry">
-                  <div
-                    className="flex-fill body-text"
-                    onClick={() =>
-                      this.openProfileModal(
-                        selectedRecipients[i + 2].publicAddress
-                      )
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id="main-buttons">
+                        <div>
+                          View {selectedRecipients[i + 2].name}'s profile
+                        </div>
+                      </Tooltip>
                     }
                   >
-                    {selectedRecipients[i + 2].name}
-                  </div>
+                    <div
+                      className="flex-fill body-text"
+                      onClick={() =>
+                        this.openProfileModal(
+                          selectedRecipients[i + 2].publicAddress
+                        )
+                      }
+                    >
+                      {selectedRecipients[i + 2].name}
+                    </div>
+                  </OverlayTrigger>
                 </div>
               </Col>
             )}
@@ -230,16 +261,18 @@ class Select extends React.Component<SelectProps, SelectState> {
                     {header === "Select Recipients" && (
                       <div>
                         Please indicate a list of intended recipients. This
-                        recipient list can be updated in <b>Edit</b>. Note that once the
-                        letter is sent to a recipient, the recipient will be
-                        moved into <b>History</b>. Learn more in the FAQs.
+                        recipient list can be updated in <b>Edit</b>. Note that
+                        once the letter is sent to a recipient, the recipient
+                        will be moved into <b>History</b>. Learn more in the
+                        FAQs.
                       </div>
                     )}
                     {header === "Edit Recipients" && (
                       <div>
-                        You may add and remove intended recipients. Note that once the
-                        writer uploads and sends your letter to a recipient, the
-                        recipient will be moved into <b>History</b>. Learn more in the FAQs.
+                        You may add and remove intended recipients. Note that
+                        once the writer uploads and sends your letter to a
+                        recipient, the recipient will be moved into{" "}
+                        <b>History</b>. Learn more in the FAQs.
                       </div>
                     )}
                   </>
@@ -253,20 +286,28 @@ class Select extends React.Component<SelectProps, SelectState> {
           <div className="flex-fill"></div>
 
           {selectedRecipients.length !== 0 && (
-            <Button
-              variant="outline-light"
-              className="flex-shrink-1 float-right"
-              onClick={() => {
-                this.props.onSubmit(selectedRecipients);
-              }}
+            <OverlayTrigger
+              overlay={
+                <Tooltip id="tooltip">
+                  Select {selectedRecipients.length} recipients
+                </Tooltip>
+              }
             >
-              Submit
-            </Button>
+              <Button
+                variant="outline-light"
+                className="flex-shrink-1 float-right"
+                onClick={() => {
+                  this.props.onSubmit(selectedRecipients);
+                }}
+              >
+                Submit
+              </Button>
+            </OverlayTrigger>
           )}
           {selectedRecipients.length === 0 && (
             <OverlayTrigger
               overlay={
-                <Tooltip id="tooltip">No Recipients Selected</Tooltip>
+                <Tooltip id="tooltip">Select no recipients for now</Tooltip>
               }
             >
               <span className="d-inline-block">
@@ -284,18 +325,34 @@ class Select extends React.Component<SelectProps, SelectState> {
               </span>
             </OverlayTrigger>
           )}
-          <Button
-            variant="outline-light"
-            className="flex-shrink-1 ml-3"
-            onClick={() => {
-              this.setState({
-                selectedRecipients: previouslySelectedRecipients,
-              });
-            }}
+          <OverlayTrigger
+            overlay={
+              <Tooltip id="tooltip">
+                {header === "Edit Recipients"
+                  ? "Reset to previous"
+                  : "Clear all selected recipients"}
+              </Tooltip>
+            }
           >
-            Reset
-          </Button>
-
+            <Button
+              variant="outline-light"
+              className="flex-shrink-1 ml-3"
+              onClick={() => {
+                this.setState({
+                  selectedRecipients: previouslySelectedRecipients,
+                });
+              }}
+            >
+              {header === "Edit Recipients" ? "Reset" : "Clear"}
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            overlay={
+              <Tooltip id="tooltip">
+                Cancel new request
+              </Tooltip>
+            }
+          >
           <Button
             variant="outline-light"
             className="flex-shrink-1 float-right ml-3"
@@ -305,6 +362,7 @@ class Select extends React.Component<SelectProps, SelectState> {
           >
             Close
           </Button>
+          </OverlayTrigger>
         </div>
 
         <Modal

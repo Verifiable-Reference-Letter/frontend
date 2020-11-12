@@ -8,6 +8,8 @@ import {
   Collapse,
   Col,
   Row,
+  Tooltip,
+  OverlayTrigger,
 } from "react-bootstrap";
 import UserProfile from "../common/UserProfile.interface";
 import UserAuth from "../common/UserAuth.interface";
@@ -524,95 +526,151 @@ class WriterLetterDisplay extends React.Component<
           >
             <div className="flex-fill">
               <span className="mr-3">For:</span>
-              <Button
-                variant="outline-light"
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  this.openProfileModal(letter.letterRequestor.publicAddress);
-                }}
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="main-buttons">
+                    <div>View {letter.letterRequestor?.name}'s profile</div>
+                  </Tooltip>
+                }
               >
-                {letter.letterRequestor?.name}
-              </Button>
+                <Button
+                  variant="outline-light"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    this.openProfileModal(letter.letterRequestor.publicAddress);
+                  }}
+                >
+                  {letter.letterRequestor?.name}
+                </Button>
+              </OverlayTrigger>
             </div>
 
             {numUnsentRecipients > 0 && letter.uploadedAt !== null && (
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="main-buttons">Send letter to recipients</Tooltip>
+                }
+              >
+                <Button
+                  // TODO: add Tooltip
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right ml-3"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    if (sendIsOpen) {
+                      this.closeSendModal();
+                    } else {
+                      this.openSendModal();
+                    }
+                  }}
+                >
+                  Send
+                </Button>
+              </OverlayTrigger>
+            )}
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  {uploadIsOpen ? "Close upload" : "Upload letter from device"}
+                </Tooltip>
+              }
+            >
+                <Button
+                  // TODO: add Tooltip
+                  disabled={numRecipients > 0}
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right ml-3"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    if (uploadIsOpen) {
+                      this.closeUploadModal();
+                    } else {
+                      this.openUploadModal();
+                    }
+                  }}
+                >
+                  Upload
+                </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  View letter for {letter.letterRequestor?.name}
+                </Tooltip>
+              }
+            >
+                <Button
+                  // TODO: add Tooltip
+                  disabled={letter.uploadedAt === null}
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right ml-3"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    if (viewIsOpen) {
+                      this.closeViewModal();
+                    } else {
+                      this.openViewModal();
+                    }
+                  }}
+                >
+                  View
+                </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  <div>
+                    {!historyIsOpen
+                      ? "Check who it has been sent to"
+                      : "Close letter history"}
+                  </div>
+                </Tooltip>
+              }
+            >
+                <Button
+                  // TODO: add Tooltip
+                  disabled={numRecipients === 0}
+                  variant="outline-light"
+                  className="flex-shrink-1 float-right ml-3"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    if (historyIsOpen) {
+                      this.closeHistoryModal();
+                    } else {
+                      this.openHistoryModal();
+                    }
+                  }}
+                >
+                  History
+                </Button>
+            </OverlayTrigger>
+            {/* <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  {!collapseIsOpen ? "See details" : "Close"}
+                </Tooltip>
+              }
+            >
               <Button
                 // TODO: add Tooltip
                 variant="outline-light"
                 className="flex-shrink-1 float-right ml-3"
                 onClick={(e: any) => {
                   e.stopPropagation();
-                  if (sendIsOpen) {
-                    this.closeSendModal();
-                  } else {
-                    this.openSendModal();
-                  }
+                  this.setState({ collapseIsOpen: !collapseIsOpen });
                 }}
+                aria-controls="example-collapse-text"
+                aria-expanded={collapseIsOpen}
               >
-                Send
+                *
               </Button>
-            )}
-            <Button
-              // TODO: add Tooltip
-              disabled={numRecipients > 0}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (uploadIsOpen) {
-                  this.closeUploadModal();
-                } else {
-                  this.openUploadModal();
-                }
-              }}
-            >
-              Upload
-            </Button>
-            <Button
-              // TODO: add Tooltip
-              disabled={letter.uploadedAt === null}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (viewIsOpen) {
-                  this.closeViewModal();
-                } else {
-                  this.openViewModal();
-                }
-              }}
-            >
-              View
-            </Button>
-            <Button
-              // TODO: add Tooltip
-              disabled={numRecipients === 0}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (historyIsOpen) {
-                  this.closeHistoryModal();
-                } else {
-                  this.openHistoryModal();
-                }
-              }}
-            >
-              History
-            </Button>
-            <Button
-              // TODO: add Tooltip
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.setState({ collapseIsOpen: !collapseIsOpen });
-              }}
-              aria-controls="example-collapse-text"
-              aria-expanded={collapseIsOpen}
-            >
-              *
-            </Button>
+            </OverlayTrigger> */}
           </Card.Header>
         </Card>
         <Collapse in={collapseIsOpen}>
@@ -649,7 +707,6 @@ class WriterLetterDisplay extends React.Component<
                 ></FileHistory>
               </div>
             )}
-            {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}
             {!uploadIsOpen && !historyIsOpen && (
               <div className="display-text d-flex text-white-50">
                 <div className="flex-fill">
@@ -661,7 +718,9 @@ class WriterLetterDisplay extends React.Component<
                   </div>
                 )}
                 {!letter.uploadedAt && (
-                  <div className=" flex-shrink-1 float-right">Not Uploaded</div>
+                  <div className=" flex-shrink-1 float-right">
+                    You have not uploaded the letter
+                  </div>
                 )}
               </div>
             )}

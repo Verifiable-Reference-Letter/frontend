@@ -34,14 +34,14 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
           <h3>Dashboard</h3>
         </Row>
         <Row className="dashboard-body d-flex h-100">
-        <Col className='mt-5 mb-5 mr-5'>
+        <Col className='mt-5 mb-5'>
             <Link to={ROUTES.REQUESTOR} className="text-white-50 h-100">
               <Card.Header className="dashboard-redirects h-100 d-flex justify-content-center align-items-center">
                 <h1>Requestor</h1>
               </Card.Header>
             </Link>
           </Col>
-          <Col className='mt-5 mb-5 mr-5'>
+          <Col className='mt-5 mb-5'>
             <Link to={ROUTES.WRITER} className="text-white-50 h-100">
               <Card.Header className="dashboard-redirects h-100 d-flex justify-content-center align-items-center">
                 <h1>Writer</h1>
