@@ -16,7 +16,7 @@ import FileData from "../../common/FileData.interface";
 import Letter from "../../common/LetterDetails.interface";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 
 import CryptService from "../../services/CryptService";
 
@@ -375,7 +375,7 @@ class Send extends React.Component<SendProps, SendState> {
                 </Tooltip>
               }
             >
-              <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+              <FontAwesomeIcon icon={faExclamationTriangle} size="lg" />
             </OverlayTrigger>
             <div className="ml-3">Failed to Retrieve Your Letter</div>
           </div>

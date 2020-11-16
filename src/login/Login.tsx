@@ -12,7 +12,10 @@ import "./Login.css";
 import CryptService from "../services/CryptService";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faInfoCircle,
+  faExclamationTriangle,
+} from "@fortawesome/free-solid-svg-icons";
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
 
@@ -537,7 +540,14 @@ class Login extends React.Component<LoginProps, LoginState> {
           <div>{loginMode ? loginDisplay : signupDisplay}</div>
           <div className="mt-3 d-flex justify-content-between">
             {/* <FontAwesomeIcon icon={faInfoCircle} size="lg" className="ml-3" /> */}
-            <OverlayTrigger
+            {(signingUp ||
+              failedKey ||
+              invalidEmail ||
+              invalidName ||
+              signUpSuccess ||
+              alreadySignedUp ||
+              failedSigning) && (
+                <OverlayTrigger
               placement="bottom"
               overlay={
                 <Tooltip id="learn-more">
@@ -600,13 +610,13 @@ class Login extends React.Component<LoginProps, LoginState> {
                       </div>
                     )}
                     {failedSigning && (
-                      <div>
+                      <div className="text-warning">
                         Please click <em>Sign</em> on Metamask to <b>Login</b>.
                         We need your signature to verify your identity. Learn
                         more about <b>Signing / Verification</b> in the FAQs.
                       </div>
                     )}
-                    {!signingUp &&
+                    {/* {!signingUp &&
                       !failedKey &&
                       !invalidEmail &&
                       !invalidName &&
@@ -629,13 +639,22 @@ class Login extends React.Component<LoginProps, LoginState> {
                             </div>
                           )}
                         </>
-                      )}
+                      )} */}
                   </>
                 </Tooltip>
               }
             >
-              <FontAwesomeIcon icon={faInfoCircle} size="lg" className="mr-3" />
-            </OverlayTrigger>
+              <FontAwesomeIcon
+                icon={
+                  (signingUp ||
+                  signUpSuccess)
+                    ? faInfoCircle
+                    : faExclamationTriangle
+                }
+                size="lg"
+                className="mr-3"
+              />
+            </OverlayTrigger>)}
             {signingUp && <div className="mt-1">See Metamask to signup</div>}
             {failedKey && <div className="mt-1">Error in signup process</div>}
             {invalidEmail && (
@@ -655,7 +674,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             )}
             {noAccount && <div className="mt-1">Please signup instead</div>}
             {failedSigning && <div className="mt-1">Failed to login</div>}
-            {!signingUp &&
+            {/* {!signingUp &&
               !failedKey &&
               !invalidEmail &&
               !invalidName &&
@@ -663,11 +682,9 @@ class Login extends React.Component<LoginProps, LoginState> {
               !alreadySignedUp &&
               !failedSigning && (
                 <div className="mt-1">
-                  {loginMode
-                    ? "Please authenticate"
-                    : "Fill out the form to signup"}
+                  {loginMode ? "" : "Fill out the form to signup"}
                 </div>
-              )}
+              )} */}
             <div className="flex-fill"></div>
           </div>
 

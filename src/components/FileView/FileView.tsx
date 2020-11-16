@@ -7,7 +7,7 @@ import {
   OverlayTrigger,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import LetterDetails from "../../common/LetterDetails.interface";
 import UserProfile from "../../common/UserProfile.interface";
 import FileData from "../../common/FileData.interface";
@@ -152,7 +152,7 @@ class FileView extends React.Component<FileViewProps, FileViewState> {
                       </Tooltip>
                     }
                   >
-                    <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+                    <FontAwesomeIcon icon={faExclamationTriangle} size="lg" />
                   </OverlayTrigger>
                   <div className="ml-3">Failed to Decrypt</div>
                 </div>

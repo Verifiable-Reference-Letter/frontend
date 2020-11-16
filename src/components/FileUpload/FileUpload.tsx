@@ -8,6 +8,8 @@ import {
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+
 import User from "../../common/UserAuth.interface";
 import "./FileUpload.css";
 import { DropdownDivider } from "react-bootstrap/Dropdown";
@@ -203,7 +205,8 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
                   }
                 >
                   <FontAwesomeIcon
-                    icon={faInfoCircle}
+                    icon={faExclamationTriangle}
+                    color="yellow"
                     size="lg"
                     className="ml-3"
                   />

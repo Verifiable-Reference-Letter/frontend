@@ -81,6 +81,7 @@ let web3Provider;
 
 let contract: any;
 const ERC20_NETWORK = "https://services.jade.builders/core-geth/kotti/1.11.2";
+
 export async function deployContract<T>(
   contractName: string,
   abi: any,
@@ -111,6 +112,7 @@ type MyState = {
   windowEthereum: boolean;
   numErcBeingTraded: number;
   contract: TutorialToken;
+  checkedLocal: boolean;
   connectedTo: boolean; // metamask
   loggedIn: boolean; // our app
   user: UserAuth;
@@ -123,6 +125,7 @@ class App extends React.Component<MyProps, MyState> {
       windowEthereum: true,
       numErcBeingTraded: 0,
       contract: {} as TutorialToken,
+      checkedLocal: false,
       connectedTo: false,
       loggedIn: false,
       user: { publicAddress: "", name: "", jwtToken: "" },
@@ -150,6 +153,7 @@ class App extends React.Component<MyProps, MyState> {
   async onConnect() {
     console.log("onConnect");
     const ethereum = (window as any).ethereum;
+    console.log(ethereum);
     if (ethereum) {
       await ethereum.enable();
       web3Provider = (window as any).web3.currentProvider;
@@ -174,46 +178,86 @@ class App extends React.Component<MyProps, MyState> {
 
       if (u != null) {
         let t = JSON.parse(u);
-
+        console.log(t);
         // need to check if different account, else do not set JWT
         if (user.publicAddress === t.publicAddress) {
-          user = {
-            publicAddress: t.publicAddress,
-            name: t.name,
-            jwtToken: t.jwtToken,
-          };
+          const verified: boolean = await this.checkJWT(t);
+          console.log(verified);
+          if (verified) {
+            user = {
+              publicAddress: t.publicAddress,
+              name: t.name,
+              jwtToken: t.jwtToken,
+            };
+            // this.props.history.push(ROUTES.DASHBOARD);
+            this.setState({
+              contract,
+              user,
+              loggedIn: true,
+              checkedLocal: true,
+              connectedTo: true,
+            });
+          } else {
+            // this.props.history.push(ROUTES.LOGIN);
+            this.setState({
+              contract,
+              user,
+              loggedIn: false,
+              checkedLocal: true,
+              connectedTo: true,
+            });
+          }
         }
+      } else {
+        this.setState({
+          contract,
+          connectedTo: true,
+          user: user,
+        });
       }
-
-      console.log(
-        "User from storage: " + user.publicAddress,
-        user.name,
-        user.jwtToken
-      );
-      this.setState({
-        contract,
-        connectedTo: true,
-        user: user,
-        loggedIn: user.jwtToken !== "",
-      });
-      // TODO: query here to check that jwt is correct
-
-      // const verified = await this.checkJWT(user);
-      const verified = true;
-      if (verified) {
-        this.props.history.push(ROUTES.DASHBOARD);
-      }
+      console.log(user.publicAddress, user.name, user.jwtToken);
     } else {
-      alert(
-        "Please download the Metamask browser extension (supported on Chrome & Firefox)"
-      );
+      // alert(
+      //   "Please download the Metamask browser extension (supported on Chrome & Firefox)"
+      // );
       this.setState({ windowEthereum: false });
       this.props.history.push(ROUTES.METAMASK_TUTORIAL);
+      // alert(
+      //   "Please download the Metamask browser extension (supported on Chrome & Firefox)"
+      // );
     }
   }
 
-  async checkJWT(user: UserAuth) {
-    
+  async checkJWT(user: UserAuth): Promise<boolean> {
+    console.log("checkJWT");
+    try {
+      // make any authed route request
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/${user.publicAddress}`,
+        {
+          body: JSON.stringify({
+            auth: {
+              jwtToken: user.jwtToken,
+              publicAddress: user.publicAddress,
+            },
+            data: [],
+          }),
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        }
+      );
+      console.log(response.status);
+      if (response.status === 401) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
   }
 
   onLogin(u: UserAuth) {
@@ -224,7 +268,13 @@ class App extends React.Component<MyProps, MyState> {
   }
 
   render() {
-    const { windowEthereum, connectedTo, loggedIn, user } = this.state;
+    const {
+      windowEthereum,
+      checkedLocal,
+      connectedTo,
+      loggedIn,
+      user,
+    } = this.state;
     const home = <HomePage user={user} />;
     const login = <LoginPage callback={this.onLogin.bind(this)} user={user} />;
     const dashboard = <DashboardPage user={user} />;
@@ -242,41 +292,43 @@ class App extends React.Component<MyProps, MyState> {
         />
         {/* {loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null} */}
         {/* {!windowEthereum ? <Redirect to={ROUTES.METAMASK_TUTORIAL} /> : null} */}
-        <div className="application-body">
-          <Switch>
-            <Route
-              path={NonAuthRoutes.login}
-              authed={loggedIn}
-              component={() => login}
-            />
-            <Route
-              exact
-              path={NonAuthRoutes.home}
-              authed={loggedIn}
-              component={() => home}
-            />
-            <AuthRoute
-              path={AuthRoutes.requestor}
-              authed={loggedIn}
-              Component={() => requestor}
-            />
-            <AuthRoute
-              path={AuthRoutes.writer}
-              authed={loggedIn}
-              Component={() => writer}
-            />
-            <AuthRoute
-              path={AuthRoutes.recipient}
-              authed={loggedIn}
-              Component={() => recipient}
-            />
-            <AuthRoute
-              path={AuthRoutes.dashboard}
-              authed={loggedIn}
-              Component={() => dashboard}
-            />
-          </Switch>
-        </div>
+        {checkedLocal && (
+          <div className="application-body">
+            <Switch>
+              <Route
+                path={NonAuthRoutes.login}
+                authed={loggedIn}
+                component={() => login}
+              />
+              <Route
+                exact
+                path={NonAuthRoutes.home}
+                authed={loggedIn}
+                component={() => home}
+              />
+              <AuthRoute
+                path={AuthRoutes.requestor}
+                authed={loggedIn}
+                Component={() => requestor}
+              />
+              <AuthRoute
+                path={AuthRoutes.writer}
+                authed={loggedIn}
+                Component={() => writer}
+              />
+              <AuthRoute
+                path={AuthRoutes.recipient}
+                authed={loggedIn}
+                Component={() => recipient}
+              />
+              <AuthRoute
+                path={AuthRoutes.dashboard}
+                authed={loggedIn}
+                Component={() => dashboard}
+              />
+            </Switch>
+          </div>
+        )}
       </div>
     );
   }
