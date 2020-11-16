@@ -8,6 +8,8 @@ import {
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+
 import User from "../../common/UserAuth.interface";
 import "./FileUpload.css";
 import { DropdownDivider } from "react-bootstrap/Dropdown";
@@ -193,7 +195,7 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
                     <Tooltip id="learn-more">
                       <>
                         <div>
-                          Please click <em>Confirm</em> on Metamask. We need
+                          Please click <em>Provide</em> on Metamask. We need
                           your <b>Public Key</b> to encrypt your letter. This
                           keeps your letters secure so that only you can view
                           it. See <b>End-to-End Encryption</b> in the FAQs.
@@ -203,7 +205,8 @@ class FileUpload extends React.Component<FileUploadProps, FileUploadState> {
                   }
                 >
                   <FontAwesomeIcon
-                    icon={faInfoCircle}
+                    icon={faExclamationTriangle}
+                    color="yellow"
                     size="lg"
                     className="ml-3"
                   />
