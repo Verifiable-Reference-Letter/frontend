@@ -207,12 +207,21 @@ class App extends React.Component<MyProps, MyState> {
               connectedTo: true,
             });
           }
+        } else {
+          this.setState({
+            contract,
+            connectedTo: true,
+            user,
+            checkedLocal: true,
+          });
         }
       } else {
+        console.log("")
         this.setState({
           contract,
           connectedTo: true,
-          user: user,
+          user,
+          checkedLocal: true,
         });
       }
       console.log(user.publicAddress, user.name, user.jwtToken);
