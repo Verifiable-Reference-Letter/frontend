@@ -2,3 +2,7 @@
   height: calc(100vh - 110px);
   overflow-y: scroll;
 }
+
+svg.svg-inline--fa.fa-exclamation-triangle {
+  color: rgba(220, 0, 0, .5);
+}

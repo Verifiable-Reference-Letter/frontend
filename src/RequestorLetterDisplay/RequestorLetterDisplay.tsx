@@ -8,6 +8,8 @@ import {
   Collapse,
   Col,
   Row,
+  Tooltip,
+  OverlayTrigger,
 } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import UserProfile from "../common/UserProfile.interface";
@@ -42,6 +44,7 @@ interface RequestorLetterDisplayState {
   confirmIsOpen: boolean;
   collapseIsOpen: boolean;
   previouslySelectedRecipients: User[];
+  sentRecipients: User[];
   selectedRecipients: User[];
   selectedPublicAddress?: string;
   selectedUserProfile?: UserProfile;
@@ -66,6 +69,7 @@ class RequestorLetterDisplay extends React.Component<
       confirmIsOpen: false,
       collapseIsOpen: false,
       previouslySelectedRecipients: [],
+      sentRecipients: [],
       selectedRecipients: [],
     };
 
@@ -108,7 +112,7 @@ class RequestorLetterDisplay extends React.Component<
         const data: User[] = body.data;
         console.log(response);
         console.log(data);
-        if (data && data.length !== 0) {
+        if (data) {
           this.setState({
             selectIsOpen: false,
             confirmIsOpen: false,
@@ -135,7 +139,8 @@ class RequestorLetterDisplay extends React.Component<
   async openSelectModal() {
     console.log("on send click");
     // fetch backend to get recipients list (who the letter has not been sent to)
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/unsentRecipients`;
+    const unsentUrl = `/api/v1/letters/${this.props.letter.letterId}/unsentRecipients`;
+    const sentUrl = `/api/v1/letters/${this.props.letter.letterId}/sentRecipients`;
 
     if (this.state.previouslySelectedRecipients.length === 0) {
       this.setState({
@@ -143,7 +148,8 @@ class RequestorLetterDisplay extends React.Component<
         collapseIsOpen: true,
         selectIsOpen: true,
       });
-      this.retrieveUnsentRecipientsFromServer(fetchUrl);
+      await this.retrieveUnsentRecipientsFromServer(unsentUrl);
+      await this.retrieveSentRecipientsFromServer(sentUrl);
     } else {
       this.setState({
         selectIsOpen: true,
@@ -188,8 +194,64 @@ class RequestorLetterDisplay extends React.Component<
         console.log(data);
         this.setState({
           previouslySelectedRecipients: data,
-          loadingSelect: false,
+          // loadingSelect: false,
         });
+      }
+    } catch (e) {
+      console.log(e);
+      this.setState({
+        loadingSelect: false,
+        // selectIsOpen: false,
+        // collapseIsOpen: this.state.historyIsOpen,
+      });
+    }
+  }
+
+  async retrieveSentRecipientsFromServer(fetchUrl: string) {
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth: {
+          jwtToken: this.props.user.jwtToken,
+          publicAddress: this.props.user.publicAddress,
+        },
+        data: {},
+      }),
+    };
+
+    try {
+      let response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${fetchUrl}`,
+        init
+      );
+      if (response.status === 400) {
+        console.log(response.status);
+        this.setState({
+          loadingSelect: false,
+          // selectIsOpen: false,
+          // collapseIsOpen: this.state.historyIsOpen,
+        });
+      } else {
+        let body = await response.json();
+
+        const data: User[] = body.data;
+        console.log(response);
+        console.log(data);
+        if (data) {
+          this.setState({
+            sentRecipients: data,
+            loadingSelect: false,
+          });
+        } else {
+          this.setState({
+            loadingSelect: false,
+          });
+        }
+
       }
     } catch (e) {
       console.log(e);
@@ -387,6 +449,7 @@ class RequestorLetterDisplay extends React.Component<
       confirmIsOpen,
       collapseIsOpen,
       previouslySelectedRecipients,
+      sentRecipients,
       selectedRecipients,
       selectedPublicAddress,
     } = this.state;
@@ -400,58 +463,102 @@ class RequestorLetterDisplay extends React.Component<
           >
             <div className="flex-fill">
               <span className="mr-3">From:</span>
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="main-buttons">
+                    <div>View {letter.letterWriter?.name}'s profile</div>
+                  </Tooltip>
+                }
+              >
+                <Button
+                  variant="outline-light"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    this.openProfileModal(letter.letterWriter.publicAddress);
+                  }}
+                >
+                  {letter.letterWriter?.name}
+                </Button>
+              </OverlayTrigger>
+            </div>
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-button">
+                  <div>
+                    {!selectIsOpen ? "Edit the list of intended recipients" : "Close edit"}
+                  </div>
+                </Tooltip>
+              }
+            >
               <Button
+                // TODO: add Tooltip
                 variant="outline-light"
+                className="flex-shrink-1 float-right ml-3"
                 onClick={(e: any) => {
                   e.stopPropagation();
-                  this.openProfileModal(letter.letterWriter.publicAddress);
+                  if (selectIsOpen) {
+                    this.closeSelectModal();
+                  } else {
+                    this.openSelectModal();
+                  }
                 }}
               >
-                {letter.letterWriter?.name}
+                Edit
               </Button>
-            </div>
-            <Button
-              // TODO: add Tooltip
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (selectIsOpen) {
-                  this.closeSelectModal();
-                } else {
-                  this.openSelectModal();
-                }
-              }}
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-button">
+                  <div>
+                      {!historyIsOpen
+                      ? "Check who it has been sent to"
+                      : "Close letter history"}
+                  </div>
+                </Tooltip>
+              }
             >
-              Edit
-            </Button>
-            <Button
-              disabled={numRecipients === 0}
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                if (historyIsOpen) {
-                  this.closeHistoryModal();
-                } else {
-                  this.openHistoryModal();
-                }
-              }}
+              <span>
+              <Button
+                disabled={numRecipients === 0}
+                variant="outline-light"
+                className="flex-shrink-1 float-right ml-3"
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  if (historyIsOpen) {
+                    this.closeHistoryModal();
+                  } else {
+                    this.openHistoryModal();
+                  }
+                }}
+              >
+                History
+              </Button>
+              </span>
+            </OverlayTrigger>
+            {/* <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id="main-buttons">
+                  {!collapseIsOpen ? "See details" : "Close"}
+                </Tooltip>
+              }
             >
-              History
-            </Button>
-            <Button
-              variant="outline-light"
-              className="flex-shrink-1 float-right ml-3"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                this.setState({ collapseIsOpen: !collapseIsOpen });
-              }}
-              aria-controls="example-collapse-text"
-              aria-expanded={collapseIsOpen}
-            >
-              *
-            </Button>
+              <Button
+                variant="outline-light"
+                className="flex-shrink-1 float-right ml-3"
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  this.setState({ collapseIsOpen: !collapseIsOpen });
+                }}
+                aria-controls="example-collapse-text"
+                aria-expanded={collapseIsOpen}
+              >
+                *
+              </Button>
+            </OverlayTrigger> */}
           </Card.Header>
         </Card>
         <Collapse in={collapseIsOpen}>
@@ -475,10 +582,18 @@ class RequestorLetterDisplay extends React.Component<
                   header="Edit Recipients"
                   onClose={this.closeSelectModal.bind(this)}
                   onSubmit={this.openMessageModal.bind(this)}
-                  users={users.filter(
-                    (user: User) =>
-                      user.publicAddress !== letter.letterWriter.publicAddress
-                  )}
+                  users={users.filter((user: User) => {
+                    let b =
+                      user.publicAddress !== letter.letterWriter.publicAddress;
+                    if (b) {
+                      for (let i = 0; i < sentRecipients.length; i++) {
+                        b =
+                          user.publicAddress !==
+                          sentRecipients[i]?.publicAddress;
+                      }
+                    }
+                    return b;
+                  })}
                 ></Select>
               </div>
             )}
@@ -500,7 +615,6 @@ class RequestorLetterDisplay extends React.Component<
                 ></FileHistory>
               </div>
             )}
-            {(loadingHistory || historyIsOpen) && <div className="mb-5"></div>}
             {!selectIsOpen && !historyIsOpen && (
               <div className="display-text d-flex text-white-50">
                 <div className="flex-fill">
@@ -512,7 +626,7 @@ class RequestorLetterDisplay extends React.Component<
                   </div>
                 )}
                 {!letter.uploadedAt && (
-                  <div className=" flex-shrink-1 float-right">Not Uploaded</div>
+                  <div className=" flex-shrink-1 float-right">Your letter has not been uploaded</div>
                 )}
               </div>
             )}

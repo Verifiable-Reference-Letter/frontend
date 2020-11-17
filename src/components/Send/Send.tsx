@@ -7,6 +7,8 @@ import {
   Card,
   Collapse,
   Form,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
 import UserAuth from "../../common/UserAuth.interface";
 import UserKey from "../../common/UserKey.interface";
@@ -14,6 +16,8 @@ import FileData from "../../common/FileData.interface";
 import Letter from "../../common/LetterDetails.interface";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+
 import CryptService from "../../services/CryptService";
 
 import "./Send.css";
@@ -26,7 +30,11 @@ interface SendProps {
 }
 interface SendState {
   loadingContents: boolean;
+  failedLoad: boolean;
+  signingLetter: boolean;
+  failedSigning: boolean;
   sending: boolean;
+  sendSuccess: boolean;
   encrypted: boolean[];
   encryptedLetter?: FileData;
 }
@@ -48,7 +56,11 @@ class Send extends React.Component<SendProps, SendState> {
 
     this.state = {
       loadingContents: true,
+      failedLoad: false,
+      signingLetter: false,
+      failedSigning: false,
       sending: false,
+      sendSuccess: false,
       encrypted: e,
     };
     this.cryptService = new CryptService();
@@ -62,45 +74,88 @@ class Send extends React.Component<SendProps, SendState> {
     );
   }
 
-  async encryptAndUpload(key: number, userKey: UserKey) {
-    console.log("Pub key is: " + userKey.publicKey);
-    console.log("State url: " + this.state.encryptedLetter);
+  async encryptSignAndUpload(key: number, userKey: UserKey) {
+    this.setState({ failedLoad: false, failedSigning: false, sendSuccess: false, });
+    try {
+      console.log("Pub key is: " + userKey.publicKey);
+      console.log("State url: " + this.state.encryptedLetter);
 
-    if (!this.state.encryptedLetter) return;
-    let encryptedLetter = await this.cryptService.encryptSend(
-      this.state.encryptedLetter,
-      userKey.publicKey
-    );
-    console.log("Encrypted letter: " + encryptedLetter);
+      if (!this.state.encryptedLetter) return;
 
-    let signedLetter = await this.cryptService.signLetter(
-      encryptedLetter,
-      this.props.user.publicAddress
-    );
-    console.log("Signed letter: " + signedLetter);
+      // this does not prompt the user with metamask
+      let encryptedLetter = await this.cryptService.encryptSend(
+        this.state.encryptedLetter,
+        userKey.publicKey
+      );
+      console.log("Encrypted letter: " + encryptedLetter);
 
-    const encryptedLetterForm: {
-      letterContents: string;
-      letterSignature: string;
-      letterRecipient: string;
-    } = {
-      letterContents: encryptedLetter,
-      letterSignature: signedLetter,
-      letterRecipient: userKey.publicAddress,
-    };
+      this.setState({ signingLetter: true });
 
-    this.setState({ sending: true });
+      // this padding is necessary for correct signature and verification of encrypted recipient letters
+      // the first 10 characters are 'encrypted:'
+      let signedLetter = await this.cryptService.signLetter(
+        "encrypted:" + encryptedLetter,
+        this.props.user.publicAddress
+      );
+      this.setState({ signingLetter: false });
+      console.log("Signed letter: " + signedLetter);
 
-    const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientContents/update`;
-    const success = await this.uploadEncryptedLetterForm(
-      fetchUrl,
-      encryptedLetterForm
-    );
-    // const success = true;
-    if (success) {
-      let encrypted = [...this.state.encrypted];
-      encrypted[key] = true;
-      this.setState({ encrypted: encrypted, sending: false });
+      const encryptedLetterForm: {
+        letterContents: string;
+        letterSignature: string;
+        letterRecipient: string;
+      } = {
+        letterContents: encryptedLetter,
+        letterSignature: signedLetter,
+        letterRecipient: userKey.publicAddress,
+      };
+
+      this.setState({ sending: true });
+
+      const fetchUrl = `/api/v1/letters/${this.props.letter.letterId}/recipientContents/update`;
+      const success = await this.uploadEncryptedLetterForm(
+        fetchUrl,
+        encryptedLetterForm
+      );
+      // const success = true;
+      // check if letter sent successfully
+      if (success) {
+        let encrypted = [...this.state.encrypted];
+        encrypted[key] = true;
+        this.setState({
+          encrypted: encrypted,
+          sending: false,
+          sendSuccess: true,
+        });
+      } else {
+        this.setState({
+          sending: false,
+        });
+      }
+    } catch (e) {
+      if (this.state.signingLetter) {
+        // user likely canceled the metamask signing transaction
+        console.log("failed signing");
+        this.setState({
+          signingLetter: false,
+          sending: false,
+          failedSigning: true,
+        });
+      } else if (this.state.sending) {
+        // possible network error?
+        console.log("failed upload");
+        this.setState({
+          signingLetter: false,
+          sending: false,
+        });
+      } else {
+        // maybe something wrong with the key (yikes)
+        console.log("failed encryption or other");
+        this.setState({
+          signingLetter: false,
+          sending: false,
+        });
+      }
     }
   }
 
@@ -179,6 +234,13 @@ class Send extends React.Component<SendProps, SendState> {
                   loadingContents: false,
                 });
               }
+            })
+            .catch((e: Error) => {
+              console.log("failed to decrypt letter");
+              this.setState({
+                loadingContents: false,
+                failedLoad: true,
+              });
             });
         } else {
           console.log("Letter retrieval in send failed");
@@ -191,7 +253,15 @@ class Send extends React.Component<SendProps, SendState> {
 
   render() {
     const { user, letter, unsentRecipientKeys } = this.props;
-    const { loadingContents, sending, encrypted } = this.state;
+    const {
+      loadingContents,
+      failedLoad,
+      signingLetter,
+      failedSigning,
+      sending,
+      sendSuccess,
+      encrypted,
+    } = this.state;
 
     let recipientList = [];
     if (unsentRecipientKeys) {
@@ -205,7 +275,7 @@ class Send extends React.Component<SendProps, SendState> {
                     className="flex-fill send-entry"
                     onClick={() => {
                       if (!encrypted[i]) {
-                        this.encryptAndUpload(i, unsentRecipientKeys[i]);
+                        this.encryptSignAndUpload(i, unsentRecipientKeys[i]);
                       }
                     }}
                   >
@@ -213,13 +283,22 @@ class Send extends React.Component<SendProps, SendState> {
                   </Card.Header>
 
                   {encrypted[i] && (
-                    <FontAwesomeIcon
-                      icon={faCheckSquare}
-                      size="lg"
-                      className="send-check-square"
-                    />
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="learn-more">
+                          <div>Letter has been sent!</div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faCheckSquare}
+                        size="lg"
+                        className="send-check-square"
+                      />
+                    </OverlayTrigger>
                   )}
-                  {!encrypted[i] && !sending && (
+                  {!encrypted[i] && (
                     <div className="send-check-square-placeholder"></div>
                   )}
                 </div>
@@ -233,7 +312,7 @@ class Send extends React.Component<SendProps, SendState> {
                       className="flex-fill send-entry"
                       onClick={() => {
                         if (!encrypted[i + 1]) {
-                          this.encryptAndUpload(
+                          this.encryptSignAndUpload(
                             i + 1,
                             unsentRecipientKeys[i + 1]
                           );
@@ -243,11 +322,20 @@ class Send extends React.Component<SendProps, SendState> {
                       {unsentRecipientKeys[i + 1].name}
                     </Card.Header>
                     {encrypted[i + 1] && (
-                      <FontAwesomeIcon
-                        icon={faCheckSquare}
-                        size="lg"
-                        className="send-check-square"
-                      />
+                      <OverlayTrigger
+                        placement="bottom"
+                        overlay={
+                          <Tooltip id="learn-more">
+                            <div>Letter has been sent!</div>
+                          </Tooltip>
+                        }
+                      >
+                        <FontAwesomeIcon
+                          icon={faCheckSquare}
+                          size="lg"
+                          className="send-check-square"
+                        />
+                      </OverlayTrigger>
                     )}
                     {!encrypted[i + 1] && (
                       <div className="send-check-square-placeholder"></div>
@@ -271,12 +359,36 @@ class Send extends React.Component<SendProps, SendState> {
 
     return (
       <>
-        {!loadingContents && (
+        {!loadingContents && failedLoad && (
+          <div className="d-flex justify-content-center mb-3">
+            <OverlayTrigger
+              placement="bottom"
+              overlay={
+                <Tooltip id="learn-more">
+                  <div>
+                    Please click <em>Decrypt</em> on Metamask to retrieve your
+                    encrypted letter. This is because we use Metamask to keep
+                    your letters <b>secure</b> and need to decrypt it before we
+                    can send it. This is step 1 of 3-step process. Learn more in
+                    the FAQs.
+                  </div>
+                </Tooltip>
+              }
+            >
+              <FontAwesomeIcon icon={faExclamationTriangle} size="lg" />
+            </OverlayTrigger>
+            <div className="ml-3">Failed to Retrieve Your Letter</div>
+          </div>
+        )}
+        {!loadingContents && !failedLoad && (
           <Col>
             {unsentRecipientKeys && (
-              <Row>
-                <Col>{recipientList}</Col>
-              </Row>
+              <>
+                {/* <Row className="mb-2">Select a Recipient:</Row> */}
+                <Row>
+                  <Col>{recipientList}</Col>
+                </Row>
+              </>
             )}
             {(!unsentRecipientKeys || unsentRecipientKeys.length === 0) && (
               <Row className="d-flex justify-content-center">
@@ -287,8 +399,104 @@ class Send extends React.Component<SendProps, SendState> {
                 />
               </Row>
             )}
-            <Row className="d-flex justify-content-end">
-              <div className="mt-3 mr-3">
+            <Row className="d-flex justify-content-between">
+              <div className="d-flex justify-content-between mt-4 ml-4 text-info float-left flex-fill">
+                {signingLetter && !sending && (
+                  <div className="d-flex justify-content-between">
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="learn-more">
+                          <div>
+                            We ask you to <b>sign</b> your letter as{" "}
+                            <b>proof</b> that this letter is from you. Your{" "}
+                            <b>signature</b> will give the recipient confidence
+                            that the letter is authentic. Learn more about{" "}
+                            <b>Signing / Verification</b> in the FAQS.
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        size="lg"
+                        className="mr-3"
+                      />
+                    </OverlayTrigger>
+                    <div>See Metamask to Sign Your Letter</div>
+                  </div>
+                )}
+                {failedSigning && !sending && !signingLetter && (
+                  <div className="d-flex justify-content-between">
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="learn-more">
+                          <div>
+                            Please click <em>Sign</em> on Metamask to sign your
+                            letter. Your <b>signature</b> will give the
+                            recipient confidence that the letter is authentic.
+                            Learn more about <b>Signing / Verification</b> in
+                            the FAQS.
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+                    </OverlayTrigger>
+                    <div className="ml-3">Failed to Sign Your Letter</div>
+                  </div>
+                )}
+
+                {sending && !signingLetter && (
+                  <div className="d-flex justify-content-between">
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="learn-more">
+                          <div>
+                            Verifying your encrypted letter and the signature.
+                            Your <b>signature</b> will give the recipient
+                            confidence that the letter is authentic. Learn more
+                            about <b>Signing / Verification</b> in the FAQS.
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        size="lg"
+                        className="mr-3"
+                      />
+                    </OverlayTrigger>
+                    <div> Sending Your Letter . . . </div>
+                  </div>
+                )}
+                {sendSuccess && !sending && !signingLetter && (
+                  <div className="d-flex justify-content-between">
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="learn-more">
+                          <div>
+                            Your letter has been sent! You can continue to send
+                            letters to recipients or click <b>Close</b> to
+                            finish the session. Learn more in the FAQS.
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        size="lg"
+                        className="mr-3"
+                      />
+                    </OverlayTrigger>
+                    <div>Your letter has been sent!</div>
+                  </div>
+                )}
+              </div>
+              <div className="mt-3 mr-3 flex-shrink-1">
                 {sending && <Spinner animation="border" variant="secondary" />}
               </div>
               <Button
@@ -304,9 +512,34 @@ class Send extends React.Component<SendProps, SendState> {
         )}
 
         {loadingContents && (
-          <div className="d-flex justify-content-center mb-3">
-            <Spinner className="mb-3" animation="border" variant="secondary" />
-          </div>
+          <>
+            {/* <div className="d-flex justify-content-center mb-3">
+              <Spinner
+                className="mb-3"
+                animation="border"
+                variant="secondary"
+              />
+            </div> */}
+            <div className="d-flex justify-content-center mb-3">
+              <OverlayTrigger
+                placement="bottom"
+                overlay={
+                  <Tooltip id="learn-more">
+                    <div>
+                      We use Metamask to keep your letters <b>secure</b> and{" "}
+                      <b>verifiable</b>. To send your letter, we must 1.
+                      Retrieve and Decrypt your letter. 2. Encrypt your letter (
+                      <em>w/ the Recipient's key</em>) 3. Sign the Letter. Learn
+                      more about this proces in the FAQs.
+                    </div>
+                  </Tooltip>
+                }
+              >
+                <FontAwesomeIcon icon={faInfoCircle} size="lg" />
+              </OverlayTrigger>
+              <div className="ml-3">See Metamask to start sending</div>
+            </div>
+          </>
         )}
       </>
     );
