@@ -301,18 +301,7 @@ class App extends React.Component<MyProps, MyState> {
           onConnect={this.onConnect}
           loggedIn={loggedIn}
         />
-<<<<<<< HEAD
         <FrontPage/>
-        {this.state.loggedIn ? <Redirect to={ROUTES.REQUESTOR} /> : null}
-        <div className="application-body">
-          <Route exact path={ROUTES.HOME} render={() => home} />
-          <Route exact path={ROUTES.LOGIN} render={() => login} />
-          <Route exact path={ROUTES.DASHBOARD} render={() => dashboard} />
-          <Route exact path={ROUTES.REQUESTOR} render={() => requestor} />
-          <Route exact path={ROUTES.WRITER} render={() => writer} />
-          <Route exact path={ROUTES.RECIPIENT} render={() => recipient} />
-        </div>
-=======
         {/* {loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null} */}
         {/* {!windowEthereum ? <Redirect to={ROUTES.METAMASK_TUTORIAL} /> : null} */}
         {checkedLocal && (
@@ -352,7 +341,6 @@ class App extends React.Component<MyProps, MyState> {
             </Switch>
           </div>
         )}
->>>>>>> origin/master
       </div>
     );
   }
