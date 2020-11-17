@@ -11,6 +11,7 @@ import RequestorPage from "./requestor/Requestor";
 import RecipientPage from "./recipient/Recipient";
 import LoginPage from "./login/Login";
 import DashboardPage from "./dashboard/Dashboard";
+import FrontPage from "./frontPage/FrontPage";
 
 import UserAuth from "./common/UserAuth.interface";
 import "./App.css";
@@ -131,12 +132,14 @@ class App extends React.Component<MyProps, MyState> {
 
     return (
       <div>
+        
         <Nav
           user={this.state.user}
           connectedTo={this.state.connectedTo}
           onConnect={this.onConnect}
           loggedIn={this.state.loggedIn}
         />
+        <FrontPage/>
         {this.state.loggedIn ? <Redirect to={ROUTES.REQUESTOR} /> : null}
         <div className="application-body">
           <Route exact path={ROUTES.HOME} render={() => home} />
