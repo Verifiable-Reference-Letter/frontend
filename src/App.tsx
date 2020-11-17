@@ -27,6 +27,7 @@ import "./App.css";
 import * as ROUTES from "./routes";
 
 import Web3 from "web3";
+import MessageSender from "./MessageSender";
 export let web3: Web3;
 export let ethereum: any;
 
@@ -293,6 +294,7 @@ class App extends React.Component<MyProps, MyState> {
     const recipient = <RecipientPage user={user} />;
 
     return (
+      <MessageSender>
       <div>
         
         <Nav
@@ -342,6 +344,7 @@ class App extends React.Component<MyProps, MyState> {
           </div>
         )}
       </div>
+      </MessageSender>
     );
   }
 }

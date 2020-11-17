@@ -21,6 +21,8 @@ import ResponseBody from "../common/ResponseBody.interface";
 
 import { web3 } from "../App";
 
+import MContext from "../MessageSender";
+
 interface LoginProps {
   user: UserAuth;
   callback: (u: UserAuth) => void;
@@ -450,15 +452,19 @@ class Login extends React.Component<LoginProps, LoginState> {
   render() {
     const loginDisplay = (
       <div className="button-blur d-flex justify-content-between">
-        <Button
-          variant="outline-light"
-          className="mr-3 flex-shrink-1"
-          onClick={() => {
-            this.toggleMode();
+        <MContext.Consumer>
+          {(context: { setMessage: (arg0: boolean) => null; })=> {<Button
+            variant="outline-light"
+            className="mr-3 flex-shrink-1"
+            onClick={() => {     
+              this.toggleMode();           
+                context.setMessage(loginMode);
+            }}
+            >
+            Sign Up
+          </Button>
           }}
-        >
-          Sign Up
-        </Button>
+        </MContext.Consumer>
         <Button
           variant="outline-light"
           className="flex-fill"
