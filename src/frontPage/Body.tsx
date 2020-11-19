@@ -1,11 +1,11 @@
 import React from "react";
 
-function Body(props: { className: string; img: string; title: string; description: string; }) {
+function Body(props: { className: string; image: string; title: string; description: string; }) {
     return (
         <div className={props.className} >
             <div className="small-div">
                 <i className={props.className}></i>
-                <img src='./metamask.png' alt='' />
+                <img src={props.image} alt='' />
             </div>
 
             <div className="big-div">

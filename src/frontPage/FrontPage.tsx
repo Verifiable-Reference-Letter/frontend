@@ -2,6 +2,7 @@ import React from "react";
 import './FrontPage.css';
 import Header from "./Header";
 import Body from "./Body";
+import metamask from "./metamask.png";
 // import SlideDeck from "./SlideDeck";
 
 
@@ -12,7 +13,7 @@ class FrontPage extends React.Component {
                 <Header />
                 <Body
                     className='section'
-                    img='./Capture1.PNG'
+                    image='./Capture1.PNG'
                     title='About the Company'
                     description='Team Gas and the verifiable reference letter service aim to streamline and digitize the process of sending reference letters.
                                 Currently the process can be a major hassle, especially if professors have many requests from their students. They must send a physical letter
@@ -23,7 +24,7 @@ class FrontPage extends React.Component {
 
                 <Body
                     className='section bg-grey'
-                    img='./metamask.PNG'
+                    image={metamask}
                     title='How it Works'
                     description='You can start using our service by creating a Metamask account and then creating an account with us.
                                 
@@ -43,7 +44,7 @@ class FrontPage extends React.Component {
 
                 <Body
                     className='section bg-darkgrey'
-                    img='./Capture1.PNG'
+                    image='./Capture1.PNG'
                     title='Our Mission'
                     description='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                                 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
