@@ -201,7 +201,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             signingUp: false,
             failedKey: false,
             invalidEmail: false,
-            invalidName: true,
+            invalidName: false,
             signUpSuccess: false,
             alreadySignedUp: false,
             noAccount: true,
@@ -652,6 +652,7 @@ class Login extends React.Component<LoginProps, LoginState> {
               invalidName ||
               signUpSuccess ||
               alreadySignedUp ||
+              noAccount ||
               failedSigning ||
               loggingIn ||
               notVerified ||
@@ -701,8 +702,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                       {signUpSuccess && (
                         <div>
                           You've successfully signed up. Please check your{" "}
-                          <b>Email</b>
-                          to verify your identity!{" "}
+                          <b>Email</b> to verify your identity!{" "}
                         </div>
                       )}
                       {alreadySignedUp && (
@@ -755,6 +755,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                       !invalidName &&
                       !signUpSuccess &&
                       !alreadySignedUp &&
+                      !noAccount &&
                       !failedSigning && !loggingIn && !notVerified && !failedLogin && (
                         <>
                           {loginMode && (
@@ -827,6 +828,7 @@ class Login extends React.Component<LoginProps, LoginState> {
               !invalidName &&
               !signUpSuccess &&
               !alreadySignedUp &&
+              !noAccount &&
               !failedSigning && !loggingIn && !notVerified && !failedLogin && (
                 <div className="mt-1">
                   {loginMode ? "" : "Fill out the form to signup"}
