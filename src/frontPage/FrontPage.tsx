@@ -2,13 +2,12 @@ import React from "react";
 import './FrontPage.css';
 import Header from "./Header";
 import Body from "./Body";
-import MContext from "../MessageSender";
 // import SlideDeck from "./SlideDeck";
 
 
 class FrontPage extends React.Component {
     render() {
-        const body = (
+        return (
             <div id="body">
                 <Header />
                 <Body
@@ -54,18 +53,10 @@ class FrontPage extends React.Component {
                                 pariatur.'
                 />
             </div>
-        )
-        const blank = (
-            <div></div>
-        )
-        return (
-            <div>
-                <MContext.Consumer>
-                    {(context: { state: { message: boolean; }; }) => (
-                        <p>{context.state.message}</p>)}
-                </MContext.Consumer>
-            </div>
         );
+            
+
+
     }
 }
 

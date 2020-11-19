@@ -18,10 +18,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
-
+import FrontPage from "../frontPage/FrontPage";
 import { web3 } from "../App";
-
-import MContext from "../MessageSender";
 
 interface LoginProps {
   user: UserAuth;
@@ -452,19 +450,15 @@ class Login extends React.Component<LoginProps, LoginState> {
   render() {
     const loginDisplay = (
       <div className="button-blur d-flex justify-content-between">
-        <MContext.Consumer>
-          {(context: { setMessage: (arg0: boolean) => null; })=> {<Button
-            variant="outline-light"
-            className="mr-3 flex-shrink-1"
-            onClick={() => {     
-              this.toggleMode();           
-                context.setMessage(loginMode);
-            }}
-            >
-            Sign Up
-          </Button>
+        <Button
+          variant="outline-light"
+          className="mr-3 flex-shrink-1"
+          onClick={() => {
+            this.toggleMode();
           }}
-        </MContext.Consumer>
+        >
+          Sign Up
+        </Button>
         <Button
           variant="outline-light"
           className="flex-fill"
@@ -696,7 +690,9 @@ class Login extends React.Component<LoginProps, LoginState> {
 
           {/* <div className="alert"> {this.state.displayMessage}</div> */}
         </div>
+        <FrontPage/>
       </div>
+
     );
   }
 }

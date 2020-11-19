@@ -20,14 +20,12 @@ import RequestorPage from "./requestor/Requestor";
 import RecipientPage from "./recipient/Recipient";
 import LoginPage from "./login/Login";
 import DashboardPage from "./dashboard/Dashboard";
-import FrontPage from "./frontPage/FrontPage";
 
 import UserAuth from "./common/UserAuth.interface";
 import "./App.css";
 import * as ROUTES from "./routes";
 
 import Web3 from "web3";
-import MessageSender from "./MessageSender";
 export let web3: Web3;
 export let ethereum: any;
 
@@ -294,27 +292,13 @@ class App extends React.Component<MyProps, MyState> {
     const recipient = <RecipientPage user={user} />;
 
     return (
-      <MessageSender>
       <div>
-        
         <Nav
           user={user}
           connectedTo={connectedTo}
           onConnect={this.onConnect}
           loggedIn={loggedIn}
         />
-<<<<<<< HEAD
-        <FrontPage/>
-        {this.state.loggedIn ? <Redirect to={ROUTES.REQUESTOR} /> : null}
-        <div className="application-body">
-          <Route exact path={ROUTES.HOME} render={() => home} />
-          <Route exact path={ROUTES.LOGIN} render={() => login} />
-          <Route exact path={ROUTES.DASHBOARD} render={() => dashboard} />
-          <Route exact path={ROUTES.REQUESTOR} render={() => requestor} />
-          <Route exact path={ROUTES.WRITER} render={() => writer} />
-          <Route exact path={ROUTES.RECIPIENT} render={() => recipient} />
-        </div>
-=======
         {/* {loggedIn ? <Redirect to={ROUTES.DASHBOARD} /> : null} */}
         {/* {!windowEthereum ? <Redirect to={ROUTES.METAMASK_TUTORIAL} /> : null} */}
         {checkedLocal && (
@@ -354,9 +338,7 @@ class App extends React.Component<MyProps, MyState> {
             </Switch>
           </div>
         )}
->>>>>>> origin/master
       </div>
-      </MessageSender>
     );
   }
 }
