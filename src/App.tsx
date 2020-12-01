@@ -20,6 +20,7 @@ import RequestorPage from "./requestor/Requestor";
 import RecipientPage from "./recipient/Recipient";
 import LoginPage from "./login/Login";
 import DashboardPage from "./dashboard/Dashboard";
+import FaqPage from "./faqPage/Faq";
 
 import UserAuth from "./common/UserAuth.interface";
 import "./App.css";
@@ -39,6 +40,7 @@ enum AuthRoutes {
 enum NonAuthRoutes {
   home = "/",
   login = "/login",
+  faq = "/faq",
 }
 
 interface Props {
@@ -290,6 +292,7 @@ class App extends React.Component<MyProps, MyState> {
     const requestor = <RequestorPage user={user} />;
     const writer = <WriterPage user={user} />;
     const recipient = <RecipientPage user={user} />;
+    const faq = <FaqPage />;
 
     return (
       <div>
@@ -334,6 +337,11 @@ class App extends React.Component<MyProps, MyState> {
                 path={AuthRoutes.dashboard}
                 authed={loggedIn}
                 Component={() => dashboard}
+              />
+              <Route
+                path={NonAuthRoutes.faq}
+                authed={loggedIn}
+                component={() => faq}
               />
             </Switch>
           </div>

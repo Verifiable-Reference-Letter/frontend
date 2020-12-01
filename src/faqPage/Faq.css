@@ -1,0 +1,28 @@
+.section {
+	display: inline-box;
+	width: 100% - 100px;
+	margin-left: 50px;
+	margin-right: 50px;
+	height: 100%;
+}
+
+.title {
+	display: inline-box;
+	width: 100%;
+	font-size: 32px;
+	font-weight: bold; 
+}
+
+
+.bigTitle {
+	display: inline-box;
+	width: 100%;
+	font-size: 34px;
+	font-weight: bolder;
+}
+
+.question {
+	display: inline-box;
+	width: 100%;
+	font-size: 28px;
+}
