@@ -449,9 +449,10 @@ class Login extends React.Component<LoginProps, LoginState> {
 
   render() {
     const loginDisplay = (
-      <div className="button-blur d-flex justify-content-between">
+      // <div className="button-blur d-flex justify-content-between">
+      <div className="d-flex justify-content-between">
         <Button
-          variant="outline-light"
+          // variant="outline-light"
           className="mr-3 flex-shrink-1"
           onClick={() => {
             this.toggleMode();
@@ -460,7 +461,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           Sign Up
         </Button>
         <Button
-          variant="outline-light"
+          // variant="outline-light"
           className="flex-fill"
           onClick={() => {
             this.onLoginClick();
@@ -497,9 +498,10 @@ class Login extends React.Component<LoginProps, LoginState> {
             onChange={this.handleInputNameChange}
           />
         </InputGroup>
-        <div className="d-flex button-blur">
+        {/* <div className="d-flex button-blur"> */}
+        <div className="d-flex">
           <Button
-            variant="outline-light"
+            // variant="outline-light"
             className="float-right flex-fill"
             onClick={() => {
               this.onSignupClick();
@@ -508,7 +510,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             Sign Up
           </Button>
           <Button
-            variant="outline-light"
+            // variant="outline-light"
             className="float-right flex-fill ml-3"
             onClick={() => {
               this.toggleMode();
@@ -547,76 +549,78 @@ class Login extends React.Component<LoginProps, LoginState> {
               signUpSuccess ||
               alreadySignedUp ||
               failedSigning) && (
-                <OverlayTrigger
-              placement="bottom"
-              overlay={
-                <Tooltip id="learn-more">
-                  <>
-                    {signingUp && (
-                      <div>
-                        We ask you to provide your <b>Public Key</b> so that you
-                        can <b>1.</b> keep your letters <b>secure</b> with
-                        end-to-end encryption <b>2.</b> allow other users to
-                        send you letters.
-                      </div>
-                    )}
-                    {failedKey && (
-                      <div>
-                        Please click <em>Provide</em> on Metamask to sign up. We
-                        need your <b>Public Key</b> to 1. keep your letters
-                        secure 2. Allow other users to send letters to you.
-                        Learn more about <b>End-to-End Encryption</b> in the
-                        FAQs.
-                      </div>
-                    )}
-                    {invalidEmail && (
-                      <div>
-                        Please enter a valid email. You will need to verify your
-                        email to complete the sign up process. Ex:{" "}
-                        <b>placeholder@lehigh.edu</b>
-                      </div>
-                    )}
-                    {invalidName && (
-                      <div>
-                        Please enter a valid name. This name will be{" "}
-                        <b>publicly visible</b> to other users.
-                      </div>
-                    )}
-                    {user.publicAddress === "" && (
-                      <div>
-                        Please connect to metamask. You may need to check the
-                        Metamask extension. For Metamask troubleshooting, check
-                        out the FAQs.
-                      </div>
-                    )}
-                    {signUpSuccess && (
-                      <div>
-                        You've successfully signed up. Please check your{" "}
-                        <b>Email</b>
-                        to verify your identity!{" "}
-                      </div>
-                    )}
-                    {alreadySignedUp && (
-                      <div>
-                        You already have an account. Please click <b>Login</b>{" "}
-                        to authenticate. For troubleshooting, check out the
-                        FAQs.
-                      </div>
-                    )}
-                    {noAccount && (
-                      <div>
-                        No account found. Please click <b>Sign Up</b> to create
-                        an account. For troubleshooting, check out the FAQs.
-                      </div>
-                    )}
-                    {failedSigning && (
-                      <div className="text-warning">
-                        Please click <em>Sign</em> on Metamask to <b>Login</b>.
-                        We need your signature to verify your identity. Learn
-                        more about <b>Signing / Verification</b> in the FAQs.
-                      </div>
-                    )}
-                    {/* {!signingUp &&
+              <OverlayTrigger
+                placement="bottom"
+                overlay={
+                  <Tooltip id="learn-more">
+                    <>
+                      {signingUp && (
+                        <div>
+                          We ask you to provide your <b>Public Key</b> so that
+                          you can <b>1.</b> keep your letters <b>secure</b> with
+                          end-to-end encryption <b>2.</b> allow other users to
+                          send you letters.
+                        </div>
+                      )}
+                      {failedKey && (
+                        <div>
+                          Please click <em>Provide</em> on Metamask to sign up.
+                          We need your <b>Public Key</b> to 1. keep your letters
+                          secure 2. Allow other users to send letters to you.
+                          Learn more about <b>End-to-End Encryption</b> in the
+                          FAQs.
+                        </div>
+                      )}
+                      {invalidEmail && (
+                        <div>
+                          Please enter a valid email. You will need to verify
+                          your email to complete the sign up process. Ex:{" "}
+                          <b>placeholder@lehigh.edu</b>
+                        </div>
+                      )}
+                      {invalidName && (
+                        <div>
+                          Please enter a valid name. This name will be{" "}
+                          <b>publicly visible</b> to other users.
+                        </div>
+                      )}
+                      {user.publicAddress === "" && (
+                        <div>
+                          Please connect to metamask. You may need to check the
+                          Metamask extension. For Metamask troubleshooting,
+                          check out the FAQs.
+                        </div>
+                      )}
+                      {signUpSuccess && (
+                        <div>
+                          You've successfully signed up. Please check your{" "}
+                          <b>Email</b>
+                          to verify your identity!{" "}
+                        </div>
+                      )}
+                      {alreadySignedUp && (
+                        <div>
+                          You already have an account. Please click <b>Login</b>{" "}
+                          to authenticate. For troubleshooting, check out the
+                          FAQs.
+                        </div>
+                      )}
+                      {noAccount && (
+                        <div>
+                          No account found. Please click <b>Sign Up</b> to
+                          create an account. For troubleshooting, check out the
+                          FAQs.
+                        </div>
+                      )}
+                      {failedSigning && (
+                        <div className="text-warning">
+                          Please click <em>Sign</em> on Metamask to <b>Login</b>
+                          . We need your signature to verify your identity.
+                          Learn more about <b>Signing / Verification</b> in the
+                          FAQs.
+                        </div>
+                      )}
+                      {/* {!signingUp &&
                       !failedKey &&
                       !invalidEmail &&
                       !invalidName &&
@@ -640,21 +644,21 @@ class Login extends React.Component<LoginProps, LoginState> {
                           )}
                         </>
                       )} */}
-                  </>
-                </Tooltip>
-              }
-            >
-              <FontAwesomeIcon
-                icon={
-                  (signingUp ||
-                  signUpSuccess)
-                    ? faInfoCircle
-                    : faExclamationTriangle
+                    </>
+                  </Tooltip>
                 }
-                size="lg"
-                className="mr-3"
-              />
-            </OverlayTrigger>)}
+              >
+                <FontAwesomeIcon
+                  icon={
+                    signingUp || signUpSuccess
+                      ? faInfoCircle
+                      : faExclamationTriangle
+                  }
+                  size="lg"
+                  className="mr-3"
+                />
+              </OverlayTrigger>
+            )}
             {signingUp && <div className="mt-1">See Metamask to signup</div>}
             {failedKey && <div className="mt-1">Error in signup process</div>}
             {invalidEmail && (
@@ -690,9 +694,8 @@ class Login extends React.Component<LoginProps, LoginState> {
 
           {/* <div className="alert"> {this.state.displayMessage}</div> */}
         </div>
-        <FrontPage/>
+        {/* <FrontPage/> */}
       </div>
-
     );
   }
 }

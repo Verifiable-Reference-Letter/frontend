@@ -41,7 +41,7 @@
   justify-content: center;
 }
 
-.section>div {
+.section > div {
   padding: 30px;
 }
 
@@ -91,4 +91,8 @@
 img {
   width: 100px;
   height: 100px;
+}
+
+.login-holder {
+  justify-content: center;
 }
