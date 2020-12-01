@@ -17,6 +17,25 @@ class Faq extends React.Component {
 
         <br/>
         <br/>
+
+
+        <span className='title'>
+            Metamask
+        </span>
+        <div>
+            <span className='question'>
+                How do I set up my Metamask account?
+            </span>
+            <br />
+            <br/>
+            <span className='meta'>
+              <text>
+              	Go to Metamask's website and follow their tutorial. You can access their website by clicking <a className ='link' href="https://metamask.io/" target="_blank">here</a>
+
+              </text>
+              </span>
+        </div>
+        
         <span className='title'>
             Students
         </span>

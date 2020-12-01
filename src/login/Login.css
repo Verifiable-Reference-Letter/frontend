@@ -21,7 +21,8 @@
 
 .login-form {
   position: absolute;
-  top: 30%;
-  left: 50%;
+  top: 20%;
+  left: 10%;
   transform: translate(-50%, -50%) !important;
 }
+

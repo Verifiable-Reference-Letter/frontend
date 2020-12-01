@@ -26,3 +26,17 @@
 	width: 100%;
 	font-size: 28px;
 }
+
+.meta {
+	text-align: left;
+	padding-right: 1000px;
+  }
+
+.link {
+	font-weight: bold;
+	color:purple;
+}
+
+.link:hover {
+	color:purple;
+}
