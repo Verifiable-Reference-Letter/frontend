@@ -3,6 +3,8 @@ import './FrontPage.css';
 import Header from "./Header";
 import Body from "./Body";
 import metamask from "./metamask.png";
+//import video from "./tutorials/loginTutorial.mp4";
+const loginVid =  require("./tutorials/loginTutorial.mp4");
 
 class FrontPage extends React.Component {
     render() {
@@ -20,7 +22,7 @@ class FrontPage extends React.Component {
                                 technology and public key encryption to securely send reference letters from one user to another.'
                 />
                 <video width="320" height="240" controls>
-                    <source src="./tutorials/loginTutorial.mp4" type="video/mp4"/>
+                    <source src={loginVid} type="video/mp4"/>
                     Your browser does not support the video tag.
                 </video> 
 
