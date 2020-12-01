@@ -3,7 +3,9 @@ import './FrontPage.css';
 import Header from "./Header";
 import Body from "./Body";
 import metamask from "./metamask.png";
-// import SlideDeck from "./SlideDeck";
+import "node_modules/video-react/dist/video-react.css";
+import {Player} from 'video-react';
+
 
 
 class FrontPage extends React.Component {
@@ -13,7 +15,7 @@ class FrontPage extends React.Component {
                 <Header />
                 <Body
                     className='section'
-                    image='./Capture1.PNG'
+                    image={metamask}
                     title='About the Company'
                     description='Team Gas and the verifiable reference letter service aim to streamline and digitize the process of sending reference letters.
                                 Currently the process can be a major hassle, especially if professors have many requests from their students. They must send a physical letter
@@ -21,6 +23,31 @@ class FrontPage extends React.Component {
                                 letter often because there is no better way to verify the identity of the letter writer. The verifiable reference letter service utilizes blockchain
                                 technology and public key encryption to securely send reference letters from one user to another.'
                 />
+                {/* <div className='section bg-grey'>
+                    <div className="small-div">
+                        <i className='section'></i>
+                        <img src={metamask} alt='' />
+                    </div>
+
+                    <div className="big-div">
+                        <span className='div-title'>
+                            How it Works
+                        </span>
+                        <br />
+                        <span>
+                        <Player
+                            playsInline
+                            poster={metamask}
+                            src="./tutorials/loginTutorial"
+                            />
+                        </span>
+                    </div>
+                </div> */}
+
+                {/* <video width="320" height="240" controls>
+                    <source src="./tutorials/loginTutorial.mp4" type="video/mp4"/>
+                    Your browser does not support the video tag.
+                </video>  */}
 
                 <Body
                     className='section bg-grey'
@@ -38,13 +65,12 @@ class FrontPage extends React.Component {
                                 To accept a request, simply click on the request and upload a letter that you have written.
 
                                 Lastly, if you are a third party that receives the letter (ie a grad school or hr department of a company), 
-                                you will be able to see letters that have been sent to you. You can click on the received letters to view them.
-                                '
+                                you will be able to see letters that have been sent to you. You can click on the received letters to view them.'
                 />
 
                 <Body
                     className='section bg-darkgrey'
-                    image='./Capture1.PNG'
+                    image={metamask}
                     title='Our Mission'
                     description='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                                 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
