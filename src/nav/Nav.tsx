@@ -93,6 +93,11 @@ class Nav extends React.Component<NavProps, NavState> {
                   <Dropdown.Item href="#/action-5">Recipient</Dropdown.Item>
                 </li>
               </Link>
+              <Link to={ROUTES.FAQ} style={{ textDecoration: "none" }}>
+                <li>
+                  <Dropdown.Item href="#/action-5">FAQ</Dropdown.Item>
+                </li>
+              </Link>
             </Dropdown.Menu>
           )}
           {!this.props.loggedIn && (

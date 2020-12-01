@@ -5,5 +5,5 @@ export const RECIPIENT = '/recipient';
 export const REQUESTOR = '/requestor';
 export const WRITER = '/writer';
 export const METAMASK_TUTORIAL = '/metamask-tutorial';
-export const FAQS = '/faqs';
+export const FAQ = '/faq';
 export const ERROR = '/';
