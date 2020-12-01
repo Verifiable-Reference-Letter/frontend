@@ -2,9 +2,13 @@ import React from "react";
 import './FrontPage.css';
 import Header from "./Header";
 import Body from "./Body";
+import VideoBody from "./VideoBody";
 import metamask from "./metamask.png";
 //import video from "./tutorials/loginTutorial.mp4";
 const loginVid =  require("./tutorials/loginTutorial.mp4");
+const requestorVid = require("./tutorials/requestorTutorial.mp4");
+const writerVid = require("./tutorials/writerTutorial.mp4");
+const recipientVid = require("./tutorials/recipientTutorial.mp4");
 
 class FrontPage extends React.Component {
     render() {
@@ -20,11 +24,7 @@ class FrontPage extends React.Component {
                                 in order to verify their identity to the third party that ultimately receives the letter. Additionally, these third parties require a physical
                                 letter often because there is no better way to verify the identity of the letter writer. The verifiable reference letter service utilizes blockchain
                                 technology and public key encryption to securely send reference letters from one user to another.'
-                />
-                <video width="320" height="240" controls>
-                    <source src={loginVid} type="video/mp4"/>
-                    Your browser does not support the video tag.
-                </video> 
+                /> 
 
                 <Body
                     className='section bg-grey'
@@ -44,6 +44,26 @@ class FrontPage extends React.Component {
                                 Lastly, if you are a third party that receives the letter (ie a grad school or hr department of a company), 
                                 you will be able to see letters that have been sent to you. You can click on the received letters to view them.'
                 />
+                <VideoBody
+                    className='section'
+                    video = {loginVid}
+                    title ='Login Tutorial'
+                />
+                <VideoBody
+                    className='section'
+                    video = {requestorVid}
+                    title ='Requestor Tutorial'
+                />
+                <VideoBody
+                    className='section'
+                    video = {writerVid}
+                    title ='Writer Tutorial'
+                />
+                <VideoBody
+                    className='section'
+                    video = {recipientVid}
+                    title ='Recipient Tutorial'
+                />                
 
                 <Body
                     className='section bg-darkgrey'
