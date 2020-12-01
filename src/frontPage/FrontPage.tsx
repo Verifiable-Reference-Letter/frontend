@@ -3,10 +3,6 @@ import './FrontPage.css';
 import Header from "./Header";
 import Body from "./Body";
 import metamask from "./metamask.png";
-import "node_modules/video-react/dist/video-react.css";
-import {Player} from 'video-react';
-
-
 
 class FrontPage extends React.Component {
     render() {
@@ -23,31 +19,10 @@ class FrontPage extends React.Component {
                                 letter often because there is no better way to verify the identity of the letter writer. The verifiable reference letter service utilizes blockchain
                                 technology and public key encryption to securely send reference letters from one user to another.'
                 />
-                {/* <div className='section bg-grey'>
-                    <div className="small-div">
-                        <i className='section'></i>
-                        <img src={metamask} alt='' />
-                    </div>
-
-                    <div className="big-div">
-                        <span className='div-title'>
-                            How it Works
-                        </span>
-                        <br />
-                        <span>
-                        <Player
-                            playsInline
-                            poster={metamask}
-                            src="./tutorials/loginTutorial"
-                            />
-                        </span>
-                    </div>
-                </div> */}
-
-                {/* <video width="320" height="240" controls>
+                <video width="320" height="240" controls>
                     <source src="./tutorials/loginTutorial.mp4" type="video/mp4"/>
                     Your browser does not support the video tag.
-                </video>  */}
+                </video> 
 
                 <Body
                     className='section bg-grey'
