@@ -20,6 +20,7 @@ import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
 import FrontPage from "../frontPage/FrontPage";
 import { web3 } from "../App";
+import { exception } from "console";
 
 interface LoginProps {
   user: UserAuth;
@@ -35,6 +36,9 @@ interface LoginState {
   alreadySignedUp: boolean;
   noAccount: boolean;
   failedSigning: boolean;
+  loggingIn: boolean;
+  notVerified: boolean;
+  failedLogin: boolean;
   inputEmail: string;
   inputName: string;
   // displayMessage: string;
@@ -55,6 +59,9 @@ class Login extends React.Component<LoginProps, LoginState> {
       alreadySignedUp: false,
       noAccount: false,
       failedSigning: false,
+      loggingIn: false,
+      notVerified: false,
+      failedLogin: false,
       inputEmail: "",
       inputName: "",
       // displayMessage: "",
@@ -100,6 +107,9 @@ class Login extends React.Component<LoginProps, LoginState> {
         alreadySignedUp: false,
         noAccount: false,
         failedSigning: false,
+        loggingIn: false,
+        notVerified: false,
+        failedLogin: false,
       });
       return;
     } else if (this.state.inputName.length <= 1) {
@@ -115,6 +125,9 @@ class Login extends React.Component<LoginProps, LoginState> {
         alreadySignedUp: false,
         noAccount: false,
         failedSigning: false,
+        loggingIn: false,
+        notVerified: false,
+        failedLogin: false,
       });
       // this.setState({ displayMessage: "Enter Your Name." });
       return;
@@ -188,11 +201,14 @@ class Login extends React.Component<LoginProps, LoginState> {
             signingUp: false,
             failedKey: false,
             invalidEmail: false,
-            invalidName: true,
+            invalidName: false,
             signUpSuccess: false,
             alreadySignedUp: false,
             noAccount: true,
             failedSigning: false,
+            loggingIn: false,
+            notVerified: false,
+            failedLogin: false,
           });
           return Promise.reject("no existing account");
         }
@@ -240,6 +256,9 @@ class Login extends React.Component<LoginProps, LoginState> {
       alreadySignedUp: false,
       noAccount: false,
       failedSigning: false,
+      loggingIn: false,
+      notVerified: false,
+      failedLogin: false,
     });
     const publicKey = await this.cryptService.getPublicKey(publicAddress);
     console.log(publicKey);
@@ -255,6 +274,9 @@ class Login extends React.Component<LoginProps, LoginState> {
         alreadySignedUp: false,
         noAccount: false,
         failedSigning: false,
+        loggingIn: false,
+        notVerified: false,
+        failedLogin: false,
       });
       return Promise.reject("failed to get public key");
     }
@@ -280,6 +302,12 @@ class Login extends React.Component<LoginProps, LoginState> {
       .then((response) => {
         console.log("logging signup response");
         console.log(response);
+        if (response.status === 500) {
+          console.log("something went wrong with signup", response.status);
+          throw new Error(
+            "something went wrong with sendgrid (likely) in signup"
+          );
+        }
         return response.json();
       })
       .then((users) => {
@@ -296,6 +324,9 @@ class Login extends React.Component<LoginProps, LoginState> {
             alreadySignedUp: true,
             noAccount: false,
             failedSigning: false,
+            loggingIn: false,
+            notVerified: false,
+            failedLogin: false,
           });
         } else {
           // alert("You're Signed Up. Please Login . . . ");
@@ -308,6 +339,9 @@ class Login extends React.Component<LoginProps, LoginState> {
             alreadySignedUp: false,
             noAccount: false,
             failedSigning: false,
+            loggingIn: false,
+            notVerified: false,
+            failedLogin: false,
           });
           return users[0];
         }
@@ -356,6 +390,9 @@ class Login extends React.Component<LoginProps, LoginState> {
                 alreadySignedUp: false,
                 noAccount: false,
                 failedSigning: true,
+                loggingIn: false,
+                notVerified: false,
+                failedLogin: false,
               });
               return reject(err);
             }
@@ -378,11 +415,19 @@ class Login extends React.Component<LoginProps, LoginState> {
     signature: string;
   }) {
     console.log("authenticating");
-    // this.setState({
-    //   displayMessage: this.state.loginMode
-    //     ? "Logging You In . . ."
-    //     : "Signing You Up . . .",
-    // });
+    this.setState({
+      signingUp: false,
+      failedKey: false,
+      invalidEmail: false,
+      invalidName: false,
+      signUpSuccess: false,
+      alreadySignedUp: false,
+      noAccount: false,
+      failedSigning: false,
+      loggingIn: true,
+      notVerified: false,
+      failedLogin: false,
+    });
     return fetch(`${process.env.REACT_APP_BACKEND_URL}/auth`, {
       body: JSON.stringify({ publicAddress, signature }),
       headers: {
@@ -395,40 +440,95 @@ class Login extends React.Component<LoginProps, LoginState> {
         console.log("received response");
         console.log(response);
 
-        response
-          .json()
-          .then((body: ResponseBody) => {
-            console.log(body);
-            const data = body.data;
-            const j = data.jwtToken;
-            console.log("jwtToken", j);
-            let jwtToken = j ? j : undefined;
-            if (jwtToken) {
-              console.log(jwtToken);
-              this.props.callback({
-                publicAddress: this.props.user.publicAddress,
-                name: this.props.user.name,
-                jwtToken: jwtToken,
-              });
-            } else {
-              console.log("error with jwtToken");
-            }
-          })
-          .catch((err: Error) => {
-            console.log(err);
+        if (response.status === 400) {
+          this.setState({
+            signingUp: false,
+            failedKey: false,
+            invalidEmail: false,
+            invalidName: false,
+            signUpSuccess: false,
+            alreadySignedUp: false,
+            noAccount: false,
+            failedSigning: false,
+            loggingIn: false,
+            notVerified: false,
+            failedLogin: true,
           });
+        }
+        // if not verified
+        else if (response.status === 401) {
+          this.setState({
+            signingUp: false,
+            failedKey: false,
+            invalidEmail: false,
+            invalidName: false,
+            signUpSuccess: false,
+            alreadySignedUp: false,
+            noAccount: false,
+            failedSigning: false,
+            loggingIn: false,
+            notVerified: true,
+            failedLogin: false,
+          });
+        } else {
+          response
+            .json()
+            .then((body: ResponseBody) => {
+              console.log(body);
+              const data = body.data;
+              const j = data.jwtToken;
+              console.log("jwtToken", j);
+              let jwtToken = j ? j : undefined;
+              if (jwtToken) {
+                console.log(jwtToken);
+                this.props.callback({
+                  publicAddress: this.props.user.publicAddress,
+                  name: this.props.user.name,
+                  jwtToken: jwtToken,
+                });
+              } else {
+                console.log("error with jwtToken");
+              }
+            })
+            .catch((err: Error) => {
+              console.log(err);
+            });
+        }
       })
       .catch((err: Error) => {
         console.log(err);
       });
   }
 
-  handleInputNameChange(event: any) {
+  async resendEmailVerification(event: any) {
+    console.log("resendEmailVerification");
+    let response = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/auth/resendEmailVerification`,
+      {
+        body: JSON.stringify({ publicAddress: this.props.user.publicAddress }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      }
+    );
+
+    if (response.status === 500) {
+      console.log("resend failed");
+      alert("Email verification resend failed!");
+    } else {
+      console.log("resend success");
+      alert("Email verification resend success!");
+    }
+  }
+
+  async handleInputNameChange(event: any) {
     console.log(event.target.value);
     this.setState({ inputName: event.target.value });
   }
 
-  handleInputEmailChange(event: any) {
+  async handleInputEmailChange(event: any) {
     console.log(event.target.value);
     this.setState({ inputEmail: event.target.value });
   }
@@ -444,6 +544,9 @@ class Login extends React.Component<LoginProps, LoginState> {
       alreadySignedUp: false,
       noAccount: false,
       failedSigning: false,
+      loggingIn: false,
+      notVerified: false,
+      failedLogin: false,
     });
   }
 
@@ -531,7 +634,10 @@ class Login extends React.Component<LoginProps, LoginState> {
       alreadySignedUp,
       noAccount,
       failedSigning,
+      loggingIn,
+      notVerified,
       loginMode,
+      failedLogin,
     } = this.state;
 
     return (
@@ -546,83 +652,111 @@ class Login extends React.Component<LoginProps, LoginState> {
               invalidName ||
               signUpSuccess ||
               alreadySignedUp ||
-              failedSigning) && (
-                <OverlayTrigger
-              placement="bottom"
-              overlay={
-                <Tooltip id="learn-more">
-                  <>
-                    {signingUp && (
-                      <div>
-                        We ask you to provide your <b>Public Key</b> so that you
-                        can <b>1.</b> keep your letters <b>secure</b> with
-                        end-to-end encryption <b>2.</b> allow other users to
-                        send you letters.
-                      </div>
-                    )}
-                    {failedKey && (
-                      <div>
-                        Please click <em>Provide</em> on Metamask to sign up. We
-                        need your <b>Public Key</b> to 1. keep your letters
-                        secure 2. Allow other users to send letters to you.
-                        Learn more about <b>End-to-End Encryption</b> in the
-                        FAQs.
-                      </div>
-                    )}
-                    {invalidEmail && (
-                      <div>
-                        Please enter a valid email. You will need to verify your
-                        email to complete the sign up process. Ex:{" "}
-                        <b>placeholder@lehigh.edu</b>
-                      </div>
-                    )}
-                    {invalidName && (
-                      <div>
-                        Please enter a valid name. This name will be{" "}
-                        <b>publicly visible</b> to other users.
-                      </div>
-                    )}
-                    {user.publicAddress === "" && (
-                      <div>
-                        Please connect to metamask. You may need to check the
-                        Metamask extension. For Metamask troubleshooting, check
-                        out the FAQs.
-                      </div>
-                    )}
-                    {signUpSuccess && (
-                      <div>
-                        You've successfully signed up. Please check your{" "}
-                        <b>Email</b>
-                        to verify your identity!{" "}
-                      </div>
-                    )}
-                    {alreadySignedUp && (
-                      <div>
-                        You already have an account. Please click <b>Login</b>{" "}
-                        to authenticate. For troubleshooting, check out the
-                        FAQs.
-                      </div>
-                    )}
-                    {noAccount && (
-                      <div>
-                        No account found. Please click <b>Sign Up</b> to create
-                        an account. For troubleshooting, check out the FAQs.
-                      </div>
-                    )}
-                    {failedSigning && (
-                      <div className="text-warning">
-                        Please click <em>Sign</em> on Metamask to <b>Login</b>.
-                        We need your signature to verify your identity. Learn
-                        more about <b>Signing / Verification</b> in the FAQs.
-                      </div>
-                    )}
-                    {/* {!signingUp &&
+              noAccount ||
+              failedSigning ||
+              loggingIn ||
+              notVerified ||
+              failedLogin) && (
+              <OverlayTrigger
+                placement="bottom"
+                overlay={
+                  <Tooltip id="learn-more">
+                    <>
+                      {signingUp && (
+                        <div>
+                          We ask you to provide your <b>Public Key</b> so that
+                          you can <b>1.</b> keep your letters <b>secure</b> with
+                          end-to-end encryption <b>2.</b> allow other users to
+                          send you letters.
+                        </div>
+                      )}
+                      {failedKey && (
+                        <div>
+                          Please click <em>Provide</em> on Metamask to sign up.
+                          We need your <b>Public Key</b> to 1. keep your letters
+                          secure 2. Allow other users to send letters to you.
+                          Learn more about <b>End-to-End Encryption</b> in the
+                          FAQs.
+                        </div>
+                      )}
+                      {invalidEmail && (
+                        <div>
+                          Please enter a valid email. You will need to verify
+                          your email to complete the sign up process. Ex:{" "}
+                          <b>placeholder@lehigh.edu</b>
+                        </div>
+                      )}
+                      {invalidName && (
+                        <div>
+                          Please enter a valid name. This name will be{" "}
+                          <b>publicly visible</b> to other users.
+                        </div>
+                      )}
+                      {user.publicAddress === "" && (
+                        <div>
+                          Please connect to metamask. You may need to check the
+                          Metamask extension. For Metamask troubleshooting,
+                          check out the FAQs.
+                        </div>
+                      )}
+                      {signUpSuccess && (
+                        <div>
+                          You've successfully signed up. Please check your{" "}
+                          <b>Email</b> to verify your identity!{" "}
+                        </div>
+                      )}
+                      {alreadySignedUp && (
+                        <div>
+                          You already have an account. Please click <b>Login</b>{" "}
+                          to authenticate. For troubleshooting, check out the
+                          FAQs.
+                        </div>
+                      )}
+                      {noAccount && (
+                        <div>
+                          No account found. Please click <b>Sign Up</b> to
+                          create an account. For troubleshooting, check out the
+                          FAQs.
+                        </div>
+                      )}
+                      {failedSigning && (
+                        <div>
+                          Failed to verify your identity. Please click{" "}
+                          <em>Sign</em> on Metamask to <b>Login</b>. We need
+                          your signature to verify your identity. Learn more
+                          about <b>Signing / Verification</b> in the FAQs.
+                        </div>
+                      )}
+                      {loggingIn && (
+                        <div>
+                          Please click <em>Sign</em> on Metamask to <b>Login</b>
+                          . We need your signature to verify your identity.
+                          Learn more about <b>Signing / Verification</b> in the
+                          FAQs.
+                        </div>
+                      )}
+                      {notVerified && (
+                        <div>
+                          Your email is NOT verified. Please check your email to
+                          verify your identity. Or you can click <b>Re-send</b>{" "}
+                          to send another verification email. Learn more in the
+                          FAQS.
+                        </div>
+                      )}
+                      {failedLogin && (
+                        <div>
+                          Something went wrong with <em>Login</em>. Please try
+                          again or contact us in the FAQs.
+                        </div>
+                      )}
+                      {/* {!signingUp &&
                       !failedKey &&
                       !invalidEmail &&
                       !invalidName &&
                       !signUpSuccess &&
                       !alreadySignedUp &&
-                      !failedSigning && (
+                      !noAccount &&
+                      !failedSigning && !loggingIn && !notVerified && !failedLogin && (
                         <>
                           {loginMode && (
                             <div>
@@ -640,21 +774,21 @@ class Login extends React.Component<LoginProps, LoginState> {
                           )}
                         </>
                       )} */}
-                  </>
-                </Tooltip>
-              }
-            >
-              <FontAwesomeIcon
-                icon={
-                  (signingUp ||
-                  signUpSuccess)
-                    ? faInfoCircle
-                    : faExclamationTriangle
+                    </>
+                  </Tooltip>
                 }
-                size="lg"
-                className="mr-3"
-              />
-            </OverlayTrigger>)}
+              >
+                <FontAwesomeIcon
+                  icon={
+                    signingUp || signUpSuccess || loggingIn
+                      ? faInfoCircle
+                      : faExclamationTriangle
+                  }
+                  size="lg"
+                  className="mr-3"
+                />
+              </OverlayTrigger>
+            )}
             {signingUp && <div className="mt-1">See Metamask to signup</div>}
             {failedKey && <div className="mt-1">Error in signup process</div>}
             {invalidEmail && (
@@ -674,13 +808,28 @@ class Login extends React.Component<LoginProps, LoginState> {
             )}
             {noAccount && <div className="mt-1">Please signup instead</div>}
             {failedSigning && <div className="mt-1">Failed to login</div>}
+            {loggingIn && <div className="mt-1">Logging you in . . .</div>}
+            {notVerified && (
+              <div className="mt-1">
+                Email not verified (
+                <a
+                  className="text-info text-white-50"
+                  onClick={this.resendEmailVerification.bind(this)}
+                >
+                  Re-send
+                </a>
+                )
+              </div>
+            )}
+            {failedLogin && <div className="mt-1">Failed to login</div>}
             {/* {!signingUp &&
               !failedKey &&
               !invalidEmail &&
               !invalidName &&
               !signUpSuccess &&
               !alreadySignedUp &&
-              !failedSigning && (
+              !noAccount &&
+              !failedSigning && !loggingIn && !notVerified && !failedLogin && (
                 <div className="mt-1">
                   {loginMode ? "" : "Fill out the form to signup"}
                 </div>
