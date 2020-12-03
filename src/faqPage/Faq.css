@@ -1,18 +1,29 @@
-.section {
-	display: inline-box;
-	width: 100% - 100px;
-	margin-left: 50px;
-	margin-right: 50px;
-	height: 100%;
+.sectionF {
+	flex-flow: row wrap;
+	width: 100%;
+	display: flex;
+	flex-direction: row wrap;
+	align-items: center;
+	justify-content: center;
+}
+
+.sectionG {
+	width: 100%;
+	align-items: left;
+	justify-content: left;
+}
+
+.pad {
+	padding: 30px;
 }
 
 .title {
+	padding:20px;
 	display: inline-box;
 	width: 100%;
 	font-size: 32px;
-	font-weight: bold; 
+	font-weight: bold;
 }
-
 
 .bigTitle {
 	display: inline-box;
@@ -29,14 +40,27 @@
 
 .meta {
 	text-align: left;
-	padding-right: 1000px;
-  }
+	font-size: 20px;
+}
 
 .link {
 	font-weight: bold;
-	color:purple;
+	color: rgb(255, 149, 181);
 }
 
 .link:hover {
-	color:purple;
+	font-weight: bold;
+	color: rgb(255, 72, 127);
+}
+
+.bg-grey {
+	background-color: #f6f6f636;
+}
+
+.bg-darkgrey {
+	background-color: #f6f6f618;
+}
+
+.bg-lightgrey {
+	background-color: #f6f6f654;
 }

@@ -14,7 +14,7 @@ function Body(props: { className: string; image: string; title: string; descript
                 </span>
                 <br />
                 <span>
-                    <text>{props.description}</text>
+                    <text className='div-text'>{props.description}</text>
                 </span>
             </div>
         </div>
