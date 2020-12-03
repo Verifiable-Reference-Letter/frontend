@@ -219,7 +219,7 @@ class App extends React.Component<MyProps, MyState> {
           });
         }
       } else {
-        console.log("")
+        console.log("");
         this.setState({
           contract,
           connectedTo: true,
@@ -229,14 +229,20 @@ class App extends React.Component<MyProps, MyState> {
       }
       console.log(user.publicAddress, user.name, user.jwtToken);
     } else {
-      // alert(
-      //   "Please download the Metamask browser extension (supported on Chrome & Firefox)"
-      // );
-      this.setState({ windowEthereum: false });
-      this.props.history.push(ROUTES.METAMASK_TUTORIAL);
-      // alert(
-      //   "Please download the Metamask browser extension (supported on Chrome & Firefox)"
-      // );
+      if (this.state.checkedLocal) {
+        alert(
+          "Please download the Metamask browser extension (supported on Chrome & Firefox)"
+        );
+        let url = "https://metamask.io/download.html";
+        let win = window.open(url, "_blank");
+        if (win) {
+          win.focus();
+        }
+      }
+
+      this.setState({ windowEthereum: false, checkedLocal: true });
+      // this.props.history.push(ROUTES.FAQ);
+      // this.props.history.push(ROUTES.METAMASK_TUTORIAL);
     }
   }
 
