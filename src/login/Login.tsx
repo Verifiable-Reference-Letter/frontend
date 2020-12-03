@@ -18,7 +18,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import RequestBody from "../common/RequestBody.interface";
 import ResponseBody from "../common/ResponseBody.interface";
-
+import FrontPage from "../frontPage/FrontPage";
 import { web3 } from "../App";
 import { exception } from "console";
 
@@ -552,10 +552,11 @@ class Login extends React.Component<LoginProps, LoginState> {
 
   render() {
     const loginDisplay = (
-      <div className="button-blur d-flex justify-content-between">
+      // <div className="button-blur d-flex justify-content-between">
+      <div className="d-flex justify-content-between">
         <Button
-          variant="outline-light"
-          className="mr-3 flex-shrink-1"
+          // variant="outline-light"
+          className="mr-4 flex-shrink-1"
           onClick={() => {
             this.toggleMode();
           }}
@@ -563,7 +564,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           Sign Up
         </Button>
         <Button
-          variant="outline-light"
+          // variant="outline-light"
           className="flex-fill"
           onClick={() => {
             this.onLoginClick();
@@ -600,9 +601,10 @@ class Login extends React.Component<LoginProps, LoginState> {
             onChange={this.handleInputNameChange}
           />
         </InputGroup>
-        <div className="d-flex button-blur">
+        {/* <div className="d-flex button-blur"> */}
+        <div className="d-flex">
           <Button
-            variant="outline-light"
+            // variant="outline-light"
             className="float-right flex-fill"
             onClick={() => {
               this.onSignupClick();
@@ -611,7 +613,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             Sign Up
           </Button>
           <Button
-            variant="outline-light"
+            // variant="outline-light"
             className="float-right flex-fill ml-3"
             onClick={() => {
               this.toggleMode();
@@ -839,6 +841,7 @@ class Login extends React.Component<LoginProps, LoginState> {
 
           {/* <div className="alert"> {this.state.displayMessage}</div> */}
         </div>
+        {/* <FrontPage/> */}
       </div>
     );
   }
