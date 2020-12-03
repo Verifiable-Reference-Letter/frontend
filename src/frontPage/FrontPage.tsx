@@ -88,7 +88,7 @@ class FrontPage extends React.Component<FrontPageProps, FrontPageState> {
         {header}
 
         <Body
-          className="section"
+          className="section bg-darkgrey"
           image={metamask}
           title="About the Company"
           description="Team Gas and the verifiable reference letter service aim to streamline and digitize the process of sending reference letters.
@@ -128,6 +128,7 @@ class FrontPage extends React.Component<FrontPageProps, FrontPageState> {
                                 reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
                                 pariatur."
         />
+        
         <VideoBody
           className="section"
           video={loginVid}

@@ -556,7 +556,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       <div className="d-flex justify-content-between">
         <Button
           // variant="outline-light"
-          className="mr-3 flex-shrink-1"
+          className="mr-4 flex-shrink-1"
           onClick={() => {
             this.toggleMode();
           }}

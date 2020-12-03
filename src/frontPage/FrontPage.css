@@ -20,7 +20,7 @@
   color: white;
   width: 100%;
   text-align: center;
-  height: 300px;
+  /* height: 300px; */
   padding: 50px;
 }
 
@@ -54,11 +54,15 @@
 }
 
 .bg-grey {
-  background-color: #f6f6f642;
+  background-color: #f6f6f636;
 }
 
 .bg-darkgrey {
   background-color: #f6f6f618;
+}
+
+.bg-lightgrey {
+  background-color: #f6f6f654;
 }
 
 .div-title {
