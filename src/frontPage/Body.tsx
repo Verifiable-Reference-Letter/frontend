@@ -4,7 +4,7 @@ function Body(props: { className: string; image: string; title: string; descript
     return (
         <div className={props.className} >
             <div className="small-div">
-                <i className={props.className}></i>
+                {/* <i className={props.className}></i> */}
                 <img src={props.image} alt='' />
             </div>
 

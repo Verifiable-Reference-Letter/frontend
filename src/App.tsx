@@ -27,6 +27,7 @@ import "./App.css";
 import * as ROUTES from "./routes";
 
 import Web3 from "web3";
+import FrontPage from "./frontPage/FrontPage";
 export let web3: Web3;
 export let ethereum: any;
 
@@ -287,7 +288,7 @@ class App extends React.Component<MyProps, MyState> {
       user,
     } = this.state;
     const home = <HomePage user={user} />;
-    const login = <LoginPage callback={this.onLogin.bind(this)} user={user} />;
+    const login = <FrontPage callback={this.onLogin.bind(this)} user={user} />;
     const dashboard = <DashboardPage user={user} />;
     const requestor = <RequestorPage user={user} />;
     const writer = <WriterPage user={user} />;
