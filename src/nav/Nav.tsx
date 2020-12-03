@@ -48,12 +48,15 @@ class Nav extends React.Component<NavProps, NavState> {
                 this.onConnect();
               }}
             >
-              Connect
+              Connect to Metamask
             </Button>
           )}
           {this.props.connectedTo && (
             <Navbar.Text className="navText">
-              Connected to Metamask: <span>{this.props.connectedTo ? this.props.user.publicAddress : "--"}</span>
+              Connected to Metamask:{" "}
+              <span>
+                {this.props.connectedTo ? this.props.user.publicAddress : "--"}
+              </span>
             </Navbar.Text>
           )}
         </Navbar.Collapse>
@@ -110,6 +113,11 @@ class Nav extends React.Component<NavProps, NavState> {
               <Link to={ROUTES.LOGIN} style={{ textDecoration: "none" }}>
                 <li>
                   <Dropdown.Item href="#/action-1">Login</Dropdown.Item>
+                </li>
+              </Link>
+              <Link to={ROUTES.FAQ} style={{ textDecoration: "none" }}>
+                <li>
+                  <Dropdown.Item href="#/action-2">FAQ</Dropdown.Item>
                 </li>
               </Link>
             </Dropdown.Menu>

@@ -86,6 +86,14 @@ class Login extends React.Component<LoginProps, LoginState> {
       console.log("Invalid public address. Connect to Metamask.");
       // this.setState({ displayMessage: "Connect to Metamask." });
       // alert("Connect to Metamask");
+      // alert(
+      //   "Please download the Metamask browser extension (supported on Chrome & Firefox)"
+      // );
+      // let url = "https://metamask.io/download.html";
+      // let win = window.open(url, "_blank");
+      // if (win) {
+      //   win.focus();
+      // }
       return;
     }
     const re: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -166,6 +174,14 @@ class Login extends React.Component<LoginProps, LoginState> {
       console.log("Invalid public address. Connect to Metamask.");
       // alert("Please Connect to Metamask");
       // this.setState({ displayMessage: "Please Connect to Metamask." });
+      // alert(
+      //   "Please download the Metamask browser extension (supported on Chrome & Firefox)"
+      // );
+      // let url = "https://metamask.io/download.html";
+      // let win = window.open(url, "_blank");
+      // if (win) {
+      //   win.focus();
+      // }
       return;
     }
 
@@ -658,6 +674,7 @@ class Login extends React.Component<LoginProps, LoginState> {
               failedSigning ||
               loggingIn ||
               notVerified ||
+              user.publicAddress === "" ||
               failedLogin) && (
               <OverlayTrigger
                 placement="bottom"
@@ -800,7 +817,7 @@ class Login extends React.Component<LoginProps, LoginState> {
               <div className="mt-1">Please enter a valid name</div>
             )}
             {user.publicAddress === "" && (
-              <div className="mt-1">Please connect to Metamask</div>
+              <div className="mt-1">Please connect to <a href="https://metamask.io/download.html" target="_blank">Metamask</a></div>
             )}
             {signUpSuccess && (
               <div className="mt-1">Success. Please verify your email</div>
