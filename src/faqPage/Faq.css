@@ -28,8 +28,9 @@
 .bigTitle {
 	display: inline-box;
 	width: 100%;
-	font-size: 34px;
+	font-size: 50px;
 	font-weight: bolder;
+	padding :30px;
 }
 
 .question {
