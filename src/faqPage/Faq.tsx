@@ -9,7 +9,7 @@ class Faq extends React.Component {
         	<br />
         	<br/>
           <span className='bigTitle'>
-              Faq Page
+              FAQ
           </span>
           <br/>
         	<br/>

@@ -3,11 +3,10 @@ import "./FrontPage.css";
 import Header from "./Header";
 import Body from "./Body";
 import VideoBody from "./VideoBody";
-import metamask from "./metamask.png";
 import UserAuth from "../common/UserAuth.interface";
 import { Card, Modal, Button } from "react-bootstrap";
 import Login from "../login/Login";
-
+import gasLogo from './gasLogo.png';
 //import video from "./tutorials/loginTutorial.mp4";
 const loginVid = require("./tutorials/loginTutorial.mp4");
 const requestorVid = require("./tutorials/requestorTutorial.mp4");
@@ -89,7 +88,7 @@ class FrontPage extends React.Component<FrontPageProps, FrontPageState> {
 
         <Body
           className="section bg-darkgrey"
-          image={metamask}
+          image={gasLogo}
           title="About the Company"
           description="Team Gas and the verifiable reference letter service aim to streamline and digitize the process of sending reference letters.
                                 Currently the process can be a major hassle, especially if professors have many requests from their students. They must send a physical letter
@@ -100,7 +99,7 @@ class FrontPage extends React.Component<FrontPageProps, FrontPageState> {
 
         <Body
           className="section bg-grey"
-          image={metamask}
+          image={gasLogo}
           title="How it Works"
           description="You can start using our service by creating a Metamask account and then creating an account with us.
                                 
@@ -117,17 +116,12 @@ class FrontPage extends React.Component<FrontPageProps, FrontPageState> {
                                 you will be able to see letters that have been sent to you. You can click on the received letters to view them."
         />
 
-        <Body
+        {/* <Body
           className="section bg-darkgrey"
-          image={metamask}
+          image=''
           title="Our Mission"
-          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                                minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                                aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                                pariatur."
-        />
+          description="Our mission is to improve the way people do things through the use of technology."
+        /> */}
         
         <VideoBody
           className="section"
