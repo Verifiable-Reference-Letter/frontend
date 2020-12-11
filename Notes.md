@@ -265,12 +265,25 @@ https://github.com/MetaMask/eth-sig-util
 - see links for documentation
 
 ## Solidity
+- solidity is the primary language used to write etheruem smart contracts. There is plenty of online documentation and tutorials to help learn it. We have included a couple links we find helpful here.
+- https://cryptozombies.io/ 
+- https://docs.soliditylang.org/en/v0.5.3/solidity-by-example.html
 
 ## Typechain
+- Typechain provides TypeScript bindings for Ethereum smart contracts. This adds a layer of safety that you wouldn't have without static typing
+- Unfortunately at the time of writting there isnt a ton of great learning resources, so the best place is the readme which is here: https://github.com/ethereum-ts/TypeChain
+- Our project was actually initially configured with typechain, though it might need some changes to get it working again. We set it up using typechain-truffle
 
 ## Truffle
+- truffle provides multiple handy tools to help in smart contract development.
+- https://www.trufflesuite.com/
+- Super userful to use for testing, migrations, compilation, and deploying of smart contracts
+- The have a test blockchain, Ganache, that you can run locally to do local testing
 
 ## Kotti
+- Kotti is the testnet for the Ethereum classic blockchain.
+- Kotti can be retreived here: http://kottifaucet.me/ and is good for testing so you dont spend any real money
+- https://blockscout.com/etc/kotti is a block explorer website that allows you to explore blockchain networks (including Kotti)
 
 ## Frontend Interfaces
 
