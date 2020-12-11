@@ -1,124 +1,20 @@
-Notes written by Brian Zhao 11/2020
+Notes written by Brian Zhao November - December 2020
 
-# Frontend Interface
+# Documentation
 
-## FileData
+To whoever may view these notes.
+These are more in-depth notes about some key aspects of the project. It might be best to start with an overview of the project before diving straight in. See advisors and/or drive.
 
-- should be called letterData
-- letterUrl is the base64 string that you can pass into an embed, for example, to display the file
-- letterUrl is read using FileReader on File (**see** Web API for JS)
-- gets encrypted with jsonstringify (**see** CryptService.ts)
-- schema
-  letterTitle: string;
-  letterType: string;
-  letterUrl: string;
+## Public Key Infrastructure
 
-## LetterContents (unused)
-
-- letterDetails + contents field
-- **see** letterDetails
-- schema
-  letterId: string;
-  contents: string;
-  letterRequestor: User;
-  letterWriter: User;
-  requestedAt: Date
-  uploadedAt: Date | null;
-
-## LetterDetails
-
-- interface used to populate list for requestor and writer
-- takes the necessary fields from the letters table
-- two timestamps: requestedAt and uploadedAt - uploadedAt can be null (if null then not uploaded) - the above information is useful for determining what to display
-- note that letterRequestor and letterWriter are the result of joins with the user table - **see** backend queries - joined on publicAddress (the primary key for an user - after the join, the queried data is passed through a constructor to create the User objects - frontend User interface and backend User dbmodel are the same
-- schema
-  letterId: string;
-  letterRequestor: User;
-  letterWriter: User;
-  requestedAt: Date
-  uploadedAt: Date | null;
-
-## LetterHistory
-
-- think of it as a join between letters and sent_letters in backend
-- letterDetails + letterRecipient (User) and sentAt (Date | null)
-- sentAt is useful information for determining whether or not the letterHistory has been sent to the user - writer is not allowed to re-upload a letter already sent to one or more recipients - history button for displaying all the recipients sent to
-- **see** letterDetails
-- schema
-  letterId: string;
-  letterRequestor: User;
-  letterWriter: User;
-  requestedAt: Date
-  uploadedAt: Date | null;
-  letterRecipient: User;
-  sentAt: Date | null;
-
-## User
-
-- basic user information (publicAddress, name)
-- used for other interfaces and keeping track of basic user info in lists
-- schema
-  publicAddress: string;
-  name: string;
-
-## UserAuth
-
-- basic user info + jwtToken
-- used for authentication (after signing and verification of nonce)
-- userAuth in the backend is similar except jwtToken is nonce (random string generated with UUID) - **see** verification of signature
-  - ecrecover, eth-sig-utils
-- backend passes back a jwtToken - expiration set tentatively for an hour - **see** [backend documentation
-- schema
-  publicAddress: string;
-  name: string;
-  jwtToken: string;
-- schema backend userAuth
-  publicAddress: string;
-  name: string;
-  nonce: string;
-
-## UserKey
-
-- basic user info + publicKey
-- note this is the key for salsa curve\* - **see** encryption, decryption, and signing
-- publicKey is used for decryption and encryption - for letter upload (encryption with writer's own public key) - for letter sending (encryption with each recipient's public key) - note this public key is not the same public key (hex) that you get from verifySignature in the backend - separation of concerns
-- schema
-  publicAddress: string;
-  name: string;
-  publicKey: string;
-
-## UserProfile -> user info for the profile page
-
-- currently only a few fields
-- intended to be whatever publicly displayed information on the userProfile page
-- not properly implemented / used
-- createdAt is when the user joined (created their account)
-- schema
-  publicAddress: string;
-  name: string;
-  profile_image: Buffer | null;
-
-      	createdAt: Date
-
-## RequestBody
-
-- (unused) for the format of the post requests
-- should be refactored to use this
-
-## ResponseBody
-
-- format of the response
-
-# Encryption, Decryption, Signing, & Verification
-
-## Encryption / Decryption
+### Encryption / Decryption
 
 - familiarize yourself with public key infrastructure
   - also known as PKI, public key cryptography, public key encryption
   - note that public address and public key are not the same thing
-  - also familiarize yourself with hashing (one way)
+  - also familiarize yourself with the concept of hashing (one way)
 - we are employing end-to-end encryption for letter contents
-  - the only time when files are not encrypted is at viewing and at sending
+  - the only time when files are not encrypted is at viewing and briefly at sending
     - (after decrypting with writer's private key and before encrypting with recipient's keys)
   - at upload, we encrypt with the writer's public key and store it as a buffer in the letters table (letter_contents)
   - at sending, we decrypt the letter with the writer's private key and encrypt it with the recipient's public key
@@ -162,8 +58,9 @@ SigUtil.encrypt(
   - how do we get from publicKey to publicAddress??
 
 [important documentation](https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods)
+- also do research on elliptical curve cryptography (ECC) and ECDSA
 
-## Signing & Verification
+### Signing & Verification
 - as seen in point #2 above, how do we get from publicKey to publicAddress?
   - we *derive* the publicAddress from the public key by first hashing it (ethereum uses keccak256)
   - the publicKey (64 bytes) becomes 32 bytes
@@ -171,21 +68,23 @@ SigUtil.encrypt(
 - this is a crucial part of signature verification as ecrecover will allow us to recover the hex public key
   - we can then derive the publicAddress to see if it matches with our stored publicAddress
 - so what is this ecrecover? (**see AuthModule in backend**)
-  - let's first look at the process signing
+  - let's first look at the process of signing
+  
+#### Signing
 
 > import * as EthUtil from "ethereumjs-util";
 > EthUtil.keccak256() // hashing algo used by ethereum
 
 - we use web3/metamask to sign the transaction
-  - not that this is different from web3.eth.sign which is deprecated
+  - not that web3.eth.personal.sign is different from web3.eth.sign which is deprecated
   - this posed initial issues with verification that have subsequently been resolved
     - we must use EthUtil.hashPersonalMessage() to have the right prefix for verfication
   - the thing we sign is called the **message**
   - the thing that is the output of signing is called the **signature**
-    - the signature is 132 characters long in hex. 132?
-      - the first 2 characters are '0x'
-      - the next 64 bytes make up what we call the 'r' and 's' part
-      - the last byte is the v part of the signature, which is this extra piece of data that *allows* ethereum to recover the publicKey
+    - the signature is 132 characters long in hex.
+      - without the 0x prefix it is 130 characters long or 65 bytes.
+      - the first 64 bytes make up what we call the 'r' and 's' part (32 bytes each)
+      - the last byte is used to derive the v part of the signature, which is this extra piece of data that *allows* ethereum to recover the publicKey
         - without it verification would not be possible
   - we use the message, signature, and publicAddress to perform *verification* as we will see in a little bit
   
@@ -201,10 +100,10 @@ web3.eth.personal
   })
 ```
 
-### Verification
-- we talked a lil above about the signature and how in verification we need these r, s, and v parts
+#### Verification
+- we talked a little about the signature above and how in verification we need these r, s, and v parts
 - r and s make up 64 bytes, each taking up 32 bytes or 64 chars each
-- v takes up the final byte
+- v is derived from the final byte
   - for example 1c (in hex) would be 28 in decimal
 - as seen in the following code we can derive this manually or just use ethereumjs to do so with EthUtil.fromRpcSig(signature)
 
@@ -217,7 +116,10 @@ web3.eth.personal
 ```
 > const sg = EthUtil.fromRpcSig(signature); // YES
 
-- these r, s, v parts are passed in the hash of the message (using keccak256) to recover the publicKey, which then we derive the publicAddress
+- these r, s, v parts are passed in to ecrecover along with the hash of the message (using keccak256) to recover the publicKey, which then we derive the publicAddress
+  - the public key is 64 byte which hashed (keccak256) becomes 32 bytes
+  - the last 20 bytes or 40 characters of the hash is the publicAddress
+  - we compare this 'recovered' publicAddress with the one stored in the db or found in the metamask account
   - here is the code:
 
 ```
@@ -240,11 +142,13 @@ EthUtil.toChecksumAddress(publicAddress)
 
 - when do we use this?
   1. we use it to authenticate / login
+    - in this case the message is nonce that we want the user to sign to verify identity
     - we use uuid() to generate a random string (**a nonce**) to have the user sign
     - by signing and then verifying the signature we can prove that the user has this public/private key pair
       - we don't have to rely on less secure salt + passwords
       - remember that this public key and the salsa public key are different things
         - separation of concerns between signing and verifying and encrypting/decrypting (we have no choice but to follow)
+          - allows for flexibility to adapt, if something changes on one end it doesn't affect the other
   2. for letter sending
     - we sign the letter after its been encrypted
     - therefore, we store the letterContents (encrypted) and the letterSignature (signature of the encrypted letter)
@@ -252,7 +156,172 @@ EthUtil.toChecksumAddress(publicAddress)
       - it should also be done at retrieving of the sent letter contents by the recipient but this would require an extra query for the writer's publicAddress to verify (Not Implemented)
 - there's a lot more to be said but these are the basics
 
-# Backend DbModels
+## RPC
+- we used REST API but cool stuff with **RPC**
+
+
+## Schema
+
+## Application Considerations / Tradeoffs
+- some food for thought, not comprehensive but a general overview of considerations
+
+### Decentralization v User Experience (UX)
+
+### FERPA Waiver
+
+### 1. PKI 2. Verification of Identity
+- step #1 is public key infrastructure; step #2 is verification of identity
+  - third-party oracles, reputation staking . . .
+
+### Time v. Complexity
+- MVP?
+
+### Being a Custodian
+- legal issues
+- managing other's smart wallet
+
+## React
+- typescript
+
+### React Hooks
+- didn't use but cool
+- functional
+
+## Tools & Links
+- React
+- React Bootstrap
+- Bootstrap
+- FontAwesome
+- Github
+- Trello
+- HackMD
+- Metamask
+- PgAdmin
+- NodePostgres
+- ExpressJS
+
+## Web3
+
+## Metamask
+
+## Solidity
+
+## Typechain
+
+## Truffle
+
+## Kotti
+
+## Frontend Interfaces
+
+### FileData
+
+- should be called letterData
+- letterUrl is the base64 string that you can pass into an embed, for example, to display the file
+- letterUrl is read using FileReader on File (**see** Web API for JS)
+- gets encrypted with jsonstringify (**see** CryptService.ts)
+- schema
+  letterTitle: string;
+  letterType: string;
+  letterUrl: string;
+
+### LetterContents (unused)
+
+- letterDetails + contents field
+- **see** letterDetails
+- schema
+  letterId: string;
+  contents: string;
+  letterRequestor: User;
+  letterWriter: User;
+  requestedAt: Date
+  uploadedAt: Date | null;
+
+### LetterDetails
+
+- interface used to populate list for requestor and writer
+- takes the necessary fields from the letters table
+- two timestamps: requestedAt and uploadedAt - uploadedAt can be null (if null then not uploaded) - the above information is useful for determining what to display
+- note that letterRequestor and letterWriter are the result of joins with the user table - **see** backend queries - joined on publicAddress (the primary key for an user - after the join, the queried data is passed through a constructor to create the User objects - frontend User interface and backend User dbmodel are the same
+- schema
+  letterId: string;
+  letterRequestor: User;
+  letterWriter: User;
+  requestedAt: Date
+  uploadedAt: Date | null;
+
+### LetterHistory
+
+- think of it as a join between letters and sent_letters in backend
+- letterDetails + letterRecipient (User) and sentAt (Date | null)
+- sentAt is useful information for determining whether or not the letterHistory has been sent to the user - writer is not allowed to re-upload a letter already sent to one or more recipients - history button for displaying all the recipients sent to
+- **see** letterDetails
+- schema
+  letterId: string;
+  letterRequestor: User;
+  letterWriter: User;
+  requestedAt: Date
+  uploadedAt: Date | null;
+  letterRecipient: User;
+  sentAt: Date | null;
+
+### User
+
+- basic user information (publicAddress, name)
+- used for other interfaces and keeping track of basic user info in lists
+- schema
+  publicAddress: string;
+  name: string;
+
+### UserAuth
+
+- basic user info + jwtToken
+- used for authentication (after signing and verification of nonce)
+- userAuth in the backend is similar except jwtToken is nonce (random string generated with UUID) - **see** verification of signature
+  - ecrecover, eth-sig-utils
+- backend passes back a jwtToken - expiration set tentatively for an hour - **see** [backend documentation
+- schema
+  publicAddress: string;
+  name: string;
+  jwtToken: string;
+- schema backend userAuth
+  publicAddress: string;
+  name: string;
+  nonce: string;
+
+### UserKey
+
+- basic user info + publicKey
+- note this is the key for salsa curve\* - **see** encryption, decryption, and signing
+- publicKey is used for decryption and encryption - for letter upload (encryption with writer's own public key) - for letter sending (encryption with each recipient's public key) - note this public key is not the same public key (hex) that you get from verifySignature in the backend - separation of concerns
+- schema
+  publicAddress: string;
+  name: string;
+  publicKey: string;
+
+### UserProfile -> user info for the profile page
+
+- currently only a few fields
+- intended to be whatever publicly displayed information on the userProfile page
+- not properly implemented / used
+- createdAt is when the user joined (created their account)
+- schema
+  publicAddress: string;
+  name: string;
+  profile_image: Buffer | null;
+
+      	createdAt: Date
+
+### RequestBody
+
+- (unused) for the format of the post requests
+- should be refactored to use this
+
+### ResponseBody
+
+- format of the response
+
+## Backend DbModels
 - how the backend was initially written and its limitations
   - kind of bulky and can be re-written
 - the idea behind the backend interfaces is we have these models that we construct from our queries and pass them in responses
@@ -284,12 +353,12 @@ static dbRowToDbModel(dbRow: any) {
 }
 ```
 
-## LetterContents
+### LetterContents
 - contents for writer's page
 - dbmodel
   letterContents: string | null;
 
-## Letter
+### Letter
 - equivalent to LetterDetails on the frontend
 - used for reuqestor and writer pages
 - dbmodel
@@ -299,7 +368,7 @@ static dbRowToDbModel(dbRow: any) {
   requestedAt: Date;
   uploadedAt: Date;
 
-## LetterHistory
+### LetterHistory
 - used for letter history and also the recipient page
 - basically a letter + letterRecipient (User) + sentAt (Date | null)
 - think of it as a join between the letters and sent_letters tables
@@ -312,13 +381,13 @@ static dbRowToDbModel(dbRow: any) {
   letterRecipient: User;
   sentAt: Date | null;
 
-## LetterRecipientContents
+### LetterRecipientContents
 - similar to LetterContents (backend) but with signature for verification
 - dbmodel
   letterContents: string | null;
   letterSignature: string | null;
 
-## SentLetter
+### SentLetter
 - used sparingly but the table is super important
 - dbmodel
   letterRecipient: string;
@@ -327,14 +396,14 @@ static dbRowToDbModel(dbRow: any) {
   letterContents: string;
   letterSignature: string;
 
-## User
+### User
 - basic user information
 - equivalent as User on frontend
 - dbmodel
   publicAddress: string;
   name: string;
 
-## UserAuth
+### UserAuth
 - similar to UserAuth on frontend except jwtToken -> nonce
 - we get the nonce from the db to be signed
     - the nonce should be reset after a verification (may or may not be implemented)
@@ -343,7 +412,7 @@ static dbRowToDbModel(dbRow: any) {
   name: string;
   nonce: string;
 
-## UserKey
+### UserKey
 - get the publicKey for encryption (letter sending)
 - equivalent to UserKey on frontend
 - dbmodel
@@ -351,7 +420,7 @@ static dbRowToDbModel(dbRow: any) {
   name: string;
   publicKey: string;
 
-## UserProfile
+### UserProfile
 - equivalent to UserProfile on frontend
 - intended to be all public information on a profile
 - dbmodel
@@ -359,22 +428,31 @@ static dbRowToDbModel(dbRow: any) {
   name: string;
   profileImage: Buffer | null;
   createdAt: Date;
+  
+## More on Backend (Considerations
+### Routes
+  - instead of taking time to document this, they are pretty clear as indicated by the express routes
+  - important to note is that many of the controller implementations are not that consistent in what they return on error
+    - some return an empty array, some return an emtpy object, some wrap the variable being returned in an object
+    - overall its consistency with the frontend that matters and more important deliverables came first
+    - note also that major refactoring can produce bugs,and you don't want to be breaking code a crucial moments (c'est un learning process')
+### JWTtoken / Session
+- we use a jwttoken, perhaps incorrectly, really a session?
 
-# Backend DbService
+### Backend Structure
+- the way we abstracted dbservice in the backend may not be best
+  - the backend should likely be redesigned to not be so bulky
+  - each new model required a new model and dbservice to be created
+- dbservice is the abstract class that each dbservice extends
+- we use node-postgres to connect to our heroku postgres database
+- the reason the large majority of routes are POSTS is we wanted to circumvent the issue of no headers for CORS testing
+  - this may not be the best decision but it was an easy fix for local testing
+  - the reason is that we needed to pass the jwttoken in the body
+  
+### Environnmental variables
+- there are certain environmental variables required before running the backend (also the frontend) for both testing locally and deployed
 
-# Backend JWT Authorization
-## JWTToken
-
-# Backend Queries
-
-# Backend Considerations
-## CORS & Local Testing
-## Backend Structure
-## Pooling
-## RPC
-- we used REST API but cool stuff with **RPC**
-
-# How to Run the Frontend
+## How to Run the Frontend
 
 ```
 // powershell
@@ -388,55 +466,6 @@ export REACT_APP_BACKEND_URL="https://verifiable-reference-letter.herokuapp.com"
 
 > npm start
 
-# How to Run the Backend
+## How to Run the Backend
 
 > npm build-ts; npm start;
-
-
-# Schema
-
-# Application Considerations / Tradeoffs
-- some food for thought, not comprehensive but a general overview of considerations
-
-## Decentralization v User Experience (UX)
-
-## FERPA Waiver
-
-## 1. PKI 2. Verification of Identity
-- step #1 is public key infrastructure; step #2 is verification of identity
-  - third-party oracles, reputation staking . . .
-
-## Time v. Complexity
-- MVP?
-
-## Being a Custodian
-- legal issues
-- managing other's smart wallet
-
-# React
-- typescript
-
-## React Hooks
-- didn't use but cool
-- functional
-
-# Tools & Links
-- React
-- React Bootstrap
-- Bootstrap
-- FontAwesome
-- Github
-- Trello
-- HackMD
-- Metamask
-- PgAdmin
-- NodePostgres
-- ExpressJS
-
-# Web3
-
-# Metamask
-
-# Solidity
-
-# Typechain
