@@ -437,7 +437,11 @@ static dbRowToDbModel(dbRow: any) {
     - overall its consistency with the frontend that matters and more important deliverables came first
     - note also that major refactoring can produce bugs,and you don't want to be breaking code a crucial moments (c'est un learning process')
 ### JWTtoken / Session
-- we use a jwttoken, perhaps incorrectly, really a session?
+- We issue a Json Web Token or JWT once a user has been authenticated
+- The tokens are signed using a secret that we just store plainly as text right now but should be changed to an envrionment variable
+- The JWT signs a payload which in our case is just the public address of the logged in user
+- This should be passed with every future request in order to continue hitting authourized routes
+- A token will expire after 1h, but is refreshed whenever a user shows activity by hitting a route again 
 
 ### Backend Structure
 - the way we abstracted dbservice in the backend may not be best
@@ -451,6 +455,16 @@ static dbRowToDbModel(dbRow: any) {
   
 ### Environnmental variables
 - there are certain environmental variables required before running the backend (also the frontend) for both testing locally and deployed
+
+```
+// powershell
+$Env:SENDGRID_API_KEY="SG.GH...."
+$Env:DATABASE_URL="postgres://.."
+
+// bash
+export SENDGRID_API_KEY="SG.GH...."
+export DATABASE_URL="postgres://.."
+```
 
 ## How to Run the Frontend
 
