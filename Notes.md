@@ -158,51 +158,114 @@ EthUtil.toChecksumAddress(publicAddress)
 
 ## RPC
 - we used REST API but cool stuff with **RPC**
+- see hackmd for further links
+
+# Links
 
 
-## Schema
-
-## Application Considerations / Tradeoffs
+## Tradeoffs and Considerations
 - some food for thought, not comprehensive but a general overview of considerations
 
-### Decentralization v User Experience (UX)
+### Time v Complexity
+- with the limited time of 2 semesters, what is the best plan forward to get tangible deliverables while also learning a lot
+- making something with complexity in a short period of time
+- we decided for MVP to focus on public key infrastructure + metamask and getting the core functionality of our app
+  - instead of making a custodian wallet or writing smart contracts to put 
+  
 
-### FERPA Waiver
+### Decentralization/Security vs. User Experience (UX)
+- for our mvp, the burden remained on the writer to take action to send to recipients
+- want to make it more decentralized
+- also want to make the experience as simple, convenient, and intuitive as possible
+  - adding tooltips and pointers to help guide users
+  - adding tutorials and FAQ and home page
+  - adding quality of life changes to improve UX
 
-### 1. PKI 2. Verification of Identity
+## FERPA Waiver
+- students in our use case (grad schools) are required to waive their ferpa rights which gives access to view education resources including letters of recommendation
+- we assume this in making sure that students cannot view the letter of recommendation
+
+## Future Considerations
+
+### Verification of Identity
+- our MVP comprises step 1, implementing public key infrastructure
 - step #1 is public key infrastructure; step #2 is verification of identity
-  - third-party oracles, reputation staking . . .
-
-### Time v. Complexity
-- MVP?
+- for our MVP, we did
+- ideas explored for tackling the verification fo identity include
+  - third-party oracles
+  - reputation staking
 
 ### Being a Custodian
 - legal issues
+  - since you're now dealing with money and legal disputes
 - managing other's smart wallet
+  - managing public private key pairs
+
+### Transactions on Chain
+- who pays for the transactions
+- there is a new technology where you can pay gas fees on another entities behalf
+- 
+
+### RPC
+- instead of REST API (more familiar)
+- JSONRPC, OpenRPC
+
 
 ## React
-- typescript
+- Typescript recommended
+- react-scripts
+- using hooks?
+- stop using too many modals
+  - use more intuitive user design (unlike our MVP)
 
 ### React Hooks
-- didn't use but cool
-- functional
+- didn't use but should consider
+- functional instead of using components
+- if using components
+  - leverage the idea of components
+  - does this component need state?
+  - you want more stateless components that just display things
 
-## Tools & Links
-- React
-- React Bootstrap
-- Bootstrap
-- FontAwesome
-- Github
-- Trello
-- HackMD
-- Metamask
-- PgAdmin
-- NodePostgres
-- ExpressJS
-
-## Web3
+## Links
+Fontawesome
+https://fontawesome.com/how-to-use/on-the-web/styling/sizing-icons
+Bootstrap
+https://getbootstrap.com/docs/4.0/utilities/text/					
+Trello
+React Bootstrap
+https://react-bootstrap.netlify.app/utilities/transitions/#collapse		
+The Typeahead for React Bootstrap
+http://ericgio.github.io/react-bootstrap-typeahead/#basic-example			
+Metamask Other RPC Methods (encryption/decryption)
+https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods	
+PGAdmin
+https://www.pgadmin.org/download/							
+1-click metamask Flow (our login flow)
+https://www.toptal.com/ethereum/one-click-login-flows-a-metamask-tutorial					
+Express JS				
+https://expressjs.com/en/api.html			
+HackMD (for Notes)
+https://hackmd.io/?nav=overview		
+SRC code
+https://github.com/Verifiable-Reference-Letter				
+SQL fiddle (SQL playground)
+http://sqlfiddle.com/							
+PostgreSQL Documentation
+https://www.postgresql.org/docs/9.5/sql-insert.html			
+Typescript Documentation
+https://www.typescriptlang.org/docs/handbook/react.html				
+Heroku
+https://data.heroku.com/							
+Web3JS Documentation
+https://web3js.readthedocs.io/en/v1.2.0/web3-eth.html			
+Eth-Sig-Utils
+https://github.com/MetaMask/eth-sig-util							
 
 ## Metamask
+- browser extension that serves as wallet to connect to networks
+- manages a public private key pair
+- unique public address
+- see links for documentation
 
 ## Solidity
 
@@ -437,11 +500,7 @@ static dbRowToDbModel(dbRow: any) {
     - overall its consistency with the frontend that matters and more important deliverables came first
     - note also that major refactoring can produce bugs,and you don't want to be breaking code a crucial moments (c'est un learning process')
 ### JWTtoken / Session
-- We issue a Json Web Token or JWT once a user has been authenticated
-- The tokens are signed using a secret that we just store plainly as text right now but should be changed to an envrionment variable
-- The JWT signs a payload which in our case is just the public address of the logged in user
-- This should be passed with every future request in order to continue hitting authourized routes
-- A token will expire after 1h, but is refreshed whenever a user shows activity by hitting a route again 
+- we use a jwttoken, perhaps incorrectly, really a session?
 
 ### Backend Structure
 - the way we abstracted dbservice in the backend may not be best
@@ -455,16 +514,6 @@ static dbRowToDbModel(dbRow: any) {
   
 ### Environnmental variables
 - there are certain environmental variables required before running the backend (also the frontend) for both testing locally and deployed
-
-```
-// powershell
-$Env:SENDGRID_API_KEY="SG.GH...."
-$Env:DATABASE_URL="postgres://.."
-
-// bash
-export SENDGRID_API_KEY="SG.GH...."
-export DATABASE_URL="postgres://.."
-```
 
 ## How to Run the Frontend
 
