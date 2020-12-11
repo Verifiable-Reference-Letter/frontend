@@ -2,8 +2,10 @@ Notes written by Brian Zhao November - December 2020
 
 # Documentation
 
-To whoever may view these notes.
-These are more in-depth notes about some key aspects of the project. It might be best to start with an overview of the project before diving straight in. See advisors and/or drive.
+- to whoever may view these notes.
+- these are more in-depth notes about some key aspects of the project
+- it might be best to start with an overview of the project before diving straight in
+- see advisors and drive and presentation.
 
 ## Public Key Infrastructure
 
@@ -156,10 +158,6 @@ EthUtil.toChecksumAddress(publicAddress)
       - it should also be done at retrieving of the sent letter contents by the recipient but this would require an extra query for the writer's publicAddress to verify (Not Implemented)
 - there's a lot more to be said but these are the basics
 
-## RPC
-- we used REST API but cool stuff with **RPC**
-- see hackmd for further links
-
 ## Tradeoffs and Considerations
 - some food for thought, not comprehensive but a general overview of considerations
 
@@ -178,7 +176,7 @@ EthUtil.toChecksumAddress(publicAddress)
   - adding tutorials and FAQ and home page
   - adding quality of life changes to improve UX
 
-## FERPA Waiver
+### FERPA Waiver
 - students in our use case (grad schools) are required to waive their ferpa rights which gives access to view education resources including letters of recommendation
 - we assume this in making sure that students cannot view the letter of recommendation
 
@@ -204,9 +202,8 @@ EthUtil.toChecksumAddress(publicAddress)
 - 
 
 ### RPC
-- instead of REST API (more familiar)
+- instead of REST API
 - JSONRPC, OpenRPC
-
 
 ## React
 - Typescript recommended
@@ -223,40 +220,135 @@ EthUtil.toChecksumAddress(publicAddress)
   - does this component need state?
   - you want more stateless components that just display things
 
-## Links
+## Links & More
+
 Fontawesome
 https://fontawesome.com/how-to-use/on-the-web/styling/sizing-icons
+
 Bootstrap
 https://getbootstrap.com/docs/4.0/utilities/text/					
+
 Trello
+https://trello.com/
+
 React Bootstrap
 https://react-bootstrap.netlify.app/utilities/transitions/#collapse		
+
 The Typeahead for React Bootstrap
-http://ericgio.github.io/react-bootstrap-typeahead/#basic-example			
+http://ericgio.github.io/react-bootstrap-typeahead/#basic-example	
+
 Metamask Other RPC Methods (encryption/decryption)
 https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods	
+
 PGAdmin
-https://www.pgadmin.org/download/							
+https://www.pgadmin.org/download/					
+
 1-click metamask Flow (our login flow)
-https://www.toptal.com/ethereum/one-click-login-flows-a-metamask-tutorial					
+https://www.toptal.com/ethereum/one-click-login-flows-a-metamask-tutorial		
+
 Express JS				
-https://expressjs.com/en/api.html			
+https://expressjs.com/en/api.html	
+
+Typescript
+https://typescript.org
+
 HackMD (for Notes)
 https://hackmd.io/?nav=overview		
-SRC code
-https://github.com/Verifiable-Reference-Letter				
+
 SQL fiddle (SQL playground)
 http://sqlfiddle.com/							
+
 PostgreSQL Documentation
-https://www.postgresql.org/docs/9.5/sql-insert.html			
+https://www.postgresql.org/docs/9.5/sql-insert.html		
+
 Typescript Documentation
-https://www.typescriptlang.org/docs/handbook/react.html				
+https://www.typescriptlang.org/docs/handbook/react.html		
+
 Heroku
-https://data.heroku.com/							
+https://data.heroku.com/						
+
 Web3JS Documentation
-https://web3js.readthedocs.io/en/v1.2.0/web3-eth.html			
+https://web3js.readthedocs.io/en/v1.2.0/web3-eth.html	
+
 Eth-Sig-Utils
-https://github.com/MetaMask/eth-sig-util							
+https://github.com/MetaMask/eth-sig-util
+
+OpenRPC
+https://open-rpc.org/
+https://github.com/open-rpc/server-js
+https://github.com/open-rpc/generator-client
+https://inspector.open-rpc.org/
+http://spec.playground.org
+
+JSONRPC
+https://www.jsonrpc.org/specification
+
+Coregeth
+https://github.com/etclabscore/core-geth
+
+MermaidJS (for diagrams)
+https://mermaid-js.github.io/mermaid/#/
+
+OpenZepplin (smart contract library, updating smart contracts)
+https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies
+
+Testnet, Slither, Mythril, Consensys/Mythx (smart contract auditing)
+https://github.com/ConsenSys/mythx-playground
+https://github.com/ConsenSys/mythril
+https://cwe.mitre.org/data/definitions/696.html
+https://github.com/Z3Prover/z3
+
+EIP ERC-725
+https://github.com/ethereum/EIPs/issues/725
+
+Storj Labs (storage, like AWS but decentralized, ancient-server)
+https://storj.io/
+
+PBKDF2
+https://en.wikipedia.org/wiki/PBKDF2
+
+ETC Signatory
+https://github.com/etclabscore/signatory/blob/master/src/lib/sign.test.ts
+
+ETC Pristine (open source best practices)
+https://github.com/etclabscore/pristine
+
+Truffle
+https://github.com/trufflesuite/truffle
+
+Typechain
+https://github.com/ethereum-ts/TypeChain
+https://blog.neufund.org/introducing-typechain-typescript-bindings-for-ethereum-smart-contracts-839fc2becf22
+
+Chainid
+https://chainid.network/
+
+Remix (IDE)
+https://remix.ethereum.org/#optimize=false&evmVersion=null&version=soljson-v0.6.1+commit.e6f7d5a4.js
+
+PlayStudio (IDE)
+https://studio.ethereum.org/
+
+Solc (solidity compiler)
+https://https://solidity.readthedocs.io/en/v0.6.2
+
+Vyper
+https://github.com/vyperlang/vyper)
+
+Solidity (smart contracts)
+https://ninabreznik.github.io/workshop-solidity/
+
+Ethereum
+https://github.com/ethereumbook/ethereumbook
+
+Eserialize
+https://eserialize.com/?input=string&output=hex)
+
+PKI
+https://ethereumclassic.org/blog/2017-04-18-keys
+
+Formatic (similar to oauth)
+https://fortmatic.com
 
 ## Metamask
 - browser extension that serves as wallet to connect to networks
@@ -265,25 +357,12 @@ https://github.com/MetaMask/eth-sig-util
 - see links for documentation
 
 ## Solidity
-- solidity is the primary language used to write etheruem smart contracts. There is plenty of online documentation and tutorials to help learn it. We have included a couple links we find helpful here.
-- https://cryptozombies.io/ 
-- https://docs.soliditylang.org/en/v0.5.3/solidity-by-example.html
 
 ## Typechain
-- Typechain provides TypeScript bindings for Ethereum smart contracts. This adds a layer of safety that you wouldn't have without static typing
-- Unfortunately at the time of writting there isnt a ton of great learning resources, so the best place is the readme which is here: https://github.com/ethereum-ts/TypeChain
-- Our project was actually initially configured with typechain, though it might need some changes to get it working again. We set it up using typechain-truffle
 
 ## Truffle
-- truffle provides multiple handy tools to help in smart contract development.
-- https://www.trufflesuite.com/
-- Super userful to use for testing, migrations, compilation, and deploying of smart contracts
-- The have a test blockchain, Ganache, that you can run locally to do local testing
 
 ## Kotti
-- Kotti is the testnet for the Ethereum classic blockchain.
-- Kotti can be retreived here: http://kottifaucet.me/ and is good for testing so you dont spend any real money
-- https://blockscout.com/etc/kotti is a block explorer website that allows you to explore blockchain networks (including Kotti)
 
 ## Frontend Interfaces
 
@@ -394,6 +473,37 @@ https://github.com/MetaMask/eth-sig-util
 
 - format of the response
 
+## Create Schema
+
+```
+create table users (
+	public_address		varchar(42)	not null,
+	name			varchar(32)	not null,
+  email			varchar(64)	not null,
+	profile_image           bytea,
+	created_at		timestamp 	not null,
+	nonce			varchar(64)	not null,
+	primary key (public_address)
+);
+create table letters (
+	letter_id		varchar(36)	not null,
+	letter_contents		varchar(380),    
+	letter_writer 		varchar(42)	not null references users(public_address),
+	letter_requestor	varchar(42)	not null references users(public_address),
+	requested_at		timestamp 	not null,
+	uploaded_at             timestamp, 		
+	primary key (letter_id)
+);
+create table sent_letters (
+	letter_recipient	varchar(42) 	not null references users(public_address),
+	letter_id 		varchar(36)	not null references letters(letter_id),
+  sent_at                 timestamp, 		        
+  letter_contents         bytea,
+  letter_signature        varchar(132),
+	primary key (letter_recipient, letter_id)
+);
+```
+
 ## Backend DbModels
 - how the backend was initially written and its limitations
   - kind of bulky and can be re-written
@@ -502,13 +612,16 @@ static dbRowToDbModel(dbRow: any) {
   profileImage: Buffer | null;
   createdAt: Date;
   
-## More on Backend (Considerations
+
+## More on Backend
+
 ### Routes
   - instead of taking time to document this, they are pretty clear as indicated by the express routes
   - important to note is that many of the controller implementations are not that consistent in what they return on error
     - some return an empty array, some return an emtpy object, some wrap the variable being returned in an object
     - overall its consistency with the frontend that matters and more important deliverables came first
     - note also that major refactoring can produce bugs,and you don't want to be breaking code a crucial moments (c'est un learning process')
+    
 ### JWTtoken / Session
 - we use a jwttoken, perhaps incorrectly, really a session?
 
