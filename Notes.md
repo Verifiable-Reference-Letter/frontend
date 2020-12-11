@@ -160,9 +160,6 @@ EthUtil.toChecksumAddress(publicAddress)
 - we used REST API but cool stuff with **RPC**
 - see hackmd for further links
 
-# Links
-
-
 ## Tradeoffs and Considerations
 - some food for thought, not comprehensive but a general overview of considerations
 
