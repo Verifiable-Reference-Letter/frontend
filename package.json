@@ -21,7 +21,7 @@
     "@types/react-dom": "^16.9.5",
     "@types/underscore": "^1.9.4",
     "husky": "^4.2.3",
-    "lite-server": "^2.3.0",
+    "lite-server": "^2.6.1",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
     "react-scripts": "^3.4.0",
@@ -71,7 +71,7 @@
     "reactjs-popup": "^1.5.0",
     "redux": "^4.0.5",
     "scrypt": "^6.0.3",
-    "truffle": "^5.1.15",
+    "truffle": "^5.10.2",
     "typechain-target-web3-v1": "^1.0.0",
     "video-react": "^0.14.1",
     "web3": "^1.2.4"
